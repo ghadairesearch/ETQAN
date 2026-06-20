@@ -287,6 +287,8 @@ EN_TRANSLATIONS = {
     'home.plo_description': 'Measure PLO attainment by aggregating course-level evidence and generate PLO performance reports.',
     'home.course_report_title': 'Course Report',
     'home.course_report_description': 'Generate an NCAAA-aligned course report using CLO attainment results and course performance data.',
+    'home.no_courses_message': 'Welcome to ETQAN. Start by adding your first course.',
+    'home.add_course': 'Add Course',
     'course_report.select_description': 'Select a course to generate its course report.',
     'course_report.need_clo_report': 'To create a course report, you need a CLO attainment report first.',
     'course_report.create_clo_prompt': 'Would you like to create one now?',
@@ -588,7 +590,7 @@ EN_TRANSLATIONS = {
     'history.delete': 'Delete',
     'history.delete_confirm': 'Are you sure you want to delete this report? This action cannot be undone.',
     'history.deleted': 'Report deleted.',
-    'history.empty': 'No saved reports yet. Generate a report while logged in to save it here.',
+    'history.empty': 'No saved reports yet. Create a report from the services page to save it here.',
     'billing.title': 'Subscriptions',
     'billing.description': '',
     'billing.free_status': 'Free reports used',
@@ -657,7 +659,7 @@ EN_TRANSLATIONS = {
     'contact.attachment': 'Attach file',
     'contact.attachment_help': 'CSV, PDF, and image files only.',
     'contact.submit': 'Submit Enquiry',
-    'contact.sent': 'Enquiry logged locally. Please wire up an email or CRM service before production use.',
+    'contact.sent': 'Your enquiry has been submitted successfully. We will contact you soon.',
     'contact.invalid_attachment': 'Contact attachment must be a CSV, PDF, or image file.',
     'contact.university_subscription_subject': 'University Subscription Enquiry',
     'contact.enquiry_type': 'Type of Enquiry',
@@ -744,6 +746,8 @@ TRANSLATIONS = {
         'home.plo_description': 'قياس تحقق مخرجات تعلم البرنامج من خلال تحليل أدلة المقررات وإنشاء تقرير أداء مخرجات تعلم البرنامج.',
         'home.course_report_title': 'تقرير المقرر',
         'home.course_report_description': 'إنشاء تقرير مقرر متوافق مع نموذج NCAAA باستخدام نتائج تحليل تحقق مخرجات التعلم وبيانات أداء المقرر.',
+        'home.no_courses_message': 'مرحباً بك في إتقان. ابدأ بإضافة مقررك الأول.',
+        'home.add_course': 'إضافة مقرر',
         'course_report.select_description': '\u0627\u062e\u062a\u0631 \u0645\u0642\u0631\u0631\u0627\u064b \u0644\u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631\u0647.',
         'course_report.need_clo_report': '\u0644\u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631\u060c \u062a\u062d\u062a\u0627\u062c \u0623\u0648\u0644\u0627\u064b \u0625\u0644\u0649 \u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'course_report.create_clo_prompt': '\u0647\u0644 \u062a\u0631\u063a\u0628 \u0628\u0625\u0646\u0634\u0627\u0621 \u0648\u0627\u062d\u062f \u0627\u0644\u0622\u0646\u061f',
@@ -1045,7 +1049,7 @@ TRANSLATIONS = {
         'history.delete': 'حذف',
         'history.delete_confirm': 'هل أنت متأكد من حذف هذا التقرير؟ لا يمكن التراجع عن هذا الإجراء.',
         'history.deleted': 'تم حذف التقرير.',
-        'history.empty': 'لا توجد تقارير محفوظة بعد. أنشئ تقرير تحقق نواتج التعلم أثناء تسجيل الدخول لحفظه هنا.',
+        'history.empty': 'لا توجد تقارير محفوظة بعد. أنشئ تقرير من صفحة الخدمات لحفظه هنا.',
         'billing.title': 'الاشتراكات',
         'billing.description': '',
         'billing.free_status': 'التقارير المجانية المستخدمة',
@@ -1114,7 +1118,7 @@ TRANSLATIONS = {
         'contact.attachment': 'إرفاق ملف',
         'contact.attachment_help': 'ملفات CSV وPDF والصور فقط.',
         'contact.submit': 'إرسال',
-        'contact.sent': 'تم تسجيل الطلب محلياً. يرجى ربط خدمة بريد إلكتروني أو CRM قبل الاستخدام الإنتاجي.',
+        'contact.sent': 'تم إرسال طلبك بنجاح. سنتواصل معك قريباً.',
         'contact.invalid_attachment': 'يجب أن يكون مرفق التواصل ملف CSV أو PDF أو صورة.',
         'contact.university_subscription_subject': 'استفسار عن اشتراك جامعة',
         'contact.enquiry_type': 'نوع الاستفسار',
@@ -9252,7 +9256,6 @@ def register():
                 raise
             flash("An account already exists for this email.", "error")
             return redirect(url_for('login'))
-        flash("Account created. Your generated reports will be saved in My Reports.")
         return redirect(url_for('index'))
     return render_template('auth.html', title='Create Account', button_label='Create Account', mode='register')
 
@@ -10245,7 +10248,15 @@ def save_question_clos():
 
 @app.route('/')
 def index():
-    return render_template('service_home.html')
+    user = current_user()
+    saved_course_count = 0
+    if user:
+        with get_db() as conn:
+            saved_course_count = conn.execute(
+                "SELECT COUNT(*) AS count FROM user_courses WHERE user_id = ?",
+                (user['id'],)
+            ).fetchone()['count']
+    return render_template('service_home.html', saved_course_count=saved_course_count)
 
 @app.route('/plo-analysis', methods=['GET', 'POST'])
 def plo_analysis_service():

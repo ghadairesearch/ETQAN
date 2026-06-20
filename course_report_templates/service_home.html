@@ -79,6 +79,24 @@
         margin: 0;
     }
 
+    .welcome-course-callout {
+        border: 1px solid rgba(38, 54, 95, 0.18);
+        border-radius: 8px;
+        background: #f8fafc;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .welcome-course-callout p {
+        margin: 0;
+        color: var(--text-main);
+        font-weight: 600;
+    }
+
     @media (max-width: 720px) {
         .service-grid {
             grid-template-columns: 1fr;
@@ -89,6 +107,13 @@
 
 <div class="card">
     <div class="service-home">
+        {% if current_user and saved_course_count == 0 %}
+            <div class="welcome-course-callout">
+                <p>{{ _('home.no_courses_message') }}</p>
+                <a href="{{ url_for('new_course') }}" class="btn">{{ _('home.add_course') }}</a>
+            </div>
+        {% endif %}
+
         <section class="service-level">
             <div class="service-level-header">
                 <h3>{{ _('home.course_level') }}</h3>

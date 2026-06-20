@@ -96,17 +96,17 @@
 </style>
 <div class="card">
     <h2 style="margin-top: 0;">{{ _('history.title') }}</h2>
-    {% if reports %}
-        <table>
-            <thead>
-                <tr>
-                    <th>{{ _('history.report') }}</th>
-                    <th>{{ _('history.course') }}</th>
-                    <th>{{ _('history.created') }}</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
+    <table>
+        <thead>
+            <tr>
+                <th>{{ _('history.report') }}</th>
+                <th>{{ _('history.course') }}</th>
+                <th>{{ _('history.created') }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if reports %}
                 {% for report in reports %}
                 <tr>
                     <td>
@@ -160,11 +160,15 @@
                     </td>
                 </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="alert">{{ _('history.empty') }}</div>
-    {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="4" style="color: var(--text-muted); text-align: center; padding: 1.25rem;">
+                        {{ _('history.empty') }}
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
