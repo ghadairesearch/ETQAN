@@ -14,9 +14,14 @@ RESEND_API_KEY=<Resend API key>
 RESEND_FROM_EMAIL=onboarding@resend.dev
 CONTACT_TO_EMAIL=ghad.ai.research@gmail.com
 APP_PUBLIC_URL=https://your-etqan-service.onrender.com
+GEMINI_API_KEY=<Gemini API key for fast course specification extraction>
+GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MAX_INLINE_BYTES=18874368
 ```
 
 For production email, verify your own domain in Resend and replace `RESEND_FROM_EMAIL` with an address on that domain. `onboarding@resend.dev` is useful for initial testing.
+
+Gemini Flash is used as the first pass for readable/scanned PDF course specifications when `GEMINI_API_KEY` is set. If Gemini is unavailable, returns incomplete data, or the PDF is larger than `GEMINI_MAX_INLINE_BYTES`, ETQAN falls back to the existing embedded-text and OCR extraction pipeline.
 
 Recommended Render setup:
 

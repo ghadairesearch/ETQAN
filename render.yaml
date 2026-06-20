@@ -21,6 +21,12 @@ services:
         value: /var/data/uploads
       - key: ORG_LOGO_FOLDER
         value: /var/data/uploads/organization_logos
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash
+      - key: GEMINI_MAX_INLINE_BYTES
+        value: "18874368"
 
 databases:
   - name: etqan-postgres

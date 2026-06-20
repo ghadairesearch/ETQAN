@@ -12,6 +12,7 @@ import hashlib
 import shutil
 import subprocess
 import urllib.error
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 import secrets
@@ -53,6 +54,14 @@ def load_local_env_file():
 
 load_local_env_file()
 
+
+def int_env(name, default):
+    try:
+        return int(os.environ.get(name) or default)
+    except (TypeError, ValueError):
+        return default
+
+
 app = Flask(__name__, template_folder='course_report_templates', static_folder='public')
 app.secret_key = os.environ.get('SECRET_KEY') or 'super_secret_key_for_course_report'
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
@@ -63,6 +72,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 APP_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PDF_TEXT_CACHE = {}
 PDF_TEXT_CACHE_MAX_ITEMS = 64
+GEMINI_SPEC_CACHE = {}
+GEMINI_SPEC_CACHE_MAX_ITEMS = 32
 DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
 APP_PUBLIC_URL = os.environ.get('APP_PUBLIC_URL', '').strip().rstrip('/')
 ADMIN_EMAILS = {
@@ -78,10 +89,19 @@ SMTP_FROM_EMAIL = os.environ.get('SMTP_FROM_EMAIL', '').strip() or SMTP_USERNAME
 SMTP_FROM_NAME = os.environ.get('SMTP_FROM_NAME', 'ETQAN').strip() or 'ETQAN'
 SMTP_USE_SSL = os.environ.get('SMTP_USE_SSL', '').strip().lower() in {'1', 'true', 'yes', 'on'}
 SMTP_USE_TLS = os.environ.get('SMTP_USE_TLS', 'true').strip().lower() not in {'0', 'false', 'no', 'off'}
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '').strip()
+GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-3.5-flash').strip() or 'gemini-3.5-flash'
+GEMINI_MAX_INLINE_BYTES = int_env('GEMINI_MAX_INLINE_BYTES', 18 * 1024 * 1024)
 SMTP_TIMEOUT_SECONDS = int(os.environ.get('SMTP_TIMEOUT_SECONDS') or 10)
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '').strip()
 RESEND_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', '').strip() or SMTP_FROM_EMAIL
 CONTACT_TO_EMAIL = os.environ.get('CONTACT_TO_EMAIL', '').strip()
+LOGIN_FAILURE_WINDOW_MINUTES = 15
+LOGIN_EMAIL_FAILURE_LIMIT = 5
+LOGIN_IP_FAILURE_LIMIT = 20
+LOGIN_DISTINCT_EMAIL_LIMIT = 10
+LOGIN_LOCK_MINUTES = 15
+LOGIN_ESCALATED_LOCK_MINUTES = 60
 COURSE_REPORT_TEMPLATE_PATH = os.path.join(APP_BASE_DIR, 'course_report_templates', 'TP-154 Course Report - Eng.docx')
 COURSE_IMPROVEMENT_RECOMMENDATIONS = [
     'Improve student performance in CLOs',
@@ -337,6 +357,8 @@ EN_TRANSLATIONS = {
     'auth.reset_sent': 'If the email exists, a password reset link has been sent.',
     'auth.reset_email_unconfigured': 'Email delivery is not configured yet. Please set SMTP settings before sending reset emails.',
     'auth.reset_email_failed': 'We could not send the reset email right now. Please try again later.',
+    'auth.login_locked_email': 'Too many failed login attempts for this email. Please try again later.',
+    'auth.login_locked_ip': 'Too many failed login attempts from this network. Please try again later.',
     'auth.new_password': 'New Password',
     'auth.confirm_password': 'Confirm Password',
     'auth.reset_button': 'Update Password',
@@ -431,7 +453,7 @@ EN_TRANSLATIONS = {
     'courses.extract_missing': 'Upload a course specification first.',
     'courses.extracted': 'Course information extracted. Review it, then click Save Course.',
     'courses.save': 'Save Course',
-    'courses.empty': 'No saved courses yet.',
+    'courses.empty': 'No saved courses yet. Add a course from the home page.',
     'courses.delete': 'Delete',
     'courses.delete_confirm': 'Delete this saved course?',
     'courses.saved': 'Course saved.',
@@ -606,7 +628,7 @@ EN_TRANSLATIONS = {
     'history.delete': 'Delete',
     'history.delete_confirm': 'Are you sure you want to delete this report? This action cannot be undone.',
     'history.deleted': 'Report deleted.',
-    'history.empty': 'No saved reports yet. Create a report from the services page to save it here.',
+    'history.empty': 'No saved reports yet. Create a report from the home page.',
     'billing.title': 'Subscriptions',
     'billing.description': '',
     'billing.free_status': 'Free reports used',
@@ -812,6 +834,8 @@ TRANSLATIONS = {
         'auth.reset_sent': 'إذا كان البريد مسجلاً، فقد تم إرسال رابط إعادة تعيين كلمة المرور.',
         'auth.reset_email_unconfigured': 'إرسال البريد غير مفعّل حالياً. يرجى إعداد SMTP قبل إرسال روابط إعادة التعيين.',
         'auth.reset_email_failed': 'تعذر إرسال بريد إعادة التعيين حالياً. يرجى المحاولة لاحقاً.',
+        'auth.login_locked_email': 'حدثت محاولات تسجيل دخول فاشلة كثيرة لهذا البريد. يرجى المحاولة لاحقاً.',
+        'auth.login_locked_ip': 'حدثت محاولات تسجيل دخول فاشلة كثيرة من هذه الشبكة. يرجى المحاولة لاحقاً.',
         'auth.new_password': 'كلمة المرور الجديدة',
         'auth.confirm_password': 'تأكيد كلمة المرور',
         'auth.reset_button': 'تحديث كلمة المرور',
@@ -906,7 +930,7 @@ TRANSLATIONS = {
         'courses.topics': '\u0645\u0648\u0636\u0648\u0639\u0627\u062a \u0627\u0644\u0645\u0642\u0631\u0631',
         'courses.topics_placeholder': '\u0623\u062f\u062e\u0644 \u0645\u0648\u0636\u0648\u0639\u0627\u062a \u0627\u0644\u0645\u0642\u0631\u0631\u060c \u0643\u0644 \u0645\u0648\u0636\u0648\u0639 \u0641\u064a \u0633\u0637\u0631',
         'courses.save': 'حفظ المقرر',
-        'courses.empty': 'لا توجد مقررات محفوظة بعد.',
+        'courses.empty': 'لا توجد مقررات محفوظة بعد. أضف مقررًا من الصفحة الرئيسية.',
         'courses.delete': 'حذف',
         'courses.delete_confirm': 'حذف هذا المقرر المحفوظ؟',
         'courses.saved': 'تم حفظ المقرر.',
@@ -1081,7 +1105,7 @@ TRANSLATIONS = {
         'history.delete': 'حذف',
         'history.delete_confirm': 'هل أنت متأكد من حذف هذا التقرير؟ لا يمكن التراجع عن هذا الإجراء.',
         'history.deleted': 'تم حذف التقرير.',
-        'history.empty': 'لا توجد تقارير محفوظة بعد. أنشئ تقرير من صفحة الخدمات لحفظه هنا.',
+        'history.empty': 'لا توجد تقارير محفوظة بعد. أنشئ تقرير من الصفحة الرئيسية.',
         'billing.title': 'الاشتراكات',
         'billing.description': '',
         'billing.free_status': 'التقارير المجانية المستخدمة',
@@ -1491,6 +1515,7 @@ def get_db():
 
 
 def get_table_columns(conn, table_name):
+    validate_sql_identifier(table_name)
     rows = conn.execute(
         """
         SELECT column_name
@@ -1503,9 +1528,18 @@ def get_table_columns(conn, table_name):
     return {row['column_name'] for row in rows}
 
 
+def validate_sql_identifier(value):
+    value = str(value or '')
+    if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', value):
+        raise ValueError("Invalid SQL identifier.")
+    return value
+
+
 def add_missing_columns(conn, table_name, columns):
+    table_name = validate_sql_identifier(table_name)
     existing_columns = get_table_columns(conn, table_name)
     for column, definition in columns.items():
+        column = validate_sql_identifier(column)
         if column not in existing_columns:
             conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {column} {definition}")
 
@@ -1617,6 +1651,26 @@ def init_postgres_db(conn):
             created_at TEXT NOT NULL
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS login_failures (
+            id SERIAL PRIMARY KEY,
+            email TEXT DEFAULT '',
+            ip_address TEXT DEFAULT '',
+            attempted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS login_locks (
+            id SERIAL PRIMARY KEY,
+            lock_type TEXT NOT NULL,
+            lock_key TEXT NOT NULL,
+            locked_until TIMESTAMP NOT NULL,
+            lock_count INTEGER DEFAULT 1,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(lock_type, lock_key)
+        )
+    """)
 
 
 def init_db():
@@ -1666,6 +1720,97 @@ def is_admin_user(user=None):
     if not user:
         return False
     return str(user['email'] or '').strip().lower() in ADMIN_EMAILS
+
+def get_client_ip():
+    forwarded = request.headers.get('X-Forwarded-For', '')
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+    return request.remote_addr or ''
+
+def login_window_start():
+    return datetime.utcnow() - timedelta(minutes=LOGIN_FAILURE_WINDOW_MINUTES)
+
+def get_active_login_lock(conn, lock_type, lock_key):
+    if not lock_key:
+        return None
+    return conn.execute(
+        """
+        SELECT *
+          FROM login_locks
+         WHERE lock_type = ?
+           AND lock_key = ?
+           AND locked_until > CURRENT_TIMESTAMP
+        """,
+        (lock_type, lock_key)
+    ).fetchone()
+
+def upsert_login_lock(conn, lock_type, lock_key, minutes):
+    if not lock_key:
+        return
+    locked_until = datetime.utcnow() + timedelta(minutes=minutes)
+    now = datetime.utcnow()
+    conn.execute(
+        """
+        INSERT INTO login_locks (lock_type, lock_key, locked_until, lock_count, created_at, updated_at)
+        VALUES (?, ?, ?, 1, ?, ?)
+        ON CONFLICT (lock_type, lock_key)
+        DO UPDATE SET
+            locked_until = EXCLUDED.locked_until,
+            lock_count = login_locks.lock_count + 1,
+            updated_at = EXCLUDED.updated_at
+        """,
+        (lock_type, lock_key, locked_until, now, now)
+    )
+
+def login_lock_minutes_for_email(conn, email):
+    row = conn.execute(
+        "SELECT lock_count FROM login_locks WHERE lock_type = 'email' AND lock_key = ?",
+        (email,)
+    ).fetchone()
+    if row and int(row['lock_count'] or 0) >= 1:
+        return LOGIN_ESCALATED_LOCK_MINUTES
+    return LOGIN_LOCK_MINUTES
+
+def evaluate_login_lock(conn, email, ip_address):
+    email_lock = get_active_login_lock(conn, 'email', email)
+    if email_lock:
+        return 'email', email_lock
+    ip_lock = get_active_login_lock(conn, 'ip', ip_address)
+    if ip_lock:
+        return 'ip', ip_lock
+    return '', None
+
+def record_failed_login(conn, email, ip_address):
+    attempted_at = datetime.utcnow()
+    conn.execute(
+        "INSERT INTO login_failures (email, ip_address, attempted_at) VALUES (?, ?, ?)",
+        (email, ip_address, attempted_at)
+    )
+    window_start = login_window_start()
+    email_failures = conn.execute(
+        "SELECT COUNT(*) AS count FROM login_failures WHERE email = ? AND attempted_at >= ?",
+        (email, window_start)
+    ).fetchone()['count'] if email else 0
+    ip_failures = conn.execute(
+        "SELECT COUNT(*) AS count FROM login_failures WHERE ip_address = ? AND attempted_at >= ?",
+        (ip_address, window_start)
+    ).fetchone()['count'] if ip_address else 0
+    distinct_email_failures = conn.execute(
+        "SELECT COUNT(DISTINCT email) AS count FROM login_failures WHERE ip_address = ? AND attempted_at >= ? AND email <> ''",
+        (ip_address, window_start)
+    ).fetchone()['count'] if ip_address else 0
+
+    if email and email_failures >= LOGIN_EMAIL_FAILURE_LIMIT:
+        upsert_login_lock(conn, 'email', email, login_lock_minutes_for_email(conn, email))
+    if ip_address and (ip_failures >= LOGIN_IP_FAILURE_LIMIT or distinct_email_failures >= LOGIN_DISTINCT_EMAIL_LIMIT):
+        upsert_login_lock(conn, 'ip', ip_address, LOGIN_LOCK_MINUTES)
+
+def clear_login_failures(conn, email, ip_address):
+    window_start = login_window_start()
+    conn.execute(
+        "DELETE FROM login_failures WHERE (email = ? OR ip_address = ?) AND attempted_at >= ?",
+        (email, ip_address, window_start)
+    )
 
 
 @app.context_processor
@@ -4059,11 +4204,248 @@ def course_spec_extraction_score(extracted):
     return score
 
 
+def course_spec_extraction_is_usable(extracted):
+    extracted = extracted or {}
+    return bool(
+        compact_text(extracted.get('course_name') or extracted.get('name'))
+        and compact_text(extracted.get('course_code') or extracted.get('course_number'))
+        and extracted.get('clos')
+    )
+
+
+def get_gemini_spec_cache(filepath):
+    try:
+        file_hash = file_sha256(filepath)
+    except Exception:
+        return None, None
+    return file_hash, GEMINI_SPEC_CACHE.get((file_hash, GEMINI_MODEL))
+
+
+def set_gemini_spec_cache(file_hash, extracted):
+    if not file_hash:
+        return extracted
+    if len(GEMINI_SPEC_CACHE) >= GEMINI_SPEC_CACHE_MAX_ITEMS:
+        try:
+            GEMINI_SPEC_CACHE.pop(next(iter(GEMINI_SPEC_CACHE)))
+        except StopIteration:
+            pass
+    GEMINI_SPEC_CACHE[(file_hash, GEMINI_MODEL)] = extracted
+    return extracted
+
+
+def gemini_course_spec_prompt():
+    return (
+        "Extract course specification information from this document. "
+        "The document may be Arabic or English, scanned or text-based. "
+        "Return JSON only, with no markdown. Preserve Arabic text exactly when present. "
+        "Do not infer the course code from the file name and do not invent missing values. "
+        "Extract only Course Learning Outcomes under Knowledge/Knowledge and Understanding, "
+        "Skills, and Values. Use this exact JSON schema: "
+        '{"course_name":"","course_code":"","college":"","department":"","program":"",'
+        '"clos":["1.1 outcome text","1.2 outcome text","2.1 outcome text","3.1 outcome text"],'
+        '"topics":[],"clo_plos":{}}'
+    )
+
+
+def parse_gemini_json_response(text):
+    text = compact_text(text or '')
+    if not text:
+        return None
+    text = re.sub(r'^```(?:json)?\s*', '', text, flags=re.I)
+    text = re.sub(r'\s*```$', '', text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    start = text.find('{')
+    end = text.rfind('}')
+    if start >= 0 and end > start:
+        try:
+            return json.loads(text[start:end + 1])
+        except json.JSONDecodeError:
+            return None
+    return None
+
+
+def normalize_gemini_clos(raw_clos):
+    if isinstance(raw_clos, dict):
+        raw_clos = [
+            {'code': key, 'text': value}
+            for key, value in raw_clos.items()
+        ]
+    clos_by_id = {}
+    for item in raw_clos or []:
+        if isinstance(item, dict):
+            clo_id = compact_text(
+                item.get('code')
+                or item.get('id')
+                or item.get('clo_id')
+                or item.get('outcome_code')
+                or item.get('number')
+            )
+            body = compact_text(
+                item.get('text')
+                or item.get('description')
+                or item.get('outcome')
+                or item.get('learning_outcome')
+                or item.get('value')
+            )
+        else:
+            clo_id = ''
+            body = compact_text(str(item or ''))
+
+        match = re.match(r'^(?:CLO\s*)?([123]\s*[\.\-]\s*[1-9]\d*)\s+(.+)$', body, flags=re.I)
+        if match:
+            clo_id = clo_id or match.group(1)
+            body = match.group(2)
+
+        clo_id = re.sub(r'\s+', '', clo_id or '').upper().replace('-', '.')
+        clo_id = re.sub(r'^CLO', '', clo_id)
+        if not re.match(r'^[123]\.[1-9]\d*$', clo_id or ''):
+            continue
+        body = clean_clo_text(body)
+        if not body or len(body) < 4:
+            continue
+        clos_by_id[clo_id] = f"{clo_id} {body}"
+
+    ordered_ids = sorted(
+        clos_by_id,
+        key=lambda value: tuple(int(part) for part in value.split('.', 1))
+    )
+    return [clos_by_id[clo_id] for clo_id in ordered_ids]
+
+
+def normalize_gemini_course_spec(payload):
+    if not isinstance(payload, dict):
+        return None
+
+    course_name = clean_pdf_fragment(compact_text(
+        payload.get('course_name')
+        or payload.get('name')
+        or payload.get('course_title')
+        or ''
+    ))
+    course_code = normalize_extracted_course_code(compact_text(
+        payload.get('course_code')
+        or payload.get('course_number')
+        or payload.get('code')
+        or ''
+    ))
+    college = clean_pdf_fragment(compact_text(payload.get('college') or payload.get('faculty') or ''))
+    department = clean_pdf_fragment(compact_text(payload.get('department') or payload.get('dept') or ''))
+    program = clean_pdf_fragment(compact_text(payload.get('program') or payload.get('programme') or ''))
+    clos = normalize_gemini_clos(payload.get('clos') or payload.get('clos_by_domain') or payload.get('learning_outcomes'))
+
+    display_name = course_name
+    if course_code and course_name and course_code not in course_name:
+        display_name = f"{course_name} ({course_code})"
+    elif course_code and not course_name:
+        display_name = course_code
+
+    clo_plos = payload.get('clo_plos') if isinstance(payload.get('clo_plos'), dict) else {}
+    topics = payload.get('topics') if isinstance(payload.get('topics'), list) else []
+    topics = [compact_text(topic) for topic in topics if compact_text(topic)]
+
+    return {
+        'name': display_name,
+        'course_name': course_name,
+        'course_code': course_code,
+        'course_number': course_code,
+        'college': college,
+        'department': department,
+        'program': program,
+        'clos': clos,
+        'topics': topics,
+        'clo_plos': clo_plos,
+        'grouped_clos': group_clos_by_domain(clos)
+    }
+
+
+def extract_course_spec_with_gemini(filepath, filename=''):
+    file_ext = os.path.splitext(filename or filepath)[1].lower()
+    if not GEMINI_API_KEY or file_ext != '.pdf':
+        return None
+    try:
+        if os.path.getsize(filepath) > GEMINI_MAX_INLINE_BYTES:
+            app.logger.info("Skipping Gemini course specification extraction because file is larger than GEMINI_MAX_INLINE_BYTES.")
+            return None
+    except OSError:
+        return None
+
+    file_hash, cached = get_gemini_spec_cache(filepath)
+    if cached is not None:
+        return cached or None
+
+    try:
+        with open(filepath, 'rb') as file:
+            encoded_pdf = base64.b64encode(file.read()).decode('ascii')
+        payload = {
+            'contents': [
+                {
+                    'parts': [
+                        {'text': gemini_course_spec_prompt()},
+                        {
+                            'inline_data': {
+                                'mime_type': 'application/pdf',
+                                'data': encoded_pdf
+                            }
+                        }
+                    ]
+                }
+            ],
+            'generationConfig': {
+                'temperature': 0,
+                'responseMimeType': 'application/json'
+            }
+        }
+        endpoint = (
+            'https://generativelanguage.googleapis.com/v1beta/models/'
+            + urllib.parse.quote(GEMINI_MODEL, safe='')
+            + ':generateContent?key='
+            + urllib.parse.quote(GEMINI_API_KEY, safe='')
+        )
+        request_data = json.dumps(payload).encode('utf-8')
+        gemini_request = urllib.request.Request(
+            endpoint,
+            data=request_data,
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'ETQAN-CourseSpecExtractor/1.0'
+            },
+            method='POST'
+        )
+        with urllib.request.urlopen(gemini_request, timeout=90) as response:
+            gemini_payload = json.loads(response.read().decode('utf-8'))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode('utf-8', errors='replace')
+        app.logger.warning("Gemini course specification extraction failed with HTTP %s: %s", exc.code, body[:800])
+        return set_gemini_spec_cache(file_hash, False) or None
+    except Exception as exc:
+        app.logger.warning("Gemini course specification extraction failed: %s", exc)
+        return set_gemini_spec_cache(file_hash, False) or None
+
+    response_text = ''
+    for candidate in gemini_payload.get('candidates') or []:
+        content = candidate.get('content') or {}
+        for part in content.get('parts') or []:
+            response_text += part.get('text') or ''
+
+    extracted = normalize_gemini_course_spec(parse_gemini_json_response(response_text))
+    if course_spec_extraction_is_usable(extracted):
+        return set_gemini_spec_cache(file_hash, extracted)
+    app.logger.info("Gemini course specification extraction did not return complete course data; falling back to local parser/OCR.")
+    return set_gemini_spec_cache(file_hash, False) or None
+
+
 def extract_course_spec_document(filepath, filename=''):
     file_ext = os.path.splitext(filename or filepath)[1].lower()
     if file_ext == '.docx':
         text = extract_docx_text(filepath)
         return text, extract_course_spec_metadata(text, filename)
+
+    gemini_extracted = extract_course_spec_with_gemini(filepath, filename)
+    if gemini_extracted:
+        return '', gemini_extracted
 
     text = extract_pdf_text(filepath, allow_ocr=True)
     extracted = extract_course_spec_metadata(text, filename)
@@ -9318,18 +9700,32 @@ def login():
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
         password = request.form.get('password') or ''
+        ip_address = get_client_ip()
         with get_db() as conn:
+            lock_type, active_lock = evaluate_login_lock(conn, email, ip_address)
+            if active_lock:
+                return render_template(
+                    'auth.html',
+                    title='Login',
+                    button_label='Login',
+                    mode='login',
+                    auth_message=translate('auth.login_locked_email' if lock_type == 'email' else 'auth.login_locked_ip'),
+                    auth_message_category='error',
+                    auth_email=email
+                )
             user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
-        if not user or not check_password_hash(user['password_hash'], password):
-            return render_template(
-                'auth.html',
-                title='Login',
-                button_label='Login',
-                mode='login',
-                auth_message=translate('auth.invalid_login'),
-                auth_message_category='error',
-                auth_email=email
-            )
+            if not user or not check_password_hash(user['password_hash'], password):
+                record_failed_login(conn, email, ip_address)
+                return render_template(
+                    'auth.html',
+                    title='Login',
+                    button_label='Login',
+                    mode='login',
+                    auth_message=translate('auth.invalid_login'),
+                    auth_message_category='error',
+                    auth_email=email
+                )
+            clear_login_failures(conn, email, ip_address)
         session['user_id'] = user['id']
         # Removed flash("Logged in successfully.") to hide the message
         return redirect(url_for('index'))
