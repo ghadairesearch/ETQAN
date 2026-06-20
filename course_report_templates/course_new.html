@@ -15,7 +15,10 @@
             <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; align-items: start;">
                 <section style="border: 1px solid var(--border-color); border-radius: 8px; background: #fff; padding: 1rem;">
                     <div class="form-group">
-                        <label class="form-label">{{ _('courses.spec_file') }}</label>
+                        <label class="form-label" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                            <span>{{ _('courses.spec_file') }}</span>
+                            <span tabindex="0" title="{{ _('courses.spec_file_help') }}" aria-label="{{ _('courses.spec_file_help') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border-color); color: var(--primary-color); font-size: 0.75rem; font-weight: 700; cursor: help;">i</span>
+                        </label>
                         <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
                             <input type="file" name="course_spec_file" class="form-control" accept=".pdf,.docx" style="padding: 0.5rem; flex: 1 1 280px;">
                             <button type="submit" name="form_action" value="extract" class="btn extract-progress-button" data-extract-progress-button data-loading-label="{{ _('courses.extracting') }}" title="{{ _('courses.extract') }}" aria-label="{{ _('courses.extract') }}" style="display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
