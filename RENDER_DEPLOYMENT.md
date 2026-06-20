@@ -10,7 +10,12 @@ SECRET_KEY=<long random secret>
 ADMIN_EMAILS=admin@example.com,another-admin@example.com
 UPLOAD_FOLDER=/var/data/uploads
 ORG_LOGO_FOLDER=/var/data/uploads/organization_logos
+RESEND_API_KEY=<Resend API key>
+RESEND_FROM_EMAIL=onboarding@resend.dev
+CONTACT_TO_EMAIL=ghad.ai.research@gmail.com
 ```
+
+For production email, verify your own domain in Resend and replace `RESEND_FROM_EMAIL` with an address on that domain. `onboarding@resend.dev` is useful for initial testing.
 
 Recommended Render setup:
 

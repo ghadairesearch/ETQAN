@@ -11,6 +11,8 @@ import base64
 import hashlib
 import shutil
 import subprocess
+import urllib.error
+import urllib.request
 import xml.etree.ElementTree as ET
 import secrets
 import difflib
@@ -73,6 +75,9 @@ SMTP_FROM_NAME = os.environ.get('SMTP_FROM_NAME', 'ETQAN').strip() or 'ETQAN'
 SMTP_USE_SSL = os.environ.get('SMTP_USE_SSL', '').strip().lower() in {'1', 'true', 'yes', 'on'}
 SMTP_USE_TLS = os.environ.get('SMTP_USE_TLS', 'true').strip().lower() not in {'0', 'false', 'no', 'off'}
 SMTP_TIMEOUT_SECONDS = int(os.environ.get('SMTP_TIMEOUT_SECONDS') or 10)
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '').strip()
+RESEND_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', '').strip() or SMTP_FROM_EMAIL
+CONTACT_TO_EMAIL = os.environ.get('CONTACT_TO_EMAIL', '').strip()
 COURSE_REPORT_TEMPLATE_PATH = os.path.join(APP_BASE_DIR, 'course_report_templates', 'TP-154 Course Report - Eng.docx')
 COURSE_IMPROVEMENT_RECOMMENDATIONS = [
     'Improve student performance in CLOs',
@@ -1310,33 +1315,51 @@ def get_profile_university_name():
         return choice
     return canonical_university_name(request.form.get('university_name') or '')
 
-def is_smtp_configured():
-    return bool(SMTP_HOST and SMTP_FROM_EMAIL)
+def is_email_configured():
+    return bool((RESEND_API_KEY and RESEND_FROM_EMAIL) or (SMTP_HOST and SMTP_FROM_EMAIL))
 
-def send_password_reset_email(recipient_email, reset_url):
-    if not is_smtp_configured():
+def send_email(recipient_email, subject, text_body, html_body=''):
+    if RESEND_API_KEY and RESEND_FROM_EMAIL:
+        payload = {
+            'from': f"{SMTP_FROM_NAME} <{RESEND_FROM_EMAIL}>",
+            'to': [recipient_email],
+            'subject': subject,
+            'text': text_body,
+        }
+        if html_body:
+            payload['html'] = html_body
+        request_data = json.dumps(payload).encode('utf-8')
+        request = urllib.request.Request(
+            'https://api.resend.com/emails',
+            data=request_data,
+            headers={
+                'Authorization': f"Bearer {RESEND_API_KEY}",
+                'Content-Type': 'application/json',
+            },
+            method='POST'
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=SMTP_TIMEOUT_SECONDS) as response:
+                status = response.getcode()
+                if 200 <= status < 300:
+                    return True, ''
+                return False, f'resend_status_{status}'
+        except urllib.error.HTTPError as exc:
+            app.logger.error("Resend email failed: HTTP %s %s", exc.code, exc.read().decode('utf-8', errors='replace'))
+            return False, 'send_failed'
+        except Exception:
+            app.logger.exception("Resend email failed")
+            return False, 'send_failed'
+
+    if not (SMTP_HOST and SMTP_FROM_EMAIL):
         return False, 'missing_config'
-
     message = EmailMessage()
-    message['Subject'] = 'Reset your ETQAN password'
+    message['Subject'] = subject
     message['From'] = f"{SMTP_FROM_NAME} <{SMTP_FROM_EMAIL}>"
     message['To'] = recipient_email
-    text_body = (
-        "Hello,\n\n"
-        "We received a request to reset your ETQAN password.\n\n"
-        f"Use this link within 1 hour:\n{reset_url}\n\n"
-        "If you did not request this, you can ignore this email."
-    )
-    html_body = f"""
-    <p>Hello,</p>
-    <p>We received a request to reset your ETQAN password.</p>
-    <p><a href="{reset_url}">Reset your password</a></p>
-    <p>This link expires in 1 hour.</p>
-    <p>If you did not request this, you can ignore this email.</p>
-    """
     message.set_content(text_body)
-    message.add_alternative(html_body, subtype='html')
-
+    if html_body:
+        message.add_alternative(html_body, subtype='html')
     try:
         if SMTP_USE_SSL:
             with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=SMTP_TIMEOUT_SECONDS, context=ssl.create_default_context()) as server:
@@ -1351,9 +1374,28 @@ def send_password_reset_email(recipient_email, reset_url):
                     server.login(SMTP_USERNAME, SMTP_PASSWORD)
                 server.send_message(message)
     except Exception:
-        app.logger.exception("Failed to send password reset email")
+        app.logger.exception("SMTP email failed")
         return False, 'send_failed'
     return True, ''
+
+def send_password_reset_email(recipient_email, reset_url):
+    if not is_email_configured():
+        return False, 'missing_config'
+
+    text_body = (
+        "Hello,\n\n"
+        "We received a request to reset your ETQAN password.\n\n"
+        f"Use this link within 1 hour:\n{reset_url}\n\n"
+        "If you did not request this, you can ignore this email."
+    )
+    html_body = f"""
+    <p>Hello,</p>
+    <p>We received a request to reset your ETQAN password.</p>
+    <p><a href="{reset_url}">Reset your password</a></p>
+    <p>This link expires in 1 hour.</p>
+    <p>If you did not request this, you can ignore this email.</p>
+    """
+    return send_email(recipient_email, 'Reset your ETQAN password', text_body, html_body)
 
 def get_upload_path(filename):
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -9029,6 +9071,39 @@ def contact_us():
                     datetime.now().strftime("%Y-%m-%d %H:%M")
                 )
             )
+        if CONTACT_TO_EMAIL and is_email_configured():
+            enquiry_type = (request.form.get('enquiry_type') or '').strip()
+            sender_name = (request.form.get('name') or '').strip()
+            sender_email = (request.form.get('email') or '').strip()
+            organization = (request.form.get('organization') or '').strip()
+            college = (request.form.get('college') or '').strip()
+            department = (request.form.get('department') or '').strip()
+            message_text = (request.form.get('message') or '').strip()
+            attachment_note = original_name or 'No attachment'
+            text_body = (
+                "New ETQAN contact request\n\n"
+                f"Type: {enquiry_type}\n"
+                f"Name: {sender_name}\n"
+                f"Email: {sender_email}\n"
+                f"Organization: {organization}\n"
+                f"College: {college}\n"
+                f"Department: {department}\n"
+                f"Attachment: {attachment_note}\n\n"
+                f"Message:\n{message_text}\n"
+            )
+            html_body = f"""
+            <h2>New ETQAN contact request</h2>
+            <p><strong>Type:</strong> {enquiry_type}</p>
+            <p><strong>Name:</strong> {sender_name}</p>
+            <p><strong>Email:</strong> {sender_email}</p>
+            <p><strong>Organization:</strong> {organization}</p>
+            <p><strong>College:</strong> {college}</p>
+            <p><strong>Department:</strong> {department}</p>
+            <p><strong>Attachment:</strong> {attachment_note}</p>
+            <p><strong>Message:</strong></p>
+            <pre>{message_text}</pre>
+            """
+            send_email(CONTACT_TO_EMAIL, 'New ETQAN contact request', text_body, html_body)
         flash(translate('contact.sent'))
         return redirect(url_for('contact_us'))
     default_message = translate('contact.university_subscription_subject') if topic == 'university-subscription' else ''
