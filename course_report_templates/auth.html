@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .required-star {
+        color: #dc2626;
+        font-weight: 700;
+        margin-inline-start: 0.2rem;
+    }
+</style>
+<div class="card" style="max-width: 520px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ _('auth.register_title') if mode == 'register' else _('auth.login_title') }}</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label class="form-label">{{ _('auth.email') }}<span class="required-star">*</span></label>
+            <input type="email" name="email" class="form-control" value="{{ auth_email|default('', true) }}" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">{{ _('auth.password') }}<span class="required-star">*</span></label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        {% if mode == 'register' %}
+        <div class="form-group">
+            <label class="form-label">{{ _('auth.university') }}<span class="required-star">*</span></label>
+            <select name="university_choice" id="university_choice" class="form-control" required>
+                <option value="">{{ _('auth.select_university') }}</option>
+                {% for university in university_options %}
+                    <option value="{{ university.value }}">{{ university.label }}</option>
+                {% endfor %}
+                <option value="__other__">{{ _('auth.other_university') }}</option>
+            </select>
+            <input type="text" name="other_university_name" id="other_university_name" class="form-control" placeholder="{{ _('auth.university_placeholder') }}" style="display: none; margin-top: 0.75rem;">
+        </div>
+        <div class="form-group">
+            <label class="form-label">{{ _('auth.college_optional') }}</label>
+            <input type="text" name="college" class="form-control">
+        </div>
+        <div class="form-group">
+            <label class="form-label">{{ _('auth.department_optional') }}</label>
+            <input type="text" name="department" class="form-control">
+        </div>
+        {% endif %}
+        <button type="submit" class="btn">{{ _('auth.register_button') if mode == 'register' else _('auth.login_button') }}</button>
+        {% if auth_message %}
+            <div class="alert {% if auth_message_category == 'error' %}alert-error{% endif %}" style="margin-top: 1rem; margin-bottom: 0;">
+                {{ auth_message }}
+            </div>
+        {% endif %}
+    </form>
+    <p style="color: var(--text-muted); margin-bottom: 0;">
+        {% if mode == 'login' %}
+            {{ _('auth.need_account') }} <a href="/register" style="color: var(--accent); font-weight: 600;">{{ _('auth.create_one') }}</a>
+            <br>
+            <a href="/forgot-password" style="color: var(--accent); font-weight: 600;">{{ _('auth.forgot_password') }}</a>
+        {% else %}
+            {{ _('auth.have_account') }} <a href="/login" style="color: var(--accent); font-weight: 600;">{{ _('auth.login') }}</a>
+        {% endif %}
+    </p>
+</div>
+{% if mode == 'register' %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const universityChoice = document.getElementById('university_choice');
+        const otherUniversityName = document.getElementById('other_university_name');
+        const updateOtherField = function() {
+            const showOther = universityChoice.value === '__other__';
+            otherUniversityName.style.display = showOther ? 'block' : 'none';
+            otherUniversityName.required = showOther;
+            if (!showOther) {
+                otherUniversityName.value = '';
+            }
+        };
+        universityChoice.addEventListener('change', updateOtherField);
+        updateOtherField();
+    });
+</script>
+{% endif %}
+{% endblock %}

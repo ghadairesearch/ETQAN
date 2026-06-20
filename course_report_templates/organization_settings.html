@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .empty-color-input {
+        border: 1px dashed var(--border-color);
+        background: #fff;
+    }
+
+    .empty-color-swatch {
+        border: 1px dashed var(--border-color);
+        background: transparent !important;
+    }
+</style>
+<div class="card" style="max-width: 720px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ _('org.title') }}</h2>
+    <p style="color: var(--text-muted); margin-top: -0.5rem;">
+        {{ _('org.description') }}
+    </p>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% set current_university = current_user.university_name|default('', true) %}
+        {% set current_university_value = canonical_university_name(current_university) %}
+        {% set known_university = current_university_value in university_choices %}
+
+        <div id="default_identity_preview" style="display: block; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <p style="margin: 0 0 0.45rem; font-weight: 700;">{{ _('org.used_logo') }}</p>
+            <div style="margin-top: 1rem; border: 1px dashed var(--border-color); border-radius: 8px; min-height: 170px; display: flex; align-items: center; justify-content: center; background: #f9fafb; padding: 1rem;">
+                <img id="default_logo_preview" src="{{ active_branding.logo_preview_url }}" alt="{{ _('org.logo_alt') }}" style="display: {% if active_branding.logo_preview_url %}block{% else %}none{% endif %}; max-height: 150px; max-width: 100%; object-fit: contain;">
+                <span id="logo_empty_state" style="display: {% if active_branding.logo_preview_url %}none{% else %}block{% endif %}; color: var(--text-muted);">{{ _('org.no_logo') }}</span>
+            </div>
+
+            <div class="form-group" style="margin: 1rem 0 0;">
+                <label class="form-label">{{ _('org.logo') }}</label>
+                <input type="file" name="report_logo" id="report_logo" class="form-control" accept=".jpg,.jpeg" style="padding: 0.5rem;">
+                {% if active_branding.logo_original_name %}
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0.5rem 0 0;">{{ _('org.current_logo') }} {{ active_branding.logo_original_name }}</p>
+                {% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(140px, 170px)); gap: 1rem; align-items: end; margin-top: 1rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">{{ _('org.primary_color') }}</label>
+                    <input type="hidden" name="brand_primary_color_empty" id="brand_primary_color_empty" value="{% if active_branding.primary_color %}0{% else %}1{% endif %}">
+                    <input type="hidden" name="brand_primary_color_custom" id="brand_primary_color_custom" value="0">
+                    <input type="color" name="brand_primary_color" id="brand_primary_color" class="form-control{% if not active_branding.primary_color %} empty-color-input{% endif %}" value="{{ active_branding.primary_color or '#ffffff' }}" style="height: 3rem; padding: 0.25rem;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">{{ _('org.secondary_color') }}</label>
+                    <input type="hidden" name="brand_secondary_color_empty" id="brand_secondary_color_empty" value="{% if active_branding.secondary_color %}0{% else %}1{% endif %}">
+                    <input type="hidden" name="brand_secondary_color_custom" id="brand_secondary_color_custom" value="0">
+                    <input type="color" name="brand_secondary_color" id="brand_secondary_color" class="form-control{% if not active_branding.secondary_color %} empty-color-input{% endif %}" value="{{ active_branding.secondary_color or '#ffffff' }}" style="height: 3rem; padding: 0.25rem;">
+                </div>
+
+                <div class="form-group" id="tertiary_color_group" style="margin-bottom: 0; display: {% if active_branding.tertiary_color or not known_university %}block{% else %}none{% endif %};">
+                    <label class="form-label">{{ _('org.tertiary_color') }}</label>
+                    <input type="hidden" name="brand_tertiary_color_empty" id="brand_tertiary_color_empty" value="{% if active_branding.tertiary_color %}0{% else %}1{% endif %}">
+                    <input type="hidden" name="brand_tertiary_color_custom" id="brand_tertiary_color_custom" value="0">
+                    <input type="color" name="brand_tertiary_color" id="brand_tertiary_color" class="form-control{% if not active_branding.tertiary_color %} empty-color-input{% endif %}" value="{{ active_branding.tertiary_color or '#ffffff' }}" style="height: 3rem; padding: 0.25rem;" {% if not active_branding.tertiary_color and known_university %}disabled{% endif %}>
+                </div>
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap;">
+                <span id="primary_color_swatch" class="{% if not active_branding.primary_color %}empty-color-swatch{% endif %}" style="width: 4.5rem; height: 0.45rem; border-radius: 999px; background: {{ active_branding.primary_color or 'transparent' }};"></span>
+                <span id="secondary_color_swatch" class="{% if not active_branding.secondary_color %}empty-color-swatch{% endif %}" style="width: 4.5rem; height: 0.45rem; border-radius: 999px; background: {{ active_branding.secondary_color or 'transparent' }};"></span>
+                <span id="tertiary_color_swatch" class="{% if not active_branding.tertiary_color %}empty-color-swatch{% endif %}" style="display: {% if active_branding.tertiary_color or not known_university %}inline-block{% else %}none{% endif %}; width: 4.5rem; height: 0.45rem; border-radius: 999px; background: {{ active_branding.tertiary_color or 'transparent' }};"></span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="submit" class="btn">{{ _('org.save') }}</button>
+        </div>
+    </form>
+
+</div>
+<script>
+    const universityColorPresets = {{ university_color_presets|tojson }};
+    const universityIdentityPresets = {{ university_identity_presets|tojson }};
+    const universityInput = document.getElementById('university_choice');
+    const otherUniversityInput = document.getElementById('other_university_name');
+    const colorInput = document.getElementById('brand_primary_color');
+    const secondaryColorInput = document.getElementById('brand_secondary_color');
+    const tertiaryColorInput = document.getElementById('brand_tertiary_color');
+    const colorEmptyInput = document.getElementById('brand_primary_color_empty');
+    const secondaryColorEmptyInput = document.getElementById('brand_secondary_color_empty');
+    const tertiaryColorEmptyInput = document.getElementById('brand_tertiary_color_empty');
+    const colorCustomInput = document.getElementById('brand_primary_color_custom');
+    const secondaryColorCustomInput = document.getElementById('brand_secondary_color_custom');
+    const tertiaryColorCustomInput = document.getElementById('brand_tertiary_color_custom');
+    const tertiaryColorGroup = document.getElementById('tertiary_color_group');
+    const primarySwatch = document.getElementById('primary_color_swatch');
+    const secondarySwatch = document.getElementById('secondary_color_swatch');
+    const tertiarySwatch = document.getElementById('tertiary_color_swatch');
+    const identityPreview = document.getElementById('default_identity_preview');
+    const logoPreview = document.getElementById('default_logo_preview');
+    const logoInput = document.getElementById('report_logo');
+    const logoEmptyState = document.getElementById('logo_empty_state');
+    const savedCustomLogo = {{ active_branding.logo_stored_name|tojson }};
+    let colorEdited = false;
+    let secondaryColorEdited = false;
+    let tertiaryColorEdited = false;
+
+    function setColorEmpty(input, swatch, emptyField) {
+        if (!input) {
+            return;
+        }
+        input.value = '#ffffff';
+        input.classList.add('empty-color-input');
+        if (emptyField) {
+            emptyField.value = '1';
+        }
+        if (swatch) {
+            swatch.classList.add('empty-color-swatch');
+            swatch.style.background = 'transparent';
+        }
+    }
+
+    function setColorFilled(input, swatch, emptyField, value) {
+        if (!input) {
+            return;
+        }
+        input.value = value || input.value || '#ffffff';
+        input.classList.remove('empty-color-input');
+        if (emptyField) {
+            emptyField.value = '0';
+        }
+        if (swatch) {
+            swatch.classList.remove('empty-color-swatch');
+            swatch.style.background = input.value;
+        }
+    }
+
+    if (colorInput) {
+        colorInput.addEventListener('input', () => {
+            colorEdited = true;
+            if (colorCustomInput) {
+                colorCustomInput.value = '1';
+            }
+            setColorFilled(colorInput, primarySwatch, colorEmptyInput, colorInput.value);
+        });
+    }
+
+    if (secondaryColorInput) {
+        secondaryColorInput.addEventListener('input', () => {
+            secondaryColorEdited = true;
+            if (secondaryColorCustomInput) {
+                secondaryColorCustomInput.value = '1';
+            }
+            setColorFilled(secondaryColorInput, secondarySwatch, secondaryColorEmptyInput, secondaryColorInput.value);
+        });
+    }
+
+    if (tertiaryColorInput) {
+        tertiaryColorInput.addEventListener('input', () => {
+            tertiaryColorEdited = true;
+            if (tertiaryColorCustomInput) {
+                tertiaryColorCustomInput.value = '1';
+            }
+            setColorFilled(tertiaryColorInput, tertiarySwatch, tertiaryColorEmptyInput, tertiaryColorInput.value);
+        });
+    }
+
+    if (logoInput && logoPreview) {
+        logoInput.addEventListener('change', () => {
+            const file = logoInput.files && logoInput.files[0];
+            if (!file) {
+                return;
+            }
+            logoPreview.src = URL.createObjectURL(file);
+            logoPreview.style.display = 'block';
+            if (logoEmptyState) {
+                logoEmptyState.style.display = 'none';
+            }
+        });
+    }
+
+    if (universityInput && colorInput) {
+        universityInput.addEventListener('change', () => {
+            if (otherUniversityInput) {
+                otherUniversityInput.style.display = universityInput.value === '__other__' ? 'block' : 'none';
+                if (universityInput.value !== '__other__') {
+                    otherUniversityInput.value = '';
+                }
+            }
+            const isOtherUniversity = universityInput.value === '__other__';
+            colorEdited = false;
+            secondaryColorEdited = false;
+            tertiaryColorEdited = false;
+            if (colorCustomInput) {
+                colorCustomInput.value = '0';
+            }
+            if (secondaryColorCustomInput) {
+                secondaryColorCustomInput.value = '0';
+            }
+            if (tertiaryColorCustomInput) {
+                tertiaryColorCustomInput.value = '0';
+            }
+            if (isOtherUniversity) {
+                setColorEmpty(colorInput, primarySwatch, colorEmptyInput);
+                setColorEmpty(secondaryColorInput, secondarySwatch, secondaryColorEmptyInput);
+                if (tertiaryColorGroup && tertiaryColorInput) {
+                    tertiaryColorGroup.style.display = 'block';
+                    tertiaryColorInput.disabled = false;
+                    setColorEmpty(tertiaryColorInput, tertiarySwatch, tertiaryColorEmptyInput);
+                }
+                if (tertiarySwatch) {
+                    tertiarySwatch.style.display = 'inline-block';
+                }
+                if (logoPreview && !savedCustomLogo) {
+                    logoPreview.src = '';
+                    logoPreview.style.display = 'none';
+                    if (logoEmptyState) {
+                        logoEmptyState.style.display = 'block';
+                    }
+                }
+                return;
+            }
+            const identity = universityIdentityPresets[universityInput.value] || {};
+            const presetColor = identity.primary_color || universityColorPresets[universityInput.value];
+            if (presetColor) {
+                setColorFilled(colorInput, primarySwatch, colorEmptyInput, presetColor);
+            }
+            const presetSecondaryColor = identity.secondary_color || '';
+            if (secondaryColorInput) {
+                if (presetSecondaryColor) {
+                    setColorFilled(secondaryColorInput, secondarySwatch, secondaryColorEmptyInput, presetSecondaryColor);
+                } else {
+                    setColorEmpty(secondaryColorInput, secondarySwatch, secondaryColorEmptyInput);
+                }
+            }
+            const presetTertiaryColor = identity.tertiary_color || '';
+            if (tertiaryColorGroup && tertiaryColorInput) {
+                tertiaryColorGroup.style.display = 'block';
+                tertiaryColorInput.disabled = false;
+                if (presetTertiaryColor) {
+                    setColorFilled(tertiaryColorInput, tertiarySwatch, tertiaryColorEmptyInput, presetTertiaryColor);
+                }
+                if (!presetTertiaryColor) {
+                    setColorEmpty(tertiaryColorInput, tertiarySwatch, tertiaryColorEmptyInput);
+                }
+            }
+            if (tertiarySwatch) {
+                tertiarySwatch.style.display = 'inline-block';
+                if (presetTertiaryColor) {
+                    tertiarySwatch.style.background = tertiaryColorInput ? tertiaryColorInput.value : presetTertiaryColor;
+                }
+            }
+            const logoFilename = identity.logo_filename || '';
+            const hasNewLogoSelection = logoInput && logoInput.files && logoInput.files.length > 0;
+            if (logoPreview && !savedCustomLogo && !hasNewLogoSelection) {
+                logoPreview.src = logoFilename ? `/university-logos/${encodeURIComponent(logoFilename)}` : '';
+                logoPreview.style.display = logoFilename ? 'block' : 'none';
+                if (logoEmptyState) {
+                    logoEmptyState.style.display = logoFilename ? 'none' : 'block';
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ _('home.assessment_balance_title') }}</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+        {{ _('home.assessment_balance_description') }}
+    </p>
+
+    <form method="POST" action="/assessment-balance-check" enctype="multipart/form-data">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label>{{ _('index.course') }}</label>
+            <select name="course_name" class="form-control" required>
+                <option value="">{{ _('index.select_course') }}</option>
+                {% for course in courses %}
+                    <option value="{{ course.name }}">{{ (course.display_label_ar if language == 'ar' else course.display_label_en) or course.display_label or course.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label>{{ _('index.assessment_files') }}</label>
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.75rem;">Upload the grades file to extract max scores automatically, or a PDF exam paper if grades aren't available.</p>
+            
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem;">
+                <div style="display: grid; grid-template-columns: minmax(140px, 180px) minmax(210px, 1fr); gap: 0.75rem; padding: 0 0.25rem 0.5rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">
+                    <span>{{ _('index.type') }}</span>
+                    <span>{{ _('index.grades_file') }}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: minmax(140px, 180px) minmax(210px, 1fr); gap: 0.75rem; align-items: center;">
+                    <div>
+                        <select name="assessment_name" class="form-control" aria-label="Assessment type" required>
+                            <option value="Final">{{ _('assessment.final') }}</option>
+                            <option value="Midterm">{{ _('assessment.midterm') }}</option>
+                            <option value="Quiz">{{ _('assessment.quiz') }}</option>
+                            <option value="Project">{{ _('assessment.project') }}</option>
+                            <option value="Assignment">{{ _('assessment.assignment') }}</option>
+                            <option value="Other">{{ _('assessment.other') }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="file" name="assessment_file" class="form-control" accept=".csv,.xlsx,.xls,.pdf,.docx,.txt" style="padding: 0.5rem;" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="/" class="btn" style="background-color: var(--border-color); color: var(--text-main);">Back</a>
+            <button type="submit" class="btn">Next: Map Questions</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

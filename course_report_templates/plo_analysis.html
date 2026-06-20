@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 960px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h2 style="margin-top: 0;">{{ _('home.plo_title') }}</h2>
+            <p style="color: var(--text-muted); margin-top: -0.5rem;">Measure Program Learning Outcome attainment from your saved CLO reports.</p>
+        </div>
+        <a href="{{ url_for('plo_analysis_service') }}" class="btn" style="background: transparent; color: var(--text-color); border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 0.45rem;">
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+            </svg>
+            Start Over
+        </a>
+    </div>
+
+    {% if step == 'upload_matrix' %}
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="step" value="upload_matrix">
+        
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; background: #fff;">
+            <h3 style="margin-top: 0; font-size: 1.1rem; margin-bottom: 1rem;">Step 1: Upload Program Specification or Alignment Matrix</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Upload a program specification or PLO-course alignment matrix. ETQAN will extract courses and the associated PLOs from PDF, Word, or Excel files.</p>
+            
+            <input type="file" name="matrix_file" class="form-control" accept=".pdf,.docx,.xlsx,.xls,.txt" required>
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%;">Continue</button>
+    </form>
+
+    {% elif step == 'select_reports' %}
+    <form method="POST" id="selectForm">
+        <input type="hidden" name="step" value="map_plos">
+
+        {% if matrix and matrix.courses %}
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1.5rem; overflow: hidden; background: #fff;">
+            <div style="display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: 1rem; background: #f9fafb; border-bottom: 1px solid var(--border-color); flex-wrap: wrap;">
+                <div>
+                    <h3 style="margin: 0 0 0.25rem; font-size: 1.05rem;">Extracted Course-PLO Matrix</h3>
+                    <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+                        {{ matrix.course_count }} course(s) detected from {{ matrix.original_name or 'uploaded file' }}.
+                    </p>
+                </div>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Detection: {{ matrix.confidence }}</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="table" style="margin-bottom: 0;">
+                    <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course</th>
+                            <th>Associated PLOs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in matrix.courses %}
+                        <tr>
+                            <td>{{ course.course_code or '-' }}</td>
+                            <td>{{ course.course_title }}</td>
+                            <td>{{ format_matrix_course_plos(course) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; background: #fff;">
+            <label class="form-label" style="font-size: 1.05rem;">Select a course to add to the PLO attainment analysis</label>
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; align-items: stretch; flex-wrap: wrap;">
+                <select id="courseDropdown" class="form-control" style="flex: 1 1 300px;" onchange="document.getElementById('addCourseBtn').disabled = !this.value;">
+                    <option value="">-- Select a Course Report --</option>
+                    {% for report in reports %}
+                    <option value="{{ report.id }}" data-name="{{ report.course_name }}" data-title="{{ report.title }}" data-date="{{ report.created_at }}">
+                        {{ report.course_name }} ({{ report.title }})
+                    </option>
+                    {% endfor %}
+                </select>
+                <a href="javascript:void(0)" onclick="showInfoMessage(this.getAttribute('title'))" title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 2.45rem; height: 2.45rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; text-decoration: none; font-size: 1.2rem; align-self: center; flex-shrink: 0;">
+                    i
+                </a>
+                <button type="button" id="addCourseBtn" class="btn" onclick="addCourse()" disabled style="background: var(--text-color); color: #fff; padding-left: 1.5rem; padding-right: 1.5rem; white-space: nowrap;">Add Course</button>
+            </div>
+            
+            <h3 style="margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">Added Courses</h3>
+            <div id="addedCoursesContainer">
+                <p id="emptyState" style="color: var(--text-muted); margin: 0; font-style: italic;">No courses added yet. Select a course from the dropdown and click "Add Course".</p>
+                <table class="table" id="coursesTable" style="display: none; margin-bottom: 0;">
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Report Title</th>
+                            <th>Date Saved</th>
+                            <th style="width: 80px; text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="coursesList">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <button type="submit" id="nextButton" class="btn" style="width: 100%;" disabled>Next: Map CLOs to PLOs</button>
+    </form>
+    
+    <script>
+    function addCourse() {
+        const dropdown = document.getElementById('courseDropdown');
+        const selectedOption = dropdown.options[dropdown.selectedIndex];
+        if (!selectedOption.value) return;
+        
+        const reportId = selectedOption.value;
+        const courseName = selectedOption.getAttribute('data-name');
+        const title = selectedOption.getAttribute('data-title');
+        const date = selectedOption.getAttribute('data-date');
+        
+        if (document.getElementById('input_' + reportId)) {
+            alert('This course report is already added.');
+            return;
+        }
+        
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('coursesTable').style.display = 'table';
+        document.getElementById('nextButton').disabled = false;
+        
+        const tbody = document.getElementById('coursesList');
+        const tr = document.createElement('tr');
+        tr.id = 'row_' + reportId;
+        
+        tr.innerHTML = `
+            <td style="font-weight: 600;">${courseName}</td>
+            <td>${title}</td>
+            <td>${date}</td>
+            <td style="text-align: center;">
+                <button type="button" onclick="removeCourse('${reportId}')" style="background: transparent; border: none; color: var(--error-color); cursor: pointer; padding: 0.2rem;" title="Remove">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+                <input type="hidden" name="report_ids" value="${reportId}" id="input_${reportId}">
+            </td>
+        `;
+        tbody.appendChild(tr);
+        dropdown.selectedIndex = 0;
+        document.getElementById('addCourseBtn').disabled = true;
+    }
+    
+    function removeCourse(reportId) {
+        const tr = document.getElementById('row_' + reportId);
+        if (tr) tr.remove();
+        
+        const tbody = document.getElementById('coursesList');
+        if (tbody.children.length === 0) {
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('coursesTable').style.display = 'none';
+            document.getElementById('nextButton').disabled = true;
+        }
+    }
+    </script>
+    
+    {% elif step == 'map_plos' %}
+    
+    <datalist id="standard_plos">
+        {% if matrix and matrix.plo_codes %}
+            {% for code in matrix.plo_codes %}
+                <option value="{{ code }}">
+            {% endfor %}
+        {% else %}
+            <option value="K1">
+            <option value="K2">
+            <option value="S1">
+            <option value="S2">
+            <option value="S3">
+            <option value="V1">
+            <option value="V2">
+        {% endif %}
+    </datalist>
+
+    <form method="POST">
+        <input type="hidden" name="step" value="results">
+        <input type="hidden" name="selected_ids" value="{{ selected_ids }}">
+        
+        <p style="margin-bottom: 1.5rem;">Assign each Course Learning Outcome to a Program Learning Outcome (e.g. PLO K1, PLO S2). You can type a custom PLO name or select from the dropdown.</p>
+
+        {% for report in reports_data %}
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1.5rem; overflow: hidden;">
+            <div style="background: #f9fafb; padding: 1rem; border-bottom: 1px solid var(--border-color); font-weight: bold; font-size: 1.1rem; color: var(--accent);">
+                {{ report.course_name }}
+                {% if report.matrix_plos %}
+                    <div style="font-weight: 400; font-size: 0.9rem; color: var(--text-muted); margin-top: 0.35rem;">
+                        Matrix PLOs for this course: {{ report.matrix_plos }}
+                    </div>
+                {% endif %}
+            </div>
+            <table class="table" style="margin-bottom: 0;">
+                <thead>
+                    <tr>
+                        <th style="width: 70%;">CLO</th>
+                        <th style="width: 15%;">Attainment</th>
+                        <th style="width: 15%;">Map to PLO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for clo in report.clos %}
+                    <tr>
+                        <td>{{ clo.text }}</td>
+                        <td>
+                            <span style="font-weight: 600; color: {% if clo.attainment >= 60 %}var(--success-color){% else %}var(--error-color){% endif %};">
+                                {{ clo.attainment }}%
+                            </span>
+                        </td>
+                        <td>
+                            <input type="text" name="plo_mapping_{{ report.id }}_{{ loop.index0 }}" list="standard_plos" class="form-control" placeholder="e.g. PLO K1" style="padding: 0.4rem;" required>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn" style="width: 100%;">Calculate PLO Achievement</button>
+    </form>
+    
+    {% elif step == 'results' %}
+    
+    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem;">
+        <div style="flex: 1 1 300px;">
+            <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem;">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem;">PLO Achievement Overview</h3>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for res in results %}
+                    <div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; font-weight: 600;">
+                            <span>{{ res.plo }}</span>
+                            <span style="color: {% if res.average >= 60 %}var(--success-color){% else %}var(--error-color){% endif %};">{{ res.average }}%</span>
+                        </div>
+                        <div class="progress-bar-container" style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div class="progress-bar-fill" style="background: {% if res.average >= 60 %}var(--success-color){% else %}var(--error-color){% endif %}; width: {{ res.average }}%; height: 100%;"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div style="flex: 2 1 400px;">
+            <div style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;">
+                <table class="table" style="margin-bottom: 0;">
+                    <thead>
+                        <tr>
+                            <th>PLO</th>
+                            <th>Overall %</th>
+                            <th>Contributing CLOs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for res in results %}
+                        <tr>
+                            <td style="font-weight: bold; font-size: 1.1rem; vertical-align: top;">{{ res.plo }}</td>
+                            <td style="vertical-align: top;">
+                                <span style="display: inline-block; padding: 0.25rem 0.5rem; background: {% if res.average >= 60 %}rgba(16, 185, 129, 0.1){% else %}rgba(239, 68, 68, 0.1){% endif %}; color: {% if res.average >= 60 %}var(--success-color){% else %}var(--error-color){% endif %}; border-radius: 4px; font-weight: 600;">
+                                    {{ res.average }}%
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    {% for mc in res.mapped_clos %}
+                                    <div style="font-size: 0.9rem; padding-bottom: 0.5rem; {% if not loop.last %}border-bottom: 1px dashed var(--border-color);{% endif %}">
+                                        <div style="font-weight: 600; color: var(--accent); margin-bottom: 0.2rem;">{{ mc.course }}</div>
+                                        <div style="display: flex; justify-content: space-between; gap: 1rem;">
+                                            <span style="color: var(--text-muted);">{{ mc.clo }}</span>
+                                            <span style="font-weight: 600; flex-shrink: 0;">{{ mc.attainment }}%</span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <button onclick="window.print()" class="btn" style="width: 100%;">Print / Save as PDF</button>
+
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ _('checkout.title') }}</h2>
+    
+    <div style="background: #f9fafb; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 2rem;">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text-muted);">{{ _('checkout.selected_plan') }}</h3>
+        <p style="font-size: 1.35rem; font-weight: 700; color: var(--accent); margin: 0.5rem 0;">
+            {% if plan == 'payg' %}
+                {{ _('billing.payg_title') }}
+            {% elif plan == 'academic' %}
+                {{ _('billing.academic_title') }}
+            {% elif plan == 'professional' %}
+                {{ _('billing.professional_title') }}
+            {% endif %}
+        </p>
+        
+        <form method="POST" id="checkoutForm">
+            <input type="hidden" name="plan" value="{{ plan }}">
+            
+            {% if plan == 'payg' %}
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label for="quantity" class="form-label">{{ _('checkout.quantity') }}</label>
+                <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" required style="max-width: 150px;">
+            </div>
+            {% endif %}
+            
+            <div style="margin-top: 1.5rem; border-top: 1px dashed var(--border-color); padding-top: 1rem;">
+                <span style="font-weight: 600; color: var(--text-main);">{{ _('checkout.total') }}: </span>
+                <strong id="totalCost" style="font-size: 1.25rem; color: var(--accent);">{{ base_price }} SAR</strong>
+            </div>
+        
+    </div>
+
+    <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">{{ _('checkout.billing_info') }}</h3>
+    
+    <div class="form-group">
+        <label for="card_name" class="form-label">{{ _('checkout.card_name') }}</label>
+        <input type="text" id="card_name" name="card_name" class="form-control" required placeholder="John Doe">
+    </div>
+    
+    <div class="form-group">
+        <label for="card_number" class="form-label">{{ _('checkout.card_number') }}</label>
+        <input type="text" id="card_number" name="card_number" class="form-control" required pattern="\d{16}" title="Please enter a 16-digit card number" placeholder="1234567812345678" maxlength="16">
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+            <label for="expiry" class="form-label">{{ _('checkout.expiry') }}</label>
+            <input type="text" id="expiry" name="expiry" class="form-control" required pattern="(0[1-9]|1[0-2])\/\d{2}" title="MM/YY" placeholder="MM/YY" maxlength="5">
+        </div>
+        <div class="form-group">
+            <label for="cvv" class="form-label">{{ _('checkout.cvv') }}</label>
+            <input type="text" id="cvv" name="cvv" class="form-control" required pattern="\d{3,4}" title="3 or 4 digits" placeholder="123" maxlength="4">
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; align-items: center;">
+        <button type="submit" class="btn" style="flex: 1; text-align: center;">{{ _('checkout.pay') }}</button>
+        <a href="/billing" class="btn" style="background: #f3f4f6; color: var(--text-main); text-align: center; border: 1px solid var(--border-color);">{{ _('billing.back') }}</a>
+    </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const plan = '{{ plan }}';
+        const basePrice = {{ base_price }};
+        
+        if (plan === 'payg') {
+            const quantityInput = document.getElementById('quantity');
+            const totalCostDisplay = document.getElementById('totalCost');
+            
+            quantityInput.addEventListener('input', function() {
+                const quantity = parseInt(this.value) || 1;
+                const total = Math.max(1, quantity) * basePrice;
+                totalCostDisplay.textContent = total + ' SAR';
+            });
+        }
+    });
+</script>
+{% endblock %}

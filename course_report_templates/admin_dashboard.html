@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+    <h1>Admin Dashboard</h1>
+    <p>Production data overview from PostgreSQL.</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ totals.users }}</div>
+        <div class="stat-label">Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ totals.courses }}</div>
+        <div class="stat-label">Saved Courses</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ totals.reports }}</div>
+        <div class="stat-label">Saved Reports</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ totals.contact_requests }}</div>
+        <div class="stat-label">Contact Requests</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Latest Users</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>University</th>
+                    <th>College</th>
+                    <th>Department</th>
+                    <th>Plan</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in latest_users %}
+                    <tr>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.university_name }}</td>
+                        <td>{{ user.college }}</td>
+                        <td>{{ user.department }}</td>
+                        <td>{{ user.billing_plan }}</td>
+                        <td>{{ user.created_at }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6">No users yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Latest Reports</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Report</th>
+                    <th>Course</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in latest_reports %}
+                    <tr>
+                        <td>{{ report.email }}</td>
+                        <td>{{ report.title }}</td>
+                        <td>{{ report.course_name }}</td>
+                        <td>{{ report.created_at }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">No saved reports yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Latest Courses</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Course</th>
+                    <th>Code</th>
+                    <th>College</th>
+                    <th>Department</th>
+                    <th>Program</th>
+                    <th>Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in latest_courses %}
+                    <tr>
+                        <td>{{ course.email }}</td>
+                        <td>{{ course.display_name }}</td>
+                        <td>{{ course.course_code }}</td>
+                        <td>{{ course.college }}</td>
+                        <td>{{ course.department }}</td>
+                        <td>{{ course.program }}</td>
+                        <td>{{ course.updated_at }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="7">No saved courses yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Latest Contact Requests</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Organization</th>
+                    <th>College</th>
+                    <th>Department</th>
+                    <th>Message</th>
+                    <th>Attachment</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in latest_contacts %}
+                    <tr>
+                        <td>{{ contact.enquiry_type }}</td>
+                        <td>{{ contact.name }}</td>
+                        <td>{{ contact.email }}</td>
+                        <td>{{ contact.organization }}</td>
+                        <td>{{ contact.college }}</td>
+                        <td>{{ contact.department }}</td>
+                        <td style="max-width: 360px;">{{ contact.message }}</td>
+                        <td>
+                            {% if contact.attachment_stored_name %}
+                                <a href="{{ url_for('admin_contact_attachment', filename=contact.attachment_stored_name) }}">{{ contact.attachment_original_name or 'Download' }}</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ contact.created_at }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="9">No contact requests yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--accent);
+    }
+
+    .stat-label {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+</style>
+{% endblock %}

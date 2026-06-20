@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+        <h2 style="margin-top: 0;">{{ _('spec.title') }}</h2>
+        <a href="/clo-attainment" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('spec.back') }}</a>
+    </div>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">{{ _('spec.description') }}</p>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label class="form-label">{{ _('spec.file') }}</label>
+            <input type="file" name="course_spec_file" class="form-control" accept=".pdf,.docx" required style="padding: 0.5rem;">
+        </div>
+        <button type="submit" class="btn extract-progress-button" data-extract-progress-button data-loading-label="{{ _('courses.extracting') }}" style="display: inline-flex; align-items: center; gap: 0.45rem;">
+            <span class="extract-donut" aria-hidden="true"></span>
+            <span class="extract-button-label">{{ _('spec.extract') }}</span>
+        </button>
+    </form>
+
+    {% if extracted %}
+        <div style="margin-top: 2rem;">
+            <h3>{{ _('spec.preview') }}</h3>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>{{ _('spec.list_name') }}</th>
+                        <td>{{ extracted.name or "-" }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ _('spec.course_name') }}</th>
+                        <td>{{ extracted.course_name or "-" }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ _('spec.course_number') }}</th>
+                        <td>{{ extracted.course_code or "-" }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ _('spec.clos') }}</th>
+                        <td>
+                            {% if extracted.clos %}
+                                <div style="display: grid; gap: 1rem;">
+                                    <div>
+                                        <strong>{{ _('domain.knowledge') }}</strong>
+                                        {% if extracted.grouped_clos['knowledge'] %}
+                                            <ul style="margin: 0.5rem 0 0; padding-left: 1.25rem;">
+                                                {% for clo in extracted.grouped_clos['knowledge'] %}
+                                                    <li>{{ clo }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p style="color: var(--text-muted); margin: 0.35rem 0 0;">{{ _('spec.no_knowledge') }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <strong>{{ _('domain.skills') }}</strong>
+                                        {% if extracted.grouped_clos['skills'] %}
+                                            <ul style="margin: 0.5rem 0 0; padding-left: 1.25rem;">
+                                                {% for clo in extracted.grouped_clos['skills'] %}
+                                                    <li>{{ clo }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p style="color: var(--text-muted); margin: 0.35rem 0 0;">{{ _('spec.no_skills') }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <strong>{{ _('domain.values') }}</strong>
+                                        {% if extracted.grouped_clos['values'] %}
+                                            <ul style="margin: 0.5rem 0 0; padding-left: 1.25rem;">
+                                                {% for clo in extracted.grouped_clos['values'] %}
+                                                    <li>{{ clo }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p style="color: var(--text-muted); margin: 0.35rem 0 0;">{{ _('spec.no_values') }}</p>
+                                        {% endif %}
+                                    </div>
+                                    {% if extracted.grouped_clos['other'] %}
+                                        <div>
+                                            <strong>{{ _('domain.other') }}</strong>
+                                            <ul style="margin: 0.5rem 0 0; padding-left: 1.25rem;">
+                                                {% for clo in extracted.grouped_clos['other'] %}
+                                                    <li>{{ clo }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{{ _('courses.topics') }}</th>
+                        <td>
+                            {% if extracted.topics %}
+                                <div style="display: grid; gap: 0.35rem;">
+                                    {% for topic in extracted.topics %}
+                                        <div>- {{ topic }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {% if extracted.name and extracted.clos %}
+                <form method="POST" style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="course_name" value="{{ extracted.course_name }}">
+                    <input type="hidden" name="course_code" value="{{ extracted.course_code }}">
+                    <input type="hidden" name="clos_json" value='{{ extracted.clos | tojson | e }}'>
+                    <input type="hidden" name="topics_json" value='{{ extracted.topics | tojson | e }}'>
+                    <input type="hidden" name="clo_plos_json" value='{{ extracted.clo_plos|default({}, true) | tojson | e }}'>
+                    <button type="submit" class="btn">{{ _('spec.add_course') }}</button>
+                    <a href="/course-specification" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('spec.upload_another') }}</a>
+                </form>
+            {% else %}
+                <p style="color: #b91c1c; font-weight: 600; margin-top: 1rem;">{{ _('spec.cannot_add') }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

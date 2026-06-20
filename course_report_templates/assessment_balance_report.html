@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .report-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    @media (min-width: 768px) {
+        .report-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    .stat-card {
+        background: #f9fafb;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--primary);
+        font-family: var(--brand-font);
+    }
+    .stat-label {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    .balance-bar-container {
+        margin-bottom: 1.5rem;
+    }
+    .balance-bar-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .balance-bar-bg {
+        background: #e5e7eb;
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .balance-bar-fill {
+        background: var(--primary);
+        height: 100%;
+        border-radius: 6px;
+    }
+    .warning-text {
+        color: var(--danger);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+</style>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h2 style="margin-top: 0;">Assessment Balance Report</h2>
+            <p style="color: var(--text-muted); margin: 0;">
+                Course: <strong>{{ course_name }}</strong> &nbsp;|&nbsp; Assessment: <strong>{{ assessment_name }}</strong>
+            </p>
+        </div>
+        <a href="/assessment-balance-check" class="btn">New Assessment Check</a>
+    </div>
+
+    <div class="report-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ "%.1f"|format(total_score) }}</div>
+            <div class="stat-label">Total Points Allocated</div>
+        </div>
+        
+        <div class="stat-card">
+            {% set covered_clos = clo_distribution|selectattr('score', '>', 0)|list|length %}
+            {% set total_clos = clo_distribution|length %}
+            <div class="stat-value">{{ covered_clos }} / {{ total_clos }}</div>
+            <div class="stat-label">CLOs Covered in Assessment</div>
+        </div>
+    </div>
+
+    <h3 style="margin-top: 3rem; margin-bottom: 1.5rem;">Score Distribution by CLO</h3>
+    
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem;">
+        {% for item in clo_distribution %}
+            <div class="balance-bar-container" style="margin-bottom: 2rem;">
+                <div style="font-weight: 600; font-size: 1.05rem; margin-bottom: 1rem; color: var(--text-main);">
+                    {{ item.clo }}
+                </div>
+                
+                {% set q_pct = (item.count / total_questions * 100) if total_questions > 0 else 0 %}
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; padding-left: 1rem; border-left: 3px solid var(--border-color);">
+                    <!-- Questions Bar -->
+                    <div>
+                        <div class="balance-bar-header">
+                            <span style="color: var(--text-muted);">From Total Questions</span>
+                            <strong>{{ item.count }} / {{ total_questions }} ({{ "%.1f"|format(q_pct) }}%)</strong>
+                        </div>
+                        <div class="balance-bar-bg">
+                            <div class="balance-bar-fill" style="width: {{ q_pct }}%; background: #3b82f6;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Marks Bar -->
+                    <div>
+                        <div class="balance-bar-header">
+                            <span style="color: var(--text-muted);">From Total Marks</span>
+                            <strong>{{ "%.1f"|format(item.score) }} / {{ "%.1f"|format(total_score) }} pts ({{ "%.1f"|format(item.pct) }}%)</strong>
+                        </div>
+                        <div class="balance-bar-bg">
+                            <div class="balance-bar-fill" style="width: {{ item.pct }}%; background: #10b981;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if item.score == 0 %}
+                    <div class="warning-text" style="margin-top: 0.75rem;">⚠️ This CLO is not covered in this assessment.</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

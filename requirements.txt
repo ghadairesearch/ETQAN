@@ -1,0 +1,12 @@
+Flask
+gunicorn
+pandas
+openpyxl
+pypdf
+reportlab
+arabic-reshaper
+python-bidi
+python-docx
+PyMuPDF
+docx2txt
+psycopg2-binary

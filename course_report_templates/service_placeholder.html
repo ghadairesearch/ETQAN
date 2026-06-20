@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 760px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ title }}</h2>
+    <p style="color: var(--text-muted); margin-top: -0.35rem;">{{ description }}</p>
+    <div class="alert">{{ _('service.coming_soon') }}</div>
+    <a href="/" class="btn">{{ _('service.back_home') }}</a>
+</div>
+{% endblock %}

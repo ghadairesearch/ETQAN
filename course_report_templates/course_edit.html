@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 960px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+        <div>
+            <h2 style="margin-top: 0;">{{ _('courses.edit_title') }}</h2>
+            <p style="color: var(--text-muted); margin-top: -0.5rem;">{{ _('courses.edit_help') }}</p>
+        </div>
+        <a href="{{ url_for('my_courses') }}" class="btn" style="background: transparent; color: var(--text-color); border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5"></path>
+                <path d="M12 19l-7-7 7-7"></path>
+            </svg>
+            <span>{{ _('courses.back_to_courses') }}</span>
+        </a>
+    </div>
+
+    <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb; margin-bottom: 1.25rem;">
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="clo_plos_json" value='{{ draft_course.clo_plos_json|default("{}", true) }}'>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; align-items: start;">
+                <section style="border: 1px solid var(--border-color); border-radius: 8px; background: #fff; padding: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">{{ _('courses.spec_file') }}</label>
+                        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                            <input type="file" name="course_spec_file" class="form-control" accept=".pdf,.docx" style="padding: 0.5rem; flex: 1 1 280px;">
+                            <button type="submit" name="form_action" value="extract" class="btn extract-progress-button" data-extract-progress-button data-loading-label="{{ _('courses.extracting') }}" title="{{ _('courses.extract') }}" aria-label="{{ _('courses.extract') }}" style="display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
+                                <span class="extract-donut" aria-hidden="true"></span>
+                                <svg class="extract-button-icon" viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <path d="M14 2v6h6"></path>
+                                    <path d="M9 15h6"></path>
+                                    <path d="M12 12v6"></path>
+                                </svg>
+                                <span class="extract-button-label">{{ _('courses.extract') }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                    <span style="height: 1px; background: var(--border-color); flex: 1;"></span>
+                    <span>{{ _('courses.manual_method') }}</span>
+                    <span style="height: 1px; background: var(--border-color); flex: 1;"></span>
+                </div>
+                <section style="border: 1px solid var(--border-color); border-radius: 8px; background: #fff; padding: 1rem;">
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0 0 0.9rem;">{{ _('courses.manual_help') }}</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">{{ _('courses.course_name') }}</label>
+                            <input type="text" name="course_name" class="form-control" value="{{ draft_course.course_name|default('', true) }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">{{ _('courses.course_code') }}</label>
+                            <input type="text" name="course_code" class="form-control" value="{{ draft_course.course_code|default('', true) }}">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">{{ _('courses.college') }}</label>
+                            <input type="text" name="college" class="form-control" value="{{ draft_course.college|default('', true) }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">{{ _('courses.department') }}</label>
+                            <input type="text" name="department" class="form-control" value="{{ draft_course.department|default('', true) }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">{{ _('courses.program') }}</label>
+                            <input type="text" name="program" class="form-control" value="{{ draft_course.program|default('', true) }}">
+                        </div>
+                    </div>
+                    {% include "course_clo_table.html" %}
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label class="form-label">{{ _('courses.topics') }}</label>
+                        <textarea name="topics" class="form-control" rows="5" placeholder="{{ _('courses.topics_placeholder') }}">{{ draft_course.topics_text|default('', true) }}</textarea>
+                    </div>
+                </section>
+            </div>
+
+            <button type="submit" name="form_action" value="save" class="btn" style="margin-top: 1rem;">{{ _('courses.save') }}</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

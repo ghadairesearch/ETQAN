@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .billing-plan-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .billing-plan-card {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        min-height: 250px;
+    }
+
+    .billing-plan-card form,
+    .billing-plan-card .billing-card-action {
+        margin-top: auto;
+    }
+
+    .feature-comparison {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+    }
+
+    .feature-comparison th,
+    .feature-comparison td {
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.85rem 1rem;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    [dir="rtl"] .feature-comparison th,
+    [dir="rtl"] .feature-comparison td {
+        text-align: right;
+    }
+
+    .feature-comparison th {
+        background: #f9fafb;
+        color: var(--text-main);
+    }
+
+    .feature-comparison tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .feature-check {
+        color: var(--accent);
+        font-weight: 800;
+    }
+
+    @media (max-width: 1100px) {
+        .billing-plan-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 720px) {
+        .billing-plan-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .feature-comparison {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    }
+</style>
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+        <div>
+            <h2 style="margin-top: 0;">{{ _('billing.title') }}</h2>
+            <p style="color: var(--text-muted); margin-top: -0.35rem;">{{ _('billing.description') }}</p>
+        </div>
+
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb;">
+            <span style="display: block; color: var(--text-muted); font-size: 0.875rem;">{{ _('billing.free_status') }}</span>
+            <strong style="font-size: 1.35rem; color: var(--accent);">{{ billing_status.saved_report_count }} / {{ billing_status.free_limit }}</strong>
+        </div>
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb;">
+            <span style="display: block; color: var(--text-muted); font-size: 0.875rem;">{{ _('billing.credits') }}</span>
+            <strong style="font-size: 1.35rem; color: var(--accent);">{{ billing_status.report_credits }}</strong>
+        </div>
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb;">
+            <span style="display: block; color: var(--text-muted); font-size: 0.875rem;">{{ _('billing.plan') }}</span>
+            <strong style="font-size: 1.35rem; color: var(--accent);">
+                {% if billing_status.active_plan == 'academic' %}
+                    {{ _('billing.academic_active') }}
+                {% elif billing_status.active_plan == 'professional' %}
+                    {{ _('billing.professional_active') }}
+                {% else %}
+                    {{ _('billing.free') }}
+                {% endif %}
+            </strong>
+            {% if billing_status.active_plan == 'academic' %}
+                <span style="display: block; margin-top: 0.25rem; color: var(--text-muted); font-size: 0.875rem;">
+                    {{ billing_status.academic_reports_used }} / {{ billing_status.academic_report_limit }} {{ _('billing.feature_clo_reports') }}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="billing-plan-grid">
+        <section class="billing-plan-card">
+            <h3 style="margin-top: 0;">{{ _('billing.payg_title') }}</h3>
+            <p style="font-size: 1.35rem; font-weight: 700; color: var(--accent); margin: 0 0 0.75rem;">{{ payg_price }} {{ _('billing.payg_unit') }}</p>
+            <p style="color: var(--text-muted);">{{ _('billing.payg_description') }}</p>
+            <div class="billing-card-action">
+                <a href="/checkout?plan=payg" class="btn">{{ _('billing.payg_button') }}</a>
+            </div>
+        </section>
+
+        <section class="billing-plan-card">
+            <h3 style="margin-top: 0;">{{ _('billing.academic_title') }}</h3>
+            <p style="font-size: 1.35rem; font-weight: 700; color: var(--accent); margin: 0 0 0.75rem;">{{ _('billing.academic_price') }}</p>
+            <p style="color: var(--text-muted);">{{ _('billing.academic_description') }}</p>
+            <div class="billing-card-action">
+                <a href="/checkout?plan=academic" class="btn">{{ _('billing.academic_button') }}</a>
+            </div>
+        </section>
+
+        <section class="billing-plan-card">
+            <h3 style="margin-top: 0;">{{ _('billing.professional_title') }}</h3>
+            <p style="font-size: 1.35rem; font-weight: 700; color: var(--accent); margin: 0 0 0.75rem;">{{ professional_price }} {{ _('billing.yearly_unit') }}</p>
+            <p style="color: var(--text-muted);">{{ _('billing.professional_description') }}</p>
+            <div class="billing-card-action">
+                <a href="/checkout?plan=professional" class="btn">{{ _('billing.professional_button') }}</a>
+            </div>
+        </section>
+
+        <section class="billing-plan-card">
+            <h3 style="margin-top: 0;">{{ _('billing.university_title') }}</h3>
+            <p style="font-size: 1.35rem; font-weight: 700; color: var(--accent); margin: 0 0 0.75rem;">{{ _('billing.university_price') }}</p>
+            <p style="color: var(--text-muted);">{{ _('billing.university_description') }}</p>
+            <div class="billing-card-action">
+                <a href="/contact-us?topic=university-subscription" class="btn">{{ _('billing.university_button') }}</a>
+            </div>
+        </section>
+    </div>
+
+    <table class="feature-comparison">
+        <thead>
+            <tr>
+                <th>{{ _('billing.feature') }}</th>
+                <th>{{ _('billing.free_col') }}</th>
+                <th>{{ _('billing.academic_col') }}</th>
+                <th>{{ _('billing.professional_col') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>{{ _('billing.feature_clo_reports') }}</td><td>{{ _('billing.one_free_report') }}</td><td>{{ _('billing.ten_reports_year') }}</td><td>{{ _('billing.unlimited') }}</td></tr>
+            <tr><td>{{ _('billing.feature_pdf') }}</td><td class="feature-check">&#10003;</td><td class="feature-check">&#10003;</td><td class="feature-check">&#10003;</td></tr>
+            <tr><td>{{ _('billing.feature_watermark') }}</td><td>{{ _('billing.with_watermark') }}</td><td>{{ _('billing.no_watermark') }}</td><td>{{ _('billing.no_watermark') }}</td></tr>
+            <tr><td>{{ _('billing.feature_csv') }}</td><td class="feature-check">&#10003;</td><td class="feature-check">&#10003;</td><td class="feature-check">&#10003;</td></tr>
+            <tr><td>{{ _('billing.feature_spec') }}</td><td class="feature-check">&#10003;</td><td class="feature-check">&#10003;</td><td class="feature-check">&#10003;</td></tr>
+            <tr><td>{{ _('billing.feature_multi') }}</td><td class="feature-check">&#10003;</td><td class="feature-check">&#10003;</td><td class="feature-check">&#10003;</td></tr>
+            <tr><td>{{ _('billing.feature_courses') }}</td><td>&ndash;</td><td>{{ _('billing.ten_courses') }}</td><td>{{ _('billing.unlimited') }}</td></tr>
+            <tr><td>{{ _('billing.feature_history') }}</td><td>{{ _('billing.one_saved_report') }}</td><td>{{ _('billing.last_12_months') }}</td><td>{{ _('billing.unlimited') }}</td></tr>
+            <tr><td>{{ _('billing.feature_priority') }}</td><td>&ndash;</td><td>&ndash;</td><td class="feature-check">&#10003;</td></tr>
+            <tr><td>{{ _('billing.feature_dashboard') }}</td><td>&ndash;</td><td>&ndash;</td><td class="feature-check">&#10003;</td></tr>
+            <tr><td>{{ _('billing.feature_evidence') }}</td><td>&ndash;</td><td>&ndash;</td><td class="feature-check">&#10003;</td></tr>
+            <tr><td>{{ _('billing.feature_early') }}</td><td>&ndash;</td><td>&ndash;</td><td class="feature-check">&#10003;</td></tr>
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

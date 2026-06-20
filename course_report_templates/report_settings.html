@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 720px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ _('report_settings.title') }}</h2>
+
+    <form method="POST">
+        <div class="form-group">
+            <label class="form-label">{{ _('report_settings.language') }}</label>
+            <select name="report_language" class="form-control">
+                <option value="en" {% if report_language == 'en' %}selected{% endif %}>{{ _('report_settings.english') }}</option>
+                <option value="ar" {% if report_language == 'ar' %}selected{% endif %}>{{ _('report_settings.arabic') }}</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="submit" class="btn">{{ _('report_settings.save') }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set active_branding = display_branding if display_branding is defined else report_branding %}
+{% set can_export = show_exports if show_exports is defined else true %}
+{% set export_csv_url = export_csv_url if export_csv_url is defined else '/export-results/csv' %}
+{% set export_pdf_url = export_pdf_url if export_pdf_url is defined else '/export-results/pdf' %}
+{% set delete_report_url = delete_report_url if delete_report_url is defined else '' %}
+{% set saved_report_view = saved_report_view if saved_report_view is defined else false %}
+{% set show_course_report_export = show_course_report_export if show_course_report_export is defined else true %}
+<style>
+    .result-export-menu {
+        position: relative;
+    }
+
+    .result-export-button,
+    .result-delete-button {
+        width: 2.6rem;
+        height: 2.6rem;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--accent);
+        color: #fff;
+        border: 0;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .result-delete-button {
+        background: var(--danger);
+    }
+
+    .result-export-button svg,
+    .result-delete-button svg {
+        width: 1.1rem;
+        height: 1.1rem;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+    }
+
+    .result-export-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 0.35rem);
+        right: 0;
+        min-width: 135px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        box-shadow: 0 10px 20px rgba(20, 29, 47, 0.12);
+        z-index: 25;
+        padding: 0.35rem;
+    }
+
+    [dir="rtl"] .result-export-panel {
+        right: auto;
+        left: 0;
+    }
+
+    .result-export-menu.open .result-export-panel {
+        display: grid;
+        gap: 0.15rem;
+    }
+
+    .result-export-panel a {
+        color: var(--text-main);
+        text-decoration: none;
+        padding: 0.65rem 0.75rem;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    .result-export-panel a:hover {
+        background: #f3f4f6;
+        color: var(--accent);
+    }
+</style>
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <!-- Logo hidden on webpage, only shown in PDF exports -->
+            <div>
+            <h2 style="margin-top: 0;">{{ _('results.title') }}</h2>
+            {% if course_info %}
+                <p style="color: var(--text-main); margin: 0 0 0.5rem;">
+                    <strong>{{ _('results.course') }}</strong> {{ course_info.course_name }}{% if course_info.course_id %} ({{ course_info.course_id }}){% endif %}
+                </p>
+            {% endif %}
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">
+                {{ _('results.total_students') }} <strong>{{ total_students }}</strong>
+            </p>
+            </div>
+            </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; align-items: center;">
+        {% if saved_report_view or not can_export %}
+            <a href="/reports" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_reports') }}</a>
+        {% endif %}
+        {% if can_export %}
+            {% if current_user and current_user.university_name %}
+            <div style="display: flex; gap: 0.45rem; justify-content: flex-end; align-items: center;">
+                <div class="result-export-menu" id="result_export_menu">
+                    <button type="button" class="result-export-button" id="result_export_button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
+                    </button>
+                    <div class="result-export-panel" aria-labelledby="result_export_button">
+                        <a href="{{ export_csv_url }}">{{ _('results.export_csv') }}</a>
+                        <a href="{{ export_pdf_url }}">{{ _('results.export_pdf') }}</a>
+                    </div>
+                </div>
+                {% if delete_report_url %}
+                <form method="POST" action="{{ delete_report_url }}" onsubmit="return confirm('{{ _('history.delete_confirm') }}');" style="margin: 0;">
+                    <button type="submit" class="result-delete-button" aria-label="{{ _('history.delete') }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3 6h18"></path>
+                            <path d="M8 6V4h8v2"></path>
+                            <path d="M19 6l-1 16H6L5 6"></path>
+                            <path d="M10 11v6"></path>
+                            <path d="M14 11v6"></path>
+                        </svg>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            {% elif current_user %}
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end;">
+                <a href="/account/organization" class="btn">{{ _('results.complete_org') }}</a>
+            </div>
+            {% else %}
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end;">
+                <a href="/login" class="btn">{{ _('results.login_export') }}</a>
+                <a href="/register" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.create_account') }}</a>
+            </div>
+            {% endif %}
+        {% endif %}
+        </div>
+    </div>
+
+
+    {% if student_count_warning %}
+        <div class="alert" style="border-color: var(--danger); color: var(--danger); background: rgba(239, 68, 68, 0.08);">
+            {{ student_count_warning }}
+        </div>
+    {% endif %}
+
+    {% if can_export and not current_user %}
+        <div class="alert">
+            {{ _('results.export_requires_account') }}
+        </div>
+    {% endif %}
+
+    {% if stats %}
+    <h3 style="margin-top: 1rem;">{{ _('results.clo_definitions') }}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 130px;">{{ _('results.domain') }}</th>
+                <th style="width: 110px;">{{ _('results.clo') }}</th>
+                <th>{{ _('results.wording') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for clo_def in clo_definitions %}
+            <tr>
+                <td>{{ _(clo_def.domain_key) if clo_def.domain_key is defined else clo_def.domain }}</td>
+                <td>{{ clo_def.number }}</td>
+                <td>{{ clo_def.wording }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 style="margin-top: 2rem;">{{ _('results.summary') }}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>{{ _('results.clo') }}</th>
+                <th>{{ _('results.mapped_questions') }}</th>
+                <th>{{ _('results.max_possible') }}</th>
+                <th>{{ _('results.target') }}</th>
+                <th>{{ _('results.students_achieved') }}</th>
+                <th>{{ _('results.achievement_pct') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for clo, data in stats_items %}
+            <tr>
+                <td>{{ clo_number(clo) }}</td>
+                <td style="color: var(--text-muted); font-size: 0.875rem;">
+                    {{ format_mapped_questions_for_report(data.questions) }}
+                    <div style="font-size: 0.8rem; margin-top: 0.25rem;">{{ data.questions|length }} {{ count_unit('question', data.questions|length) }}</div>
+                </td>
+                <td>{{ data.total_possible_score }}</td>
+                <td>{{ "%.2f"|format(data.target_score) }} <span style="color: var(--text-muted); font-size: 0.8em;">({{ "%.2f"|format(data.target_pct) }}%)</span></td>
+                <td>{{ data.students_achieved }}</td>
+                <td>
+                    {% if data.achievement_percentage >= 70 %}
+                        <span class="badge" style="background-color: rgba(16, 185, 129, 0.2); color: #34d399;">{{ data.achievement_percentage }}%</span>
+                    {% elif data.achievement_percentage >= 50 %}
+                        <span class="badge" style="background-color: rgba(245, 158, 11, 0.2); color: #fbbf24;">{{ data.achievement_percentage }}%</span>
+                    {% else %}
+                        <span class="badge" style="background-color: rgba(239, 68, 68, 0.2); color: #f87171;">{{ data.achievement_percentage }}%</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if student_achievement_matrix and student_achievement_matrix.students %}
+    <h3 style="margin-top: 2rem;">{{ _('results.student_achievement') }}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>{{ _('results.student_id') }}</th>
+                {% for clo in student_achievement_matrix.clos %}
+                    <th>{{ clo_number(clo) }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for student_id in student_achievement_matrix.students %}
+            <tr>
+                <td>{{ display_student_id(student_id) }}</td>
+                {% for clo in student_achievement_matrix.clos %}
+                    {% set cell = student_achievement_matrix.cells.get(student_id, {}).get(clo) %}
+                    <td>
+                    {% if cell %}
+                        <div>{{ "%.2f"|format(cell.score) }}</div>
+                        {% if cell.achieved %}
+                            <span class="badge" style="background-color: rgba(16, 185, 129, 0.2); color: #34d399;">{{ _('results.achieved') }}</span>
+                        {% else %}
+                            <span class="badge" style="background-color: rgba(239, 68, 68, 0.2); color: #f87171;">{{ _('results.not_achieved') }}</span>
+                        {% endif %}
+                    {% else %}
+                        <span style="color: var(--text-muted);">-</span>
+                    {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if saved_report_view %}
+    {% elif can_export %}
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; margin-top: 1rem;">
+            <a href="/mapping" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_mapping') }}</a>
+        </div>
+    {% else %}
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; margin-top: 1rem;">
+            <a href="/clo-attainment" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.create_new') }}</a>
+        </div>
+    {% endif %}
+    {% else %}
+    <div class="alert">
+        {{ _('results.no_mappings') }}
+    </div>
+    {% endif %}
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menu = document.getElementById('result_export_menu');
+        const button = document.getElementById('result_export_button');
+        if (menu && button) {
+            button.addEventListener('click', function(event) {
+                event.stopPropagation();
+                const isOpen = menu.classList.toggle('open');
+                button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+            document.addEventListener('click', function() {
+                menu.classList.remove('open');
+                button.setAttribute('aria-expanded', 'false');
+            });
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    menu.classList.remove('open');
+                    button.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .assessment-upload-panel {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #f9fafb;
+        padding: 1rem;
+    }
+
+    .assessment-upload-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .assessment-row {
+        display: grid;
+        grid-template-columns: 44px minmax(140px, 180px) minmax(210px, 1fr) auto;
+        gap: 0.75rem;
+        align-items: end;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+
+    .assessment-column-header {
+        display: grid;
+        grid-template-columns: 44px minmax(140px, 180px) minmax(210px, 1fr) auto;
+        gap: 0.75rem;
+        padding: 0 0.75rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .assessment-row-number {
+        height: 2.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        background: rgba(26, 101, 107, 0.1);
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    @media (max-width: 760px) {
+        .assessment-upload-header .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .assessment-row {
+            grid-template-columns: 44px minmax(0, 1fr);
+        }
+
+        .assessment-column-header {
+            display: none;
+        }
+
+        .assessment-file-cell,
+        .remove-assessment {
+            grid-column: 1 / -1;
+        }
+
+        .remove-assessment {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="card">
+    <h2 style="margin-top: 0;">{{ _('index.title') }}</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label class="form-label">{{ _('index.course') }}</label>
+            <div style="display: flex; align-items: stretch; gap: 0.75rem; flex-wrap: wrap;">
+                <select name="course_name" id="course_select" class="form-control" required style="flex: 1 1 320px; min-width: 0;">
+                    <option value="">{{ _('index.select_course') }}</option>
+                    {% for course in courses %}
+                        <option value="{{ course.name }}" {% if selected_course_name == course.name %}selected{% endif %}>{{ (course.display_label_ar if language == 'ar' else course.display_label_en) or course.display_label or course.name }}</option>
+                    {% endfor %}
+                </select>
+                <span title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 2.45rem; height: 2.45rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; text-decoration: none; font-size: 1.2rem; align-self: center; flex-shrink: 0; cursor: help;">
+                    i
+                </span>
+            </div>
+        </div>
+
+        <div id="clo_targets_container" style="margin-bottom: 1.5rem;">
+            <label class="form-label">{{ _('index.target_label') }}</label>
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">{{ _('index.target_help') }}</p>
+            <table id="clo_table" style="background: #f9fafb; border: 1px solid var(--border-color);">
+                <thead>
+                    <tr>
+                        <th>{{ _('index.clo') }}</th>
+                        <th style="width: 150px;">{{ _('index.target_level') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="2" style="background: rgba(0,0,0,0.05); font-weight: bold; padding: 0.5rem 1rem;">{{ _('domain.knowledge') }}</td></tr>
+                </tbody>
+                <tbody id="tbody_knowledge">
+                    <tr><td colspan="2" style="color: var(--text-muted); font-style: italic; text-align: center; font-size: 0.875rem;">{{ _('index.select_course_populate') }}</td></tr>
+                </tbody>
+                
+                <tbody>
+                    <tr><td colspan="2" style="background: rgba(0,0,0,0.05); font-weight: bold; padding: 0.5rem 1rem;">{{ _('domain.skills') }}</td></tr>
+                </tbody>
+                <tbody id="tbody_skills">
+                    <tr><td colspan="2" style="color: var(--text-muted); font-style: italic; text-align: center; font-size: 0.875rem;">{{ _('index.select_course_populate') }}</td></tr>
+                </tbody>
+                
+                <tbody>
+                    <tr><td colspan="2" style="background: rgba(0,0,0,0.05); font-weight: bold; padding: 0.5rem 1rem;">{{ _('domain.values') }}</td></tr>
+                </tbody>
+                <tbody id="tbody_values">
+                    <tr><td colspan="2" style="color: var(--text-muted); font-style: italic; text-align: center; font-size: 0.875rem;">{{ _('index.select_course_populate') }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">{{ _('index.assessment_files') }}</label>
+            <div class="assessment-upload-panel">
+                <div class="assessment-upload-header">
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">{{ _('index.assessment_help') }}</p>
+                </div>
+                <div class="assessment-column-header">
+                    <span></span>
+                    <span>{{ _('index.type') }}</span>
+                    <span>{{ _('index.grades_file') }}</span>
+                    <span></span>
+                </div>
+                <div id="assessment_rows" style="display: grid; gap: 0.75rem;">
+                    <div class="assessment-row">
+                        <input type="hidden" name="assessment_row_ids" value="1">
+                        <div class="assessment-row-number">1</div>
+                        <div>
+                            <select name="assessment_type_1" class="form-control" aria-label="Assessment type">
+                                <option value="Final">{{ _('assessment.final') }}</option>
+                                <option value="Midterm">{{ _('assessment.midterm') }}</option>
+                                <option value="Quiz">{{ _('assessment.quiz') }}</option>
+                                <option value="Project">{{ _('assessment.project') }}</option>
+                                <option value="Assignment">{{ _('assessment.assignment') }}</option>
+                                <option value="Other">{{ _('assessment.other') }}</option>
+                            </select>
+                        </div>
+                        <div class="assessment-file-cell">
+                            <input type="file" name="assessment_file_1" class="form-control assessment-file" accept=".pdf,.csv,.xlsx,.xls" style="padding: 0.5rem;" aria-label="Assessment file">
+                        </div>
+                        <button type="button" class="btn remove-assessment" style="background-color: var(--border-color); color: var(--text-main); padding: 0.75rem 1rem;">{{ _('index.remove') }}</button>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-start; margin-top: 0.75rem;">
+                    <button type="button" id="add_assessment_file" class="btn" style="background-color: var(--accent-secondary); padding: 0.65rem 1rem;">{{ _('index.add_file') }}</button>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn">{{ _('index.next_mapping') }}</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const assessmentRows = document.getElementById('assessment_rows');
+        const addAssessmentFile = document.getElementById('add_assessment_file');
+        const courseSelect = document.getElementById('course_select');
+        const tbKnowledge = document.getElementById('tbody_knowledge');
+        const tbSkills = document.getElementById('tbody_skills');
+        const tbValues = document.getElementById('tbody_values');
+        const savedTargetPercentages = {{ saved_target_percentages|tojson }};
+        const savedCustomClos = {{ saved_custom_clos|tojson }};
+        const savedCourseName = {{ selected_course_name|tojson }};
+        const text = {
+            assessmentType: {{ _('index.type')|tojson }},
+            assessmentFile: {{ _('index.grades_file')|tojson }},
+            quiz: {{ _('assessment.quiz')|tojson }},
+            assignment: {{ _('assessment.assignment')|tojson }},
+            midterm: {{ _('assessment.midterm')|tojson }},
+            final: {{ _('assessment.final')|tojson }},
+            project: {{ _('assessment.project')|tojson }},
+            other: {{ _('assessment.other')|tojson }},
+            remove: {{ _('index.remove')|tojson }},
+            courseError: {{ _('index.error_course')|tojson }},
+            fileError: {{ _('index.error_file')|tojson }},
+            emptyCategory: {{ _('index.no_clos_category')|tojson }},
+            selectCourse: {{ _('index.select_course_populate')|tojson }}
+        };
+        let assessmentRowCounter = 1;
+        
+        let coursesData = [];
+        
+        // Fetch courses config
+        fetch('/api/courses')
+            .then(res => res.json())
+            .then(data => {
+                coursesData = data;
+                if (courseSelect.value) {
+                    courseSelect.dispatchEvent(new Event('change'));
+                }
+            });
+
+        function updateRemoveButtons() {
+            const rows = assessmentRows.querySelectorAll('.assessment-row');
+            rows.forEach((row, index) => {
+                const number = row.querySelector('.assessment-row-number');
+                if (number) {
+                    number.textContent = index + 1;
+                }
+                const button = row.querySelector('.remove-assessment');
+                button.disabled = rows.length === 1;
+                button.style.opacity = rows.length === 1 ? '0.55' : '1';
+            });
+        }
+
+        function createAssessmentRow(rowId) {
+            const row = document.createElement('div');
+            const rowValue = rowId + 1;
+            row.className = 'assessment-row';
+            row.innerHTML = `
+                <input type="hidden" name="assessment_row_ids" value="${rowValue}">
+                <div class="assessment-row-number">${rowValue}</div>
+                <div>
+                    <select name="assessment_type_${rowValue}" class="form-control" aria-label="${text.assessmentType}">
+                        <option value="Final">${text.final}</option>
+                        <option value="Midterm">${text.midterm}</option>
+                        <option value="Quiz">${text.quiz}</option>
+                        <option value="Project">${text.project}</option>
+                        <option value="Assignment">${text.assignment}</option>
+                        <option value="Other">${text.other}</option>
+                    </select>
+                </div>
+                <div class="assessment-file-cell">
+                    <input type="file" name="assessment_file_${rowValue}" class="form-control assessment-file" accept=".pdf,.csv,.xlsx,.xls" style="padding: 0.5rem;" aria-label="${text.assessmentFile}">
+                </div>
+                <button type="button" class="btn remove-assessment" style="background-color: var(--border-color); color: var(--text-main); padding: 0.75rem 1rem;">${text.remove}</button>
+            `;
+            return row;
+        }
+
+        function showTopError(message) {
+            const container = document.querySelector('.container');
+            const existing = document.getElementById('upload_error_alert');
+            if (existing) {
+                existing.textContent = message;
+                existing.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+
+            const alertBox = document.createElement('div');
+            alertBox.id = 'upload_error_alert';
+            alertBox.className = 'alert alert-error';
+            alertBox.textContent = message;
+            container.insertBefore(alertBox, container.firstElementChild);
+            alertBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        addAssessmentFile.addEventListener('click', function() {
+            assessmentRows.appendChild(createAssessmentRow(assessmentRowCounter));
+            assessmentRowCounter += 1;
+            updateRemoveButtons();
+        });
+
+        assessmentRows.addEventListener('click', function(event) {
+            if (!event.target.classList.contains('remove-assessment')) {
+                return;
+            }
+            const rows = assessmentRows.querySelectorAll('.assessment-row');
+            if (rows.length <= 1) {
+                return;
+            }
+            event.target.closest('.assessment-row').remove();
+            updateRemoveButtons();
+        });
+
+        updateRemoveButtons();
+
+        form.addEventListener('submit', function(event) {
+            if (!courseSelect.value) {
+                event.preventDefault();
+                showTopError(text.courseError);
+                courseSelect.focus();
+                return;
+            }
+
+            const assessmentFiles = document.querySelectorAll('.assessment-file');
+            const hasFile = Array.from(assessmentFiles).some(input => input.files.length > 0);
+            if (!hasFile) {
+                event.preventDefault();
+                showTopError(text.fileError);
+            }
+        });
+
+        function renderClos(closToRender, selectedCourseName) {
+            const course = coursesData.find(c => c.name === selectedCourseName);
+            
+            tbKnowledge.innerHTML = '';
+            tbSkills.innerHTML = '';
+            tbValues.innerHTML = '';
+
+            const emptyMsg = `<tr><td colspan="2" style="color: var(--text-muted); font-style: italic; text-align: center; font-size: 0.875rem;">${text.emptyCategory}</td></tr>`;
+            const selectMsg = `<tr><td colspan="2" style="color: var(--text-muted); font-style: italic; text-align: center; font-size: 0.875rem;">${text.selectCourse}</td></tr>`;
+            
+            closToRender = closToRender || (
+                savedCustomClos.length > 0 && selectedCourseName === savedCourseName
+                    ? savedCustomClos
+                    : (course && course.clos ? course.clos : [])
+            );
+
+            if (closToRender.length > 0) {
+                closToRender.forEach((clo, idx) => {
+                    const courseTargetPercentages = course && course.target_percentages ? course.target_percentages : {};
+                    const savedTarget = Object.prototype.hasOwnProperty.call(savedTargetPercentages, clo)
+                        ? savedTargetPercentages[clo]
+                        : Object.prototype.hasOwnProperty.call(courseTargetPercentages, clo)
+                            ? courseTargetPercentages[clo]
+                        : 60;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="padding: 0.5rem;">
+                            <textarea name="clo_text_${idx}" class="form-control" rows="2" style="width: 100%; resize: vertical;" required>${clo}</textarea>
+                        </td>
+                        <td style="padding: 0.5rem; vertical-align: top;">
+                            <input type="number" name="target_${idx}" class="form-control" value="${savedTarget}" min="1" max="100" required>
+                        </td>
+                    `;
+                    
+                    if (clo.startsWith('1.')) {
+                        tbKnowledge.appendChild(tr);
+                    } else if (clo.startsWith('2.')) {
+                        tbSkills.appendChild(tr);
+                    } else if (clo.startsWith('3.')) {
+                        tbValues.appendChild(tr);
+                    } else {
+                        // Fallback
+                        tbKnowledge.appendChild(tr);
+                    }
+                });
+
+                if (!tbKnowledge.children.length) {
+                    tbKnowledge.innerHTML = emptyMsg;
+                }
+                if (!tbSkills.children.length) {
+                    tbSkills.innerHTML = emptyMsg;
+                }
+                if (!tbValues.children.length) {
+                    tbValues.innerHTML = emptyMsg;
+                }
+            } else {
+                tbKnowledge.innerHTML = selectMsg;
+                tbSkills.innerHTML = selectMsg;
+                tbValues.innerHTML = selectMsg;
+            }
+        }
+
+        courseSelect.addEventListener('change', function() {
+            renderClos(null, this.value);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ _('home.course_report_title') }}</h2>
+    <p style="color: var(--text-muted); margin-top: -0.35rem;">{{ _('course_report.select_description') }}</p>
+
+    {% if error_no_report %}
+    <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+        {{ _('course_report.no_associated_reports') }}
+        <br><br>
+        {{ _('course_report.create_clo_prompt') }}
+        <a href="/clo-attainment" style="font-weight: bold; text-decoration: underline; margin-left: 0.5rem;">{{ _('course_report.create_clo_report') }}</a>
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        <div class="form-group">
+            <label class="form-label">{{ _('index.course') }}</label>
+            <div style="display: flex; align-items: stretch; gap: 0.75rem; flex-wrap: wrap;">
+                <select name="course_name" id="course_select" class="form-control" required onchange="if (this.value) { this.form.submit(); }" style="flex: 1 1 320px; min-width: 0;">
+                    <option value="">{{ _('index.select_course') }}</option>
+                    {% for course in courses %}
+                        <option value="{{ course.name }}" {% if selected_course_name == course.name %}selected{% endif %}>{{ (course.display_label_ar if language == 'ar' else course.display_label_en) or course.display_label or course.name }}</option>
+                    {% endfor %}
+                </select>
+                <a href="javascript:void(0)" onclick="showInfoMessage(this.getAttribute('title'))" title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 2.45rem; height: 2.45rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; text-decoration: none; font-size: 1.2rem; align-self: center; flex-shrink: 0;">
+                    i
+                </a>
+            </div>
+        </div>
+    </form>
+
+    {% if associated_reports %}
+        <section style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+            <h3 style="margin: 0 0 0.35rem;">{{ _('course_report.associated_reports') }}</h3>
+            <p style="color: var(--text-muted); margin: 0 0 1rem;">{{ _('course_report.associated_reports_help') }}</p>
+            <form method="POST" action="{{ url_for('course_report_service_inputs_multi') }}">
+                <input type="hidden" name="course_name" value="{{ selected_course_name|default('', true) }}">
+                <div style="display: grid; gap: 0.75rem;">
+                    {% for report in associated_reports %}
+                        <label style="border: 1px solid var(--border-color); border-radius: 8px; padding: 0.9rem; background: #f9fafb; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.75rem; align-items: start;">
+                            <input type="checkbox" name="report_ids" value="{{ report.id }}" style="margin-top: 0.25rem;">
+                            <span>
+                                <span style="display: block; font-weight: 700;">{{ report.display_title }}</span>
+                                <span style="display: block; color: var(--text-muted); font-size: 0.9rem;">{{ report.created_at }}</span>
+                            </span>
+                        </label>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn" style="margin-top: 1rem;">{{ _('course_report.create_report') }}</button>
+            </form>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

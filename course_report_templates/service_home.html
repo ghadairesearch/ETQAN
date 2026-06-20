@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .service-home {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .service-level {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .service-level-header {
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        background: #f6f7f9;
+    }
+
+    .service-level-header h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        color: var(--text-main);
+    }
+
+    .service-level-header p {
+        margin: 0.25rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+    }
+
+    .service-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+
+    .service-card {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.4rem;
+        background: var(--bg-card);
+        min-height: 190px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: inherit;
+        text-decoration: none;
+        cursor: pointer;
+        transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+    }
+
+    .service-card:hover,
+    .service-card:focus-visible {
+        border-color: var(--accent);
+        box-shadow: 0 12px 26px rgba(38, 54, 95, 0.14);
+        transform: translateY(-2px);
+        outline: none;
+    }
+
+    .service-card-primary {
+        border-color: rgba(38, 54, 95, 0.45);
+        box-shadow: 0 10px 24px rgba(38, 54, 95, 0.12);
+    }
+
+    .service-card h3 {
+        margin: 0 0 0.65rem;
+        font-family: var(--brand-font);
+        color: var(--accent);
+        font-size: 1.35rem;
+    }
+
+    .service-card p {
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    @media (max-width: 720px) {
+        .service-grid {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+        }
+    }
+</style>
+
+<div class="card">
+    <div class="service-home">
+        <section class="service-level">
+            <div class="service-level-header">
+                <h3>{{ _('home.course_level') }}</h3>
+            </div>
+            <div class="service-grid">
+                <a href="/clo-attainment?fresh=1" class="service-card service-card-primary">
+                    <div>
+                        <h3>{{ _('home.clo_title') }}</h3>
+                        <p>{{ _('home.clo_description') }}</p>
+                    </div>
+                </a>
+
+                <a href="/course-report-service" class="service-card">
+                    <div>
+                        <h3>{{ _('home.course_report_title') }}</h3>
+                        <p>{{ _('home.course_report_description') }}</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="service-level">
+            <div class="service-level-header">
+                <h3>{{ _('home.program_level') }}</h3>
+            </div>
+            <div class="service-grid">
+                <a href="/plo-analysis" class="service-card service-card-primary">
+                    <div>
+                        <h3>{{ _('home.plo_title') }}</h3>
+                        <p>{{ _('home.plo_description') }}</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

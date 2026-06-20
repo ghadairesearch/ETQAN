@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+        <h2 style="margin-top: 0;">{{ _('faq.title') }}</h2>
+
+    </div>
+
+    <div style="display: grid; gap: 1rem;">
+        <section style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+            <h3 style="margin-bottom: 0.35rem;">{{ _('faq.q_supported_files') }}</h3>
+            <p style="color: var(--text-muted); margin: 0;">{{ _('faq.a_supported_files') }}</p>
+        </section>
+
+        <section style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+            <h3 style="margin-bottom: 0.35rem;">{{ _('faq.q_specs') }}</h3>
+            <p style="color: var(--text-muted); margin: 0;">{{ _('faq.a_specs') }}</p>
+        </section>
+
+        <section style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+            <h3 style="margin-bottom: 0.35rem;">{{ _('faq.q_unsupported') }}</h3>
+            <p style="color: var(--text-muted); margin: 0;">{{ _('faq.a_unsupported') }}</p>
+        </section>
+
+        <section style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+            <h3 style="margin-bottom: 0.35rem;">{{ _('faq.q_save_courses') }}</h3>
+            <p style="color: var(--text-muted); margin: 0;">{{ _('faq.a_save_courses') }}</p>
+        </section>
+
+        <section style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+            <h3 style="margin-bottom: 0.35rem;">{{ _('faq.q_visual_identity') }}</h3>
+            <p style="color: var(--text-muted); margin: 0;">{{ _('faq.a_visual_identity') }}</p>
+        </section>
+
+        <section>
+            <h3 style="margin-bottom: 0.35rem;">{{ _('faq.q_language') }}</h3>
+            <p style="color: var(--text-muted); margin: 0;">{{ _('faq.a_language') }}</p>
+        </section>
+    </div>
+</div>
+{% endblock %}

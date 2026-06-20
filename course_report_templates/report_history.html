@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .report-action-menu {
+        position: relative;
+    }
+
+    .report-action-button,
+    .report-extra-button,
+    .report-delete-button {
+        width: 2.45rem;
+        height: 2.45rem;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--accent);
+        color: #fff;
+        border: 0;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .report-delete-button {
+        background: var(--danger);
+    }
+
+    .report-action-button svg,
+    .report-extra-button svg,
+    .report-delete-button svg {
+        width: 1.05rem;
+        height: 1.05rem;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+    }
+
+    .report-action-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 0.35rem);
+        right: 0;
+        min-width: 120px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        box-shadow: 0 10px 20px rgba(20, 29, 47, 0.12);
+        z-index: 25;
+        padding: 0.35rem;
+    }
+
+    [dir="rtl"] .report-action-panel {
+        right: auto;
+        left: 0;
+    }
+
+    .report-action-menu.open .report-action-panel {
+        display: grid;
+        gap: 0.15rem;
+    }
+
+    .report-action-panel a,
+    .report-action-panel button {
+        color: var(--text-main);
+        text-decoration: none;
+        padding: 0.65rem 0.75rem;
+        border-radius: 4px;
+        font-weight: 600;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        font: inherit;
+        text-align: start;
+        width: 100%;
+    }
+
+    .report-action-panel a:hover,
+    .report-action-panel button:hover {
+        background: #f3f4f6;
+        color: var(--accent);
+    }
+
+    .report-rename-form {
+        display: none;
+        grid-template-columns: minmax(180px, 1fr) auto;
+        gap: 0.4rem;
+        margin-top: 0.5rem;
+        max-width: 440px;
+    }
+
+    .report-rename-form.open {
+        display: grid;
+    }
+
+</style>
+<div class="card">
+    <h2 style="margin-top: 0;">{{ _('history.title') }}</h2>
+    {% if reports %}
+        <table>
+            <thead>
+                <tr>
+                    <th>{{ _('history.report') }}</th>
+                    <th>{{ _('history.course') }}</th>
+                    <th>{{ _('history.created') }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                <tr>
+                    <td>
+                        <a href="/reports/{{ report.id }}" style="color: var(--accent); font-weight: 700; text-decoration: underline;">{{ report.display_title }}</a>
+                        <form id="rename-report-{{ report.id }}" class="report-rename-form" method="POST" action="/reports/{{ report.id }}/rename">
+                            <input type="text" name="title" class="form-control" value="{{ report.display_title }}" placeholder="{{ _('history.rename_placeholder') }}" maxlength="160" required style="padding: 0.45rem;">
+                            <button type="submit" class="btn" style="padding: 0.45rem 0.75rem;">{{ _('history.rename_save') }}</button>
+                        </form>
+                    </td>
+                    <td>{{ report.course_name }}</td>
+                    <td>{{ report.created_at }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
+                            <div class="report-action-menu">
+                                <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <path d="M7 10l5 5 5-5"></path>
+                                        <path d="M12 15V3"></path>
+                                    </svg>
+                                </button>
+                                <div class="report-action-panel">
+                                    <a href="/reports/{{ report.id }}/export/csv">{{ _('results.export_csv') }}</a>
+                                    <a href="/reports/{{ report.id }}/export/pdf">{{ _('results.export_pdf') }}</a>
+                                </div>
+                            </div>
+                            <div class="report-action-menu">
+                                <button type="button" class="report-action-button report-extra-button" aria-label="{{ _('history.rename') }}" aria-haspopup="true" aria-expanded="false">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                        <circle cx="19" cy="12" r="1"></circle>
+                                        <circle cx="5" cy="12" r="1"></circle>
+                                    </svg>
+                                </button>
+                                <div class="report-action-panel">
+                                    <button type="button" class="report-rename-toggle" data-rename-target="rename-report-{{ report.id }}">{{ _('history.rename') }}</button>
+                                </div>
+                            </div>
+                            <form method="POST" action="/reports/{{ report.id }}/delete" onsubmit="return confirm('{{ _('history.delete_confirm') }}');" style="margin: 0;">
+                                <button type="submit" class="report-delete-button" aria-label="{{ _('history.delete') }}">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M8 6V4h8v2"></path>
+                                        <path d="M19 6l-1 16H6L5 6"></path>
+                                        <path d="M10 11v6"></path>
+                                        <path d="M14 11v6"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert">{{ _('history.empty') }}</div>
+    {% endif %}
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menus = Array.from(document.querySelectorAll('.report-action-menu'));
+        document.querySelectorAll('.report-rename-toggle').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.stopPropagation();
+                const form = document.getElementById(button.getAttribute('data-rename-target'));
+                if (!form) {
+                    return;
+                }
+                form.classList.toggle('open');
+                const input = form.querySelector('input[name="title"]');
+                if (form.classList.contains('open') && input) {
+                    input.focus();
+                    input.select();
+                }
+                menus.forEach(function(menu) {
+                    menu.classList.remove('open');
+                    const menuButton = menu.querySelector('.report-action-button');
+                    if (menuButton) {
+                        menuButton.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+        });
+        menus.forEach(function(menu) {
+            const button = menu.querySelector('.report-action-button');
+            if (!button) {
+                return;
+            }
+            button.addEventListener('click', function(event) {
+                event.stopPropagation();
+                menus.forEach(function(other) {
+                    if (other !== menu) {
+                        other.classList.remove('open');
+                        const otherButton = other.querySelector('.report-action-button');
+                        if (otherButton) {
+                            otherButton.setAttribute('aria-expanded', 'false');
+                        }
+                    }
+                });
+                const isOpen = menu.classList.toggle('open');
+                button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+        });
+        document.addEventListener('click', function() {
+            menus.forEach(function(menu) {
+                menu.classList.remove('open');
+                const button = menu.querySelector('.report-action-button');
+                if (button) {
+                    button.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

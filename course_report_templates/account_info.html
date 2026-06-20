@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 760px; margin: 0 auto;">
+    {% set current_university = current_user.university_name|default('', true) %}
+    {% set current_university_value = canonical_university_name(current_university) %}
+    {% set known_university = current_university_value in university_choices %}
+    {% set display = namespace(university=current_university) %}
+    {% if language == 'ar' and known_university %}
+        {% for university in university_options %}
+            {% if university.value == current_university_value %}
+                {% set display.university = university.label %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem;">
+        <h2 style="margin: 0;">{{ _('account.title') }}</h2>
+        <button type="button" id="account_edit_button" aria-label="{{ _('account.edit') }}" title="{{ _('account.edit') }}" style="width: 2.5rem; height: 2.5rem; border: 1px solid var(--border-color); background: #f9f8f6; color: var(--accent); border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <table style="margin-bottom: 1.25rem;">
+        <tbody>
+            <tr>
+                <th style="width: 190px;">{{ _('account.email') }}</th>
+                <td>{{ current_user.email }}</td>
+            </tr>
+            <tr>
+                <th>{{ _('account.university') }}</th>
+                <td>{{ display.university or '-' }}</td>
+            </tr>
+            <tr>
+                <th>{{ _('account.college') }}</th>
+                <td>{{ current_user.college or '-' }}</td>
+            </tr>
+            <tr>
+                <th>{{ _('account.department') }}</th>
+                <td>{{ current_user.department or '-' }}</td>
+            </tr>
+            <tr>
+                <th>{{ _('account.created_at') }}</th>
+                <td>{{ current_user.created_at }}</td>
+            </tr>
+            <tr>
+                <th>{{ _('account.plan') }}</th>
+                <td>{{ billing_status.active_plan|capitalize }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <form method="POST" id="account_edit_form" style="display: none; margin-bottom: 1.25rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+        <div class="form-group">
+            <label class="form-label">{{ _('account.university') }}</label>
+            <select name="university_choice" id="account_university_choice" class="form-control" required>
+                <option value="">{{ _('auth.select_university') }}</option>
+                {% for university in university_options %}
+                    <option value="{{ university.value }}" {% if current_university_value == university.value %}selected{% endif %}>{{ university.label }}</option>
+                {% endfor %}
+                <option value="__other__" {% if current_university and not known_university %}selected{% endif %}>{{ _('org.other_university') }}</option>
+            </select>
+            <input type="text" name="other_university_name" id="account_other_university_name" class="form-control" value="{% if current_university and not known_university %}{{ current_university }}{% endif %}" placeholder="{{ _('org.university_placeholder') }}" style="display: {% if current_university and not known_university %}block{% else %}none{% endif %}; margin-top: 0.75rem;">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">{{ _('account.college') }}</label>
+            <input type="text" name="college" class="form-control" value="{{ current_user.college|default('', true) }}">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">{{ _('account.department') }}</label>
+            <input type="text" name="department" class="form-control" value="{{ current_user.department|default('', true) }}">
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="submit" class="btn">{{ _('account.save') }}</button>
+            <button type="button" id="account_cancel_button" class="btn" style="background: #f3f4f6; color: var(--text-main);">{{ _('account.cancel') }}</button>
+        </div>
+    </form>
+
+    <section style="border: 1px solid #fecaca; background: #fef2f2; border-radius: 8px; padding: 1rem; margin-top: 1.25rem;">
+        <h3 style="margin: 0 0 0.5rem; color: #991b1b;">{{ _('account.danger_title') }}</h3>
+        <p style="margin: 0 0 0.35rem; color: #7f1d1d;">{{ _('account.danger_text') }}</p>
+        {% if _('account.delete_help') %}
+            <p style="margin-top: 0; color: #7f1d1d; font-size: 0.9rem;">{{ _('account.delete_help') }}</p>
+        {% endif %}
+        <form method="POST" action="/account/delete" onsubmit="return confirm('{{ _('account.delete_confirm_js') }}');">
+            <div class="form-group">
+                <label class="form-label" style="color: #7f1d1d;">{{ _('account.confirm_label') }}</label>
+                <input type="text" name="delete_confirmation" class="form-control" autocomplete="off">
+            </div>
+            <button type="submit" class="btn" style="background: #b91c1c;">{{ _('account.delete_button') }}</button>
+        </form>
+    </section>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButton = document.getElementById('account_edit_button');
+        const cancelButton = document.getElementById('account_cancel_button');
+        const editForm = document.getElementById('account_edit_form');
+        const universityChoice = document.getElementById('account_university_choice');
+        const otherUniversityName = document.getElementById('account_other_university_name');
+        if (editButton && editForm) {
+            editButton.addEventListener('click', function() {
+                editForm.style.display = 'block';
+                editButton.style.display = 'none';
+                if (universityChoice) {
+                    universityChoice.focus();
+                }
+            });
+        }
+        if (cancelButton && editForm && editButton) {
+            cancelButton.addEventListener('click', function() {
+                editForm.style.display = 'none';
+                editButton.style.display = 'inline-flex';
+            });
+        }
+        if (!universityChoice || !otherUniversityName) {
+            return;
+        }
+        const updateOtherField = function() {
+            const showOther = universityChoice.value === '__other__';
+            otherUniversityName.style.display = showOther ? 'block' : 'none';
+            otherUniversityName.required = showOther;
+            if (!showOther) {
+                otherUniversityName.value = '';
+            }
+        };
+        universityChoice.addEventListener('change', updateOtherField);
+        updateOtherField();
+    });
+</script>
+{% endblock %}

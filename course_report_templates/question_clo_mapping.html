@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 820px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ _('home.question_mapping_title') }}</h2>
+    <p style="color: var(--text-muted); margin-top: -0.5rem;">
+        Upload an exam paper and let ETQAN suggest CLO mappings using question intent, action verbs, concepts, and CLO domains.
+    </p>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label class="form-label">{{ _('index.course') }}</label>
+            <div style="display: flex; align-items: stretch; gap: 0.75rem; flex-wrap: wrap;">
+                <select name="course_name" id="course_name" class="form-control" required style="flex: 1 1 320px; min-width: 0;">
+                    <option value="">{{ _('index.select_course') }}</option>
+                    {% for course in courses %}
+                        <option value="{{ course.name }}">{{ (course.display_label_ar if language == 'ar' else course.display_label_en) or course.display_label or course.name }}</option>
+                    {% endfor %}
+                </select>
+                <a href="/account/courses" style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--accent); font-weight: 700; text-decoration: none; padding: 0.7rem 0;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; border: 1px solid currentColor; font-size: 0.85rem;">i</span>
+                    <span>{{ _('index.course_not_found_my_courses') }}</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">{{ _('index.exam_paper') }}</label>
+            <input type="file" name="exam_paper" class="form-control" accept=".pdf,.docx,.txt" required style="padding: 0.5rem;">
+        </div>
+
+        <button type="submit" class="btn">{{ _('spec.extract') }}</button>
+        <a href="/" class="btn" style="background: #6b7280; margin-left: 0.5rem;">{{ _('service.back_home') }}</a>
+    </form>
+</div>
+{% endblock %}

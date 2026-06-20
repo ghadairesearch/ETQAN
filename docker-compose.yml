@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: etqan
+      POSTGRES_USER: etqan
+      POSTGRES_PASSWORD: etqan_local_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - etqan_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U etqan -d etqan"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://etqan:etqan_local_password@db:5432/etqan
+      SECRET_KEY: local-dev-secret-change-in-production
+      ADMIN_EMAILS: admin@example.com
+      UPLOAD_FOLDER: /var/data/uploads
+      ORG_LOGO_FOLDER: /var/data/uploads/organization_logos
+      PORT: 8093
+    ports:
+      - "8093:8093"
+    volumes:
+      - etqan_uploads:/var/data/uploads
+
+volumes:
+  etqan_postgres_data:
+  etqan_uploads:

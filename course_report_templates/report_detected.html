@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">{{ _('detected.title') }}</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        {{ _('mapping.course') }} <strong>{{ course_name }}</strong><br>
+        {{ _('detected.source') }} <strong>{{ filename }}</strong>
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb;">
+            <span style="display: block; color: var(--text-muted); font-size: 0.875rem;">{{ _('detected.questions') }}</span>
+            <strong style="font-size: 1.5rem; color: var(--accent);">{{ metrics.total_questions }}</strong>
+        </div>
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb;">
+            <span style="display: block; color: var(--text-muted); font-size: 0.875rem;">{{ _('detected.students') }}</span>
+            <strong style="font-size: 1.5rem; color: var(--accent);">{{ metrics.total_students }}</strong>
+        </div>
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb;">
+            <span style="display: block; color: var(--text-muted); font-size: 0.875rem;">{{ _('detected.detection') }}</span>
+            <strong style="font-size: 1.5rem; color: var(--accent);">{{ metrics.confidence }}</strong>
+        </div>
+    </div>
+
+    {% if metrics.questions %}
+        <form method="POST" action="/save-question-clos">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 160px;">{{ _('mapping.question') }}</th>
+                        <th>Smart suggestion</th>
+                        <th>{{ _('index.clo') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in metrics.questions %}
+                    <tr>
+                        <td>
+                            <strong>{{ question }}</strong>
+                            {% if metrics.question_texts and metrics.question_texts.get(question) %}
+                                <details style="margin-top: 0.5rem;">
+                                    <summary style="cursor: pointer; color: var(--text-muted); font-size: 0.85rem;">Question text</summary>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem;">{{ metrics.question_texts.get(question) }}</div>
+                                </details>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set suggestions = metrics.smart_clo_suggestions.get(question, []) if metrics.smart_clo_suggestions else [] %}
+                            {% if suggestions %}
+                                {% for suggestion in suggestions %}
+                                    <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; margin-bottom: 0.45rem; background: #f9fafb;">
+                                        <strong>{{ suggestion.clo.split(' ')[0] }}</strong>
+                                        <span style="color: var(--text-muted); font-size: 0.85rem;">{{ suggestion.score }}%</span>
+                                        {% if suggestion.reasons %}
+                                            <div style="color: var(--text-muted); font-size: 0.78rem;">{{ suggestion.reasons|join(', ') }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <span style="color: var(--text-muted);">No strong suggestion</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <select name="question_clo_{{ question }}" class="form-control" multiple size="5">
+                                {% for clo in clos %}
+                                    <option value="{{ clo }}" {% if metrics.detected_clo_mappings and clo in metrics.detected_clo_mappings.get(question, []) %}selected{% endif %}>{{ clo }}</option>
+                                {% endfor %}
+                            </select>
+                            <small style="color: var(--text-muted); display: block; margin-top: 0.4rem;">{{ _('mapping.multi_help') }}</small>
+                            <input type="text" class="form-control selected-clo-ids" style="margin-top: 0.5rem;" value="" placeholder="{{ _('mapping.selected_clo') }}" readonly>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <button type="submit" class="btn">{{ _('detected.save') }}</button>
+            <a href="/clo-attainment" class="btn" style="background: #6b7280; margin-left: 0.5rem;">{{ _('mapping.back') }}</a>
+        </form>
+    {% else %}
+        <div class="alert">
+            {{ _('detected.no_table') }}
+        </div>
+        <a href="/clo-attainment" class="btn">{{ _('detected.back_upload') }}</a>
+    {% endif %}
+
+    {% if metrics.text_sample %}
+        <details style="margin-top: 1.5rem;">
+            <summary style="cursor: pointer; color: var(--text-muted);">{{ _('detected.text_sample') }}</summary>
+            <pre style="white-space: pre-wrap; background: #f3f4f6; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; overflow: auto; max-height: 220px;">{{ metrics.text_sample }}</pre>
+        </details>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('select[name^="question_clo_"]').forEach(function(select) {
+            const idField = select.closest('td').querySelector('.selected-clo-ids');
+            const updateIds = function() {
+                const ids = Array.from(select.selectedOptions).map(function(option) {
+                    const match = option.value.trim().match(/^(\d+(?:\.\d+)*)/);
+                    return match ? match[1] : option.value.trim();
+                });
+                idField.value = ids.join(', ');
+            };
+            select.addEventListener('change', updateIds);
+            updateIds();
+        });
+    });
+</script>
+{% endblock %}

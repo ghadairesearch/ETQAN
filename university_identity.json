@@ -1,0 +1,573 @@
+{
+  "Al Baha University": {
+    "error": "",
+    "logo_filename": "al-baha-university.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided Al-Baha University logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#204080",
+      "#90C040",
+      "#2890C8",
+      "#204088",
+      "#98C840",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#204080",
+      "#90C040",
+      "#2890C8"
+    ],
+    "primary_color": "#204080",
+    "secondary_color": "#90C040",
+    "tertiary_color": "#2890C8",
+    "resolved_website": "",
+    "website": "https://bu.edu.sa"
+  },
+  "Al Jouf University": {
+    "logo_filename": "al-jouf-university-2024.png",
+    "logo_source_note": "Logo and visual identity colors provided by the user from Jouf University 2024 identity.",
+    "logo_url": "",
+    "palette_colors": [
+      "#935727",
+      "#CFC4B1",
+      "#12403C",
+      "#676127",
+      "#D7B941",
+      "#6A3B8B",
+      "#141414",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#12403C",
+      "#6A3B8B",
+      "#CFC4B1"
+    ],
+    "primary_color": "#12403C",
+    "secondary_color": "#6A3B8B",
+    "tertiary_color": "#CFC4B1",
+    "resolved_website": "https://ju.edu.sa/ar",
+    "website": "https://www.ju.edu.sa"
+  },
+  "Alfaisal University": {
+    "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+    "logo_filename": "alfaisal-university.jpg",
+    "logo_url": "",
+    "palette_colors": [
+      "#17365D",
+      "#455A78",
+      "#A9BBDD",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#17365D",
+      "#455A78",
+      "#A9BBDD"
+    ],
+    "primary_color": "#17365D",
+    "secondary_color": "#455A78",
+    "tertiary_color": "#A9BBDD",
+    "resolved_website": "",
+    "website": "https://www.alfaisal.edu"
+  },
+  "Arab Open University": {
+    "logo_filename": "arab-open-university-2024.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided Arab Open University logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#183058",
+      "#102850",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#183058"
+    ],
+    "primary_color": "#183058",
+    "secondary_color": "",
+    "tertiary_color": "",
+    "resolved_website": "https://www.arabou.edu.sa/Pages/default.aspx",
+    "website": "https://www.arabou.edu.sa"
+  },
+  "Dar Al-Hekma University": {
+    "logo_filename": "dar-al-hekma-university-2024.png",
+    "logo_url": "",
+    "logo_source_note": "Logo provided by the user; identity colors provided by the user as CMYK values and converted to HEX.",
+    "palette_colors": [
+      "#80E3FF",
+      "#FFD194",
+      "#5F1100",
+      "#C28E5C",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#5F1100",
+      "#80E3FF",
+      "#FFD194"
+    ],
+    "primary_color": "#5F1100",
+    "secondary_color": "#80E3FF",
+    "tertiary_color": "#FFD194",
+    "resolved_website": "https://www.dah.edu.sa/en/pages/default.aspx",
+    "website": "https://www.dah.edu.sa"
+  },
+  "Effat University": {
+    "error": "",
+    "logo_filename": "effat-university-2024.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided Effat University logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#181848",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#181848"
+    ],
+    "primary_color": "#181848",
+    "secondary_color": "",
+    "tertiary_color": "",
+    "resolved_website": "",
+    "website": "https://www.effatuniversity.edu.sa"
+  },
+  "Imam Abdulrahman Bin Faisal University": {
+    "logo_filename": "imam-abdulrahman-bin-faisal-university-2024.png",
+    "logo_source_note": "Logo provided by the user; blue identity colors sampled from the provided image.",
+    "logo_url": "",
+    "palette_colors": [
+      "#304060",
+      "#8898B8",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#304060",
+      "#8898B8"
+    ],
+    "primary_color": "#304060",
+    "secondary_color": "#8898B8",
+    "tertiary_color": "",
+    "resolved_website": "https://www.iau.edu.sa/en",
+    "website": "https://www.iau.edu.sa"
+  },
+  "Imam Mohammad Ibn Saud Islamic University": {
+    "logo_filename": "imam-mohammad-ibn-saud-islamic-university.png",
+    "logo_url": "https://imamu.edu.sa/_layouts/15/2016/Portal/img/logo.png",
+    "primary_color": "#045D84",
+    "secondary_color": "#B7A362",
+    "tertiary_color": "#B3DDF5",
+    "resolved_website": "https://imamu.edu.sa/Pages/default.aspx",
+    "website": "https://imamu.edu.sa"
+  },
+  "Islamic University of Madinah": {
+    "logo_filename": "islamic-university-of-madinah-correct.png",
+    "logo_url": "https://static.cdnlogo.com/logos/t/88/the-islamic-university-of-madinah.svg",
+    "primary_color": "#005A85",
+    "resolved_website": "https://iu.edu.sa",
+    "secondary_color": "#A88143",
+    "website": "https://iu.edu.sa"
+  },
+  "Jazan University": {
+    "error": "",
+    "logo_filename": "jazan-university.jpg",
+    "logo_url": "",
+    "primary_color": "#2B5872",
+    "secondary_color": "#DCA04F",
+    "tertiary_color": "#79C8EE",
+    "resolved_website": "https://www.jazanu.edu.sa",
+    "website": "https://www.jazanu.edu.sa"
+  },
+  "King Abdulaziz University": {
+    "logo_filename": "king-abdulaziz-university.png",
+    "logo_url": "https://www.kau.edu.sa/images/logo-dark.png",
+    "palette_colors": [
+      "#1B8354",
+      "#5FA140",
+      "#3D7E35",
+      "#E8F2DC",
+      "#006B3F"
+    ],
+    "primary_color": "#1B8354",
+    "secondary_color": "#E8F2DC",
+    "tertiary_color": "#006B3F",
+    "resolved_website": "https://www.kau.edu.sa/en",
+    "website": "https://www.kau.edu.sa"
+  },
+  "King Abdullah University of Science and Technology": {
+    "logo_filename": "king-abdullah-university-of-science-and-technology-2024.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided KAUST logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#786858",
+      "#00A8A0",
+      "#F89048",
+      "#C0D028",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#786858",
+      "#00A8A0",
+      "#F89048"
+    ],
+    "primary_color": "#786858",
+    "secondary_color": "#00A8A0",
+    "tertiary_color": "#F89048",
+    "resolved_website": "https://www.kaust.edu.sa/en/",
+    "website": "https://www.kaust.edu.sa"
+  },
+  "King Fahd University of Petroleum & Minerals": {
+    "logo_filename": "king-fahd-university-of-petroleum-minerals-2024.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided KFUPM identity image.",
+    "logo_url": "",
+    "palette_colors": [
+      "#337A42",
+      "#D8BE61",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#337A42",
+      "#D8BE61"
+    ],
+    "primary_color": "#337A42",
+    "secondary_color": "#D8BE61",
+    "tertiary_color": "",
+    "resolved_website": "https://www.kfupm.edu.sa",
+    "website": "https://www.kfupm.edu.sa"
+  },
+  "King Faisal University": {
+    "logo_filename": "king-faisal-university.png",
+    "logo_url": "https://www.kfu.edu.sa/Style%20Library/UD/ar-sa/images/kfu-logo-normal.png",
+    "palette_colors": [
+      "#28685B",
+      "#C2A054",
+      "#7C827F"
+    ],
+    "primary_color": "#28685B",
+    "secondary_color": "#C2A054",
+    "tertiary_color": "#7C827F",
+    "resolved_website": "https://www.kfu.edu.sa/ar/Pages/Home.aspx",
+    "website": "https://www.kfu.edu.sa"
+  },
+  "King Khalid University": {
+    "logo_filename": "king-khalid-university.png",
+    "logo_url": "https://www.kku.edu.sa/images/kku-light.png",
+    "palette_colors": [
+      "#808080",
+      "#005430",
+      "#765C9B",
+      "#D0B38B",
+      "#00667D"
+    ],
+    "display_palette_colors": [
+      "#808080",
+      "#005430",
+      "#765C9B"
+    ],
+    "primary_color": "#808080",
+    "secondary_color": "#005430",
+    "tertiary_color": "#765C9B",
+    "resolved_website": "https://www.kku.edu.sa/ar",
+    "website": "https://www.kku.edu.sa"
+  },
+  "King Saud University": {
+    "logo_filename": "king-saud-university.png",
+    "logo_url": "https://ksu.edu.sa/saudi-flag.svg",
+    "primary_color": "#008DC3",
+    "secondary_color": "#E3E0D2",
+    "tertiary_color": "#748995",
+    "resolved_website": "https://ksu.edu.sa",
+    "website": "https://ksu.edu.sa"
+  },
+  "King Saud bin Abdulaziz University for Health Sciences": {
+    "error": "",
+    "logo_filename": "king-saud-bin-abdulaziz-university-for-health-sciences-2024.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided King Saud bin Abdulaziz University for Health Sciences logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#006840",
+      "#C09840",
+      "#FFF0C8",
+      "#202020",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#006840",
+      "#C09840",
+      "#FFF0C8"
+    ],
+    "primary_color": "#006840",
+    "secondary_color": "#C09840",
+    "tertiary_color": "#FFF0C8",
+    "resolved_website": "",
+    "website": "https://www.ksau-hs.edu.sa"
+  },
+  "Majmaah University": {
+    "error": "HTTP Error 403: Forbidden",
+    "logo_filename": "majmaah-university-2024.png",
+    "logo_url": "",
+    "logo_source_note": "Logo and identity colors provided by the user from Majmaah University visual identity.",
+    "palette_colors": [
+      "#51692C",
+      "#A38843",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#51692C",
+      "#A38843"
+    ],
+    "primary_color": "#51692C",
+    "secondary_color": "#A38843",
+    "tertiary_color": "",
+    "resolved_website": "",
+    "website": "https://www.mu.edu.sa"
+  },
+  "Najran University": {
+    "logo_filename": "najran-university.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided Najran University logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#305890",
+      "#E0B830",
+      "#306090",
+      "#285888",
+      "#F0C030",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#305890",
+      "#E0B830",
+      "#306090"
+    ],
+    "primary_color": "#305890",
+    "secondary_color": "#E0B830",
+    "tertiary_color": "#306090",
+    "resolved_website": "https://portal.nu.edu.sa/ar/home",
+    "website": "https://www.nu.edu.sa"
+  },
+  "Northern Border University": {
+    "logo_filename": "northern-border-university-correct.png",
+    "logo_source_note": "Logo extracted from user-provided nbu 2 (1).pdf; colors sampled from user-provided النمط البصري-1.pdf visual identity guide.",
+    "logo_url": "",
+    "primary_color": "#236432",
+    "resolved_website": "https://www.nbu.edu.sa",
+    "secondary_color": "#CDC819",
+    "website": "https://www.nbu.edu.sa"
+  },
+  "Prince Sattam bin Abdulaziz University": {
+    "logo_filename": "prince-sattam-bin-abdulaziz-university-2024.png",
+    "logo_source_note": "Logo and identity colors provided by the user from Prince Sattam bin Abdulaziz University visual identity.",
+    "logo_url": "",
+    "palette_colors": [
+      "#6ac7bd",
+      "#3c7974",
+      "#bbe3e7",
+      "#f1f9f7",
+      "#898b8e",
+      "#bbbdc0",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#3c7974",
+      "#6ac7bd",
+      "#bbe3e7"
+    ],
+    "primary_color": "#3c7974",
+    "secondary_color": "#6ac7bd",
+    "tertiary_color": "#bbe3e7",
+    "resolved_website": "https://www.psau.edu.sa/ar",
+    "website": "https://www.psau.edu.sa"
+  },
+  "Prince Sultan University": {
+    "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+    "logo_filename": "prince-sultan-university-2024.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided Prince Sultan University logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#104070",
+      "#0090C0",
+      "#F8A020",
+      "#6088B8",
+      "#C0C8C8",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#104070",
+      "#0090C0",
+      "#F8A020"
+    ],
+    "primary_color": "#104070",
+    "secondary_color": "#0090C0",
+    "tertiary_color": "#F8A020",
+    "resolved_website": "",
+    "website": "https://www.psu.edu.sa"
+  },
+  "Princess Nourah bint Abdulrahman University": {
+    "logo_filename": "princess-nourah-bint-abdulrahman-university-2024.png",
+    "logo_source_note": "Logo provided by the user; official identity colors provided by the user.",
+    "logo_url": "",
+    "palette_colors": [
+      "#007580",
+      "#98989A",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#007580",
+      "#98989A"
+    ],
+    "primary_color": "#007580",
+    "secondary_color": "#98989A",
+    "resolved_website": "https://pnu.edu.sa/ar/Pages/Home.aspx",
+    "website": "https://www.pnu.edu.sa"
+  },
+  "Qassim University": {
+    "logo_filename": "qassim-university.png",
+    "logo_url": "https://www.qu.edu.sa/wp-content/uploads/2026/04/cropped-qu-icon_v2-32x32.png",
+    "palette_colors": [
+      "#00519b",
+      "#2596be"
+    ],
+    "primary_color": "#00519b",
+    "secondary_color": "#2596be",
+    "resolved_website": "https://www.qu.edu.sa",
+    "website": "https://www.qu.edu.sa"
+  },
+  "Saudi Electronic University": {
+    "logo_filename": "saudi-electronic-university.png",
+    "logo_url": "https://seu.edu.sa/images/new-logo.png",
+    "logo_source_note": "Identity colors provided by the user from the Saudi Electronic University visual identity.",
+    "palette_colors": [
+      "#111E4D",
+      "#32B7BB",
+      "#0083BE",
+      "#59388A",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#111E4D",
+      "#32B7BB",
+      "#0083BE"
+    ],
+    "primary_color": "#111E4D",
+    "secondary_color": "#32B7BB",
+    "tertiary_color": "#0083BE",
+    "resolved_website": "https://seu.edu.sa",
+    "website": "https://seu.edu.sa"
+  },
+  "Shaqra University": {
+    "logo_filename": "shaqra-university-2024.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided Shaqra University logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#006048",
+      "#C09870",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#006048",
+      "#C09870"
+    ],
+    "primary_color": "#006048",
+    "secondary_color": "#C09870",
+    "tertiary_color": "",
+    "resolved_website": "https://www.su.edu.sa",
+    "website": "https://www.su.edu.sa"
+  },
+  "Tabuk University": {
+    "logo_filename": "tabuk-university-2024.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided University of Tabuk logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#009050",
+      "#B8A030",
+      "#505050",
+      "#009048",
+      "#C0A830",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#009050",
+      "#B8A030",
+      "#505050"
+    ],
+    "primary_color": "#009050",
+    "secondary_color": "#B8A030",
+    "tertiary_color": "#505050",
+    "resolved_website": "https://www.ut.edu.sa",
+    "website": "https://www.ut.edu.sa"
+  },
+  "Taibah University": {
+    "logo_filename": "taibah-university.png",
+    "logo_url": "https://www.taibahu.edu.sa/themes/custom/taiu_saud/images/taibah-white-logo.svg",
+    "palette_colors": [
+      "#0A8E6E",
+      "#4056E3",
+      "#00AEDA"
+    ],
+    "primary_color": "#0A8E6E",
+    "secondary_color": "#4056E3",
+    "tertiary_color": "#00AEDA",
+    "resolved_website": "https://www.taibahu.edu.sa",
+    "website": "https://www.taibahu.edu.sa"
+  },
+  "Taif University": {
+    "error": "",
+    "logo_filename": "taif-university.png",
+    "logo_url": "",
+    "primary_color": "#D2AA4D",
+    "secondary_color": "#547d55",
+    "resolved_website": "https://www.tu.edu.sa",
+    "website": "https://www.tu.edu.sa"
+  },
+  "Umm Al-Qura University": {
+    "logo_filename": "umm-al-qura-university.png",
+    "logo_url": "https://static.uqu.edu.sa/assets/images/uquIcons/favicon-32x32.png",
+    "primary_color": "#006871",
+    "secondary_color": "#b28e42",
+    "resolved_website": "https://uqu.edu.sa",
+    "website": "https://uqu.edu.sa"
+  },
+  "University of Bisha": {
+    "logo_filename": "university-of-bisha-2024.png",
+    "logo_source_note": "Logo provided by the user; colors sampled from the provided University of Bisha logo.",
+    "logo_url": "",
+    "palette_colors": [
+      "#204078",
+      "#28B8B8",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#204078",
+      "#28B8B8"
+    ],
+    "primary_color": "#204078",
+    "secondary_color": "#28B8B8",
+    "tertiary_color": "",
+    "resolved_website": "https://www.ub.edu.sa/ar/Pages/default.aspx",
+    "website": "https://www.ub.edu.sa"
+  },
+  "University of Hail": {
+    "logo_filename": "university-of-hail.png",
+    "logo_url": "https://www.uoh.edu.sa/Style%20Library/UDesign/images/HailLogoAr.png",
+    "primary_color": "#114677",
+    "secondary_color": "#FED03F",
+    "resolved_website": "https://www.uoh.edu.sa/Ar/Pages/Home.aspx",
+    "website": "https://www.uoh.edu.sa"
+  },
+  "University of Jeddah": {
+    "logo_filename": "university-of-jeddah-2024.png",
+    "logo_url": "",
+    "logo_source_note": "Logo provided by the user; identity colors provided by the user as RGB values and converted to HEX.",
+    "palette_colors": [
+      "#004F6E",
+      "#83CCEA",
+      "#6E96A2",
+      "#FFFFFF"
+    ],
+    "display_palette_colors": [
+      "#004F6E",
+      "#83CCEA",
+      "#6E96A2"
+    ],
+    "primary_color": "#004F6E",
+    "secondary_color": "#83CCEA",
+    "tertiary_color": "#6E96A2",
+    "resolved_website": "https://www.uj.edu.sa",
+    "website": "https://www.uj.edu.sa"
+  }
+}

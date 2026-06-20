@@ -1,0 +1,175 @@
+<div class="form-group">
+    <style>
+        .clo-delete-button {
+            width: 2.45rem;
+            height: 2.45rem;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--danger);
+            color: #fff;
+            border: 0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .clo-delete-button svg {
+            width: 1.05rem;
+            height: 1.05rem;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .clo-add-button {
+            margin-top: 0.75rem;
+            background: var(--accent-secondary);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.65rem 1rem;
+        }
+
+        .clo-add-button svg {
+            width: 1rem;
+            height: 1rem;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+    </style>
+    <label class="form-label">{{ _('courses.clos') }}</label>
+    {% set clo_rows = draft_course.clo_rows|default([], true) %}
+    <div style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 6px; background: #fff;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 820px;">
+            <thead>
+                <tr style="background: #f9fafb;">
+                    <th style="text-align: start; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 60%;">{{ _('courses.clo') }}</th>
+                    <th style="text-align: start; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 28%;">{{ _('courses.associated_plo') }}</th>
+                    <th style="text-align: start; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 12%;">{{ _('courses.actions') }}</th>
+                </tr>
+            </thead>
+            {% set extra_count = 0 if clo_rows else 3 %}
+            <tbody id="course_clo_rows" data-next-index="{{ (clo_rows|length) + extra_count }}">
+                {% for row in clo_rows %}
+                    {% set row_index = loop.index0 %}
+                    <tr>
+                        <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                            <input type="hidden" name="clo_row_indexes" value="{{ row_index }}">
+                            <textarea name="clo_text_{{ row_index }}" class="form-control" rows="2">{{ row.clo }}</textarea>
+                        </td>
+                        <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                            <input type="text" name="clo_plo_{{ row_index }}" class="form-control" value="{{ row.plo }}" placeholder="K1, S2">
+                        </td>
+                        <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                            <button type="button" class="clo-delete-button" data-remove-clo-row aria-label="{{ _('courses.remove_clo') }}" title="{{ _('courses.remove_clo') }}">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M3 6h18"></path>
+                                    <path d="M8 6V4h8v2"></path>
+                                    <path d="M19 6l-1 16H6L5 6"></path>
+                                    <path d="M10 11v6"></path>
+                                    <path d="M14 11v6"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                {% set start_index = clo_rows|length %}
+                {% for extra in range(extra_count) %}
+                    {% set row_index = start_index + extra %}
+                    <tr>
+                        <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                            <input type="hidden" name="clo_row_indexes" value="{{ row_index }}">
+                            <textarea name="clo_text_{{ row_index }}" class="form-control" rows="2" placeholder="{{ _('index.inline_clos_placeholder') }}"></textarea>
+                        </td>
+                        <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                            <input type="text" name="clo_plo_{{ row_index }}" class="form-control" placeholder="K1, S2">
+                        </td>
+                        <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                            <button type="button" class="clo-delete-button" data-remove-clo-row aria-label="{{ _('courses.remove_clo') }}" title="{{ _('courses.remove_clo') }}">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M3 6h18"></path>
+                                    <path d="M8 6V4h8v2"></path>
+                                    <path d="M19 6l-1 16H6L5 6"></path>
+                                    <path d="M10 11v6"></path>
+                                    <path d="M14 11v6"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <button type="button" class="btn clo-add-button" id="add_clo_row_button">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+        </svg>
+        <span>{{ _('courses.add_clo_row') }}</span>
+    </button>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.getElementById('course_clo_rows');
+        const addButton = document.getElementById('add_clo_row_button');
+        const cloPlaceholder = {{ _('index.inline_clos_placeholder')|tojson }};
+        function removeRow(button) {
+            const row = button.closest('tr');
+            if (row) {
+                row.remove();
+            }
+        }
+        function bindRemoveButtons(scope) {
+            (scope || document).querySelectorAll('[data-remove-clo-row]').forEach(function(button) {
+                if (button.dataset.boundRemove) {
+                    return;
+                }
+                button.dataset.boundRemove = 'true';
+                button.addEventListener('click', function() {
+                    removeRow(button);
+                });
+            });
+        }
+        function addRow() {
+            if (!rows) {
+                return;
+            }
+            const index = Number(rows.getAttribute('data-next-index') || '0');
+            rows.setAttribute('data-next-index', String(index + 1));
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                    <input type="hidden" name="clo_row_indexes" value="${index}">
+                    <textarea name="clo_text_${index}" class="form-control" rows="2" placeholder="${cloPlaceholder.replace(/"/g, '&quot;')}"></textarea>
+                </td>
+                <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                    <input type="text" name="clo_plo_${index}" class="form-control" placeholder="K1, S2">
+                </td>
+                <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                    <button type="button" class="clo-delete-button" data-remove-clo-row aria-label="{{ _('courses.remove_clo') }}" title="{{ _('courses.remove_clo') }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3 6h18"></path>
+                            <path d="M8 6V4h8v2"></path>
+                            <path d="M19 6l-1 16H6L5 6"></path>
+                            <path d="M10 11v6"></path>
+                            <path d="M14 11v6"></path>
+                        </svg>
+                    </button>
+                </td>
+            `;
+            rows.appendChild(row);
+            bindRemoveButtons(row);
+            const textarea = row.querySelector('textarea');
+            if (textarea) {
+                textarea.focus();
+            }
+        }
+        bindRemoveButtons(document);
+        if (addButton) {
+            addButton.addEventListener('click', addRow);
+        }
+    });
+</script>

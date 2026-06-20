@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">{{ _('settings.title') }}</h2>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem;">
+        <a href="/account" style="display: block; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb; color: inherit; text-decoration: none;">
+            <h3 style="margin: 0 0 0.45rem;">{{ _('settings.account_title') }}</h3>
+            <p style="color: var(--text-muted); margin-bottom: 0;">{{ _('settings.account_description') }}</p>
+        </a>
+
+        <a href="/account/organization" style="display: block; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb; color: inherit; text-decoration: none;">
+            <h3 style="margin: 0 0 0.45rem;">{{ _('settings.organization_title') }}</h3>
+            <p style="color: var(--text-muted); margin-bottom: 0;">{{ _('settings.organization_description') }}</p>
+        </a>
+
+        <a href="/account/report-settings" style="display: block; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb; color: inherit; text-decoration: none;">
+            <h3 style="margin: 0 0 0.45rem;">{{ _('settings.report_title') }}</h3>
+            <p style="color: var(--text-muted); margin-bottom: 0;">{{ _('settings.report_description') }}</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
