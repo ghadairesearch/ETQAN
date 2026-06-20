@@ -27,6 +27,14 @@ The Docker image installs:
 - Poppler utilities for PDF image conversion
 - Python packages from `requirements.txt`
 
+If the Render UI does not show Docker when creating a service manually, use **New Blueprint** instead of **New Web Service**. The repository includes `render.yaml`, and the blueprint tells Render to use the Dockerfile automatically.
+
+Native Python fallback:
+
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn course_report:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 180`
+- This can run the app, but scanned Arabic PDF OCR depends on system packages. `Aptfile` lists the needed packages for environments that support apt buildpacks, but Docker/Blueprint is the reliable option.
+
 Permanent data stored in PostgreSQL:
 
 - User accounts and subscription status
