@@ -35,9 +35,7 @@
         <div>
             <h2 style="margin-top: 0;">{{ _('courses.title') }}</h2>
         </div>
-        <a href="{{ url_for('new_course') }}" class="btn" title="{{ _('courses.add_new') }}" aria-label="{{ _('courses.add_new') }}" style="display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
-            <span>{{ _('courses.add_new') }}</span>
-        </a>
+        <a href="{{ url_for('new_course') }}" class="btn" title="{{ _('courses.add_new') }}" aria-label="{{ _('courses.add_new') }}" style="white-space: nowrap;">{{ _('courses.add_new') }}</a>
     </div>
 
     <table>
