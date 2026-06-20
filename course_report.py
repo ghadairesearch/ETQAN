@@ -298,7 +298,7 @@ EN_TRANSLATIONS = {
     'home.program_level': 'Program Level Services',
     'home.program_level_description': 'Workflows that combine course evidence into program learning outcome analysis.',
     'home.add_program_title': 'Add Program',
-    'home.add_program_description': 'Create or import a program before generating PLO attainment analysis.',
+    'home.add_program_description': 'Add a program to generate reports.',
     'home.requires_program': 'Requires at least one program.',
     'home.clo_title': 'CLO Attainment Analysis',
     'home.clo_description': 'Measure CLO attainment from assessment data, identify performance gaps, and generate evidence-based reports.',
@@ -453,6 +453,9 @@ EN_TRANSLATIONS = {
     'courses.extracting': 'Extracting...',
     'courses.extract_missing': 'Upload a course specification first.',
     'courses.extracted': 'Course information extracted. Review it, then click Save Course.',
+    'courses.extraction_method_prefix': 'Extraction method:',
+    'courses.extraction_method_gemini': 'Gemini Flash',
+    'courses.extraction_method_local': 'Local text/OCR',
     'courses.save': 'Save Course',
     'courses.empty': 'No saved courses yet. Add a course from the home page.',
     'courses.delete': 'Delete',
@@ -776,12 +779,12 @@ TRANSLATIONS = {
         'home.program_level': 'خدمات البرامج',
         'home.program_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u064a\u062c\u0645\u0639 \u0623\u062f\u0644\u0629 \u0627\u0644\u0645\u0642\u0631\u0631\u0627\u062a \u0644\u062a\u062d\u0644\u064a\u0644 \u0646\u0648\u0627\u062a\u062c \u062a\u0639\u0644\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c.',
         'home.add_program_title': 'إضافة برنامج',
-        'home.add_program_description': 'أنشئ أو استورد برنامجاً قبل إنشاء تحليل تحقق مخرجات تعلم البرنامج.',
+        'home.add_program_description': 'أضف برنامجًا لتتمكن من إنشاء التقارير.',
         'home.requires_program': 'يتطلب إضافة برنامج واحد على الأقل.',
         'home.clo_title': 'تحليل تحقق مخرجات تعلم المقرر',
         'home.clo_description': 'قياس تحقق مخرجات تعلم المقرر من بيانات التقييمات، وتحديد فجوات الأداء، وإنشاء تقارير قائمة على الأدلة.',
         'home.add_course_title': 'إضافة مقرر',
-        'home.add_course_description': 'أنشئ مقرراً لتتمكن من إنشاء التقارير.',
+        'home.add_course_description': 'أضف مقرراً لتتمكن من إنشاء التقارير.',
         'home.requires_course': 'يتطلب إضافة مقرر واحد على الأقل.',
         'home.question_mapping_title': 'ربط أسئلة الاختبار بالمخرجات',
         'home.question_mapping_description': 'ارفع ورقة الاختبار واربط كل سؤال بنواتج تعلم المقرر قبل استخدام الربط في التقارير.',
@@ -905,7 +908,7 @@ TRANSLATIONS = {
         'courses.edit_title': 'تعديل المقرر',
         'courses.edit_help': 'تحديث معلومات المقرر أو رفع توصيف جديد.',
         'courses.edit': 'تعديل',
-        'courses.method_help': 'ارفع ملف توصيف المقرر، وسيستخرج إتقان معلومات المقرر.',
+        'courses.method_help': 'ارفع ملف توصيف المقرر، وسيستخرج إتقان بيانات المقرر.',
         'courses.upload_method': 'إدخال توصيف المقرر',
         'courses.upload_help': 'ستستخرج إتقان اسم المقرر ورمزه ونواتج التعلم من ملف PDF إذا كان قابلاً للقراءة.',
         'courses.manual_prompt': 'أو هل ترغب في إدخال معلومات المقرر يدوياً؟',
@@ -922,10 +925,13 @@ TRANSLATIONS = {
         'courses.extract': 'استخراج المعلومات',
         'courses.extracting': 'جاري الاستخراج...',
         'courses.extract_missing': 'يرجى رفع ملف توصيف المقرر أولاً.',
-        'courses.extracted': 'تم استخراج معلومات المقرر. راجعها ثم اضغط حفظ المقرر.',
-        'courses.clos': 'نواتج التعلم',
+        'courses.extracted': 'تم استخراج بيانات المقرر. راجعها ثم اضغط حفظ المقرر.',
+        'courses.extraction_method_prefix': 'طريقة الاستخراج:',
+        'courses.extraction_method_gemini': 'Gemini Flash',
+        'courses.extraction_method_local': 'النص المحلي / OCR',
+        'courses.clos': 'نواتج التعلم للمقرر',
         'courses.clo': '\u0646\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
-        'courses.associated_plo': '\u0631\u0645\u0632 \u0646\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0631\u062a\u0628\u0637 \u0628\u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c',
+        'courses.associated_plo': 'ناتج التعلم المرتبط من البرنامج',
         'courses.actions': '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
         'courses.add_clo_row': '\u0625\u0636\u0627\u0641\u0629 \u0646\u0627\u062a\u062c \u062a\u0639\u0644\u0645',
         'courses.remove_clo': '\u062d\u0630\u0641',
@@ -4359,7 +4365,8 @@ def normalize_gemini_course_spec(payload):
         'clos': clos,
         'topics': topics,
         'clo_plos': clo_plos,
-        'grouped_clos': group_clos_by_domain(clos)
+        'grouped_clos': group_clos_by_domain(clos),
+        'extraction_method': 'gemini'
     }
 
 
@@ -4443,7 +4450,9 @@ def extract_course_spec_document(filepath, filename=''):
     file_ext = os.path.splitext(filename or filepath)[1].lower()
     if file_ext == '.docx':
         text = extract_docx_text(filepath)
-        return text, extract_course_spec_metadata(text, filename)
+        extracted = extract_course_spec_metadata(text, filename)
+        extracted['extraction_method'] = 'local'
+        return text, extracted
 
     gemini_extracted = extract_course_spec_with_gemini(filepath, filename)
     if gemini_extracted:
@@ -4451,15 +4460,26 @@ def extract_course_spec_document(filepath, filename=''):
 
     text = extract_pdf_text(filepath, allow_ocr=True)
     extracted = extract_course_spec_metadata(text, filename)
+    extracted['extraction_method'] = 'local'
     if extracted.get('course_name') and extracted.get('course_code') and extracted.get('clos'):
         return text, extracted
 
     targeted_text = extract_pdf_text(filepath, allow_ocr=True, force_ocr=True, ocr_strategy='targeted')
     if compact_text(targeted_text):
         targeted_extracted = extract_course_spec_metadata(targeted_text, filename)
+        targeted_extracted['extraction_method'] = 'local'
         if course_spec_extraction_score(targeted_extracted) > course_spec_extraction_score(extracted):
             return targeted_text, targeted_extracted
     return text, extracted
+
+
+def flash_course_spec_extraction_method(extracted):
+    method = (extracted or {}).get('extraction_method')
+    if method == 'gemini':
+        method_label = translate('courses.extraction_method_gemini')
+    else:
+        method_label = translate('courses.extraction_method_local')
+    flash(f"{translate('courses.extraction_method_prefix')} {method_label}", "info")
 
 
 def extract_exam_paper_text(filepath, file_ext):
@@ -9982,6 +10002,7 @@ def new_course():
                 clo_plos = {}
             else:
                 flash(translate('courses.extracted'))
+                flash_course_spec_extraction_method(extracted)
             draft_course = {
                 'source': 'spec' if spec_file and spec_file.filename else '',
                 'course_name': course_name,
@@ -10202,6 +10223,7 @@ def edit_course(course_id):
                 clo_plos = {}
             else:
                 flash(translate('courses.extracted'))
+                flash_course_spec_extraction_method(extracted)
             draft_course = {
                 'source': 'spec' if spec_file and spec_file.filename else '',
                 'course_name': course_name,
