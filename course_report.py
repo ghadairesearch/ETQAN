@@ -9047,6 +9047,10 @@ def uploaded_file(filename):
         abort(403)
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/assets/etqan-logo.png')
+def etqan_logo_asset():
+    return send_from_directory(os.path.join(APP_BASE_DIR, 'public'), 'ETQAN.png')
+
 @app.route('/admin')
 def admin_dashboard():
     user = current_user()

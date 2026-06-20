@@ -94,6 +94,16 @@
             object-fit: contain;
         }
 
+        .brand-fallback {
+            align-items: center;
+            min-height: 72px;
+            font-family: var(--brand-font);
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 0;
+        }
+
         .container {
             max-width: 1000px;
             margin: 2rem auto;
@@ -362,7 +372,8 @@
 <body>
     <div class="navbar">
         <a href="/" style="text-align: left; text-decoration: none; display: block;" aria-label="{{ _('app.title') }}">
-            <img src="{{ url_for('static', filename='ETQAN.png') }}" alt="{{ _('app.title') }}" class="brand-logo">
+            <img src="{{ url_for('etqan_logo_asset') }}" alt="{{ _('app.title') }}" class="brand-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+            <span class="brand-fallback" style="display: none;">ETQAN</span>
         </a>
         <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
             {% if current_user %}
