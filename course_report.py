@@ -23,6 +23,7 @@ from email.message import EmailMessage
 from datetime import datetime, timedelta
 import pandas as pd
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, send_from_directory, has_request_context, abort
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -54,6 +55,8 @@ load_local_env_file()
 
 app = Flask(__name__, template_folder='course_report_templates', static_folder='public')
 app.secret_key = os.environ.get('SECRET_KEY') or 'super_secret_key_for_course_report'
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
+app.config['PREFERRED_URL_SCHEME'] = 'https'
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or os.path.join(tempfile.gettempdir(), 'clo_attainment_uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -61,6 +64,7 @@ APP_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PDF_TEXT_CACHE = {}
 PDF_TEXT_CACHE_MAX_ITEMS = 64
 DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+APP_PUBLIC_URL = os.environ.get('APP_PUBLIC_URL', '').strip().rstrip('/')
 ADMIN_EMAILS = {
     email.strip().lower()
     for email in os.environ.get('ADMIN_EMAILS', '').split(',')
@@ -1306,6 +1310,11 @@ def get_registration_university_name():
     if choice in UNIVERSITY_CHOICES:
         return choice
     return ''
+
+def external_url_for(endpoint, **values):
+    if APP_PUBLIC_URL:
+        return f"{APP_PUBLIC_URL}{url_for(endpoint, **values)}"
+    return url_for(endpoint, _external=True, _scheme='https', **values)
 
 def get_profile_university_name():
     choice = (request.form.get('university_choice') or '').strip()
@@ -9285,7 +9294,7 @@ def forgot_password():
                     "UPDATE users SET reset_token = ?, reset_token_expires_at = ? WHERE id = ?",
                     (token, expires_at, user['id'])
                 )
-                reset_url = url_for('reset_password', token=token, _external=True)
+                reset_url = external_url_for('reset_password', token=token)
                 sent, reset_email_status = send_password_reset_email(user['email'], reset_url)
                 if not sent:
                     conn.execute(

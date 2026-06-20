@@ -13,6 +13,7 @@ ORG_LOGO_FOLDER=/var/data/uploads/organization_logos
 RESEND_API_KEY=<Resend API key>
 RESEND_FROM_EMAIL=onboarding@resend.dev
 CONTACT_TO_EMAIL=ghad.ai.research@gmail.com
+APP_PUBLIC_URL=https://your-etqan-service.onrender.com
 ```
 
 For production email, verify your own domain in Resend and replace `RESEND_FROM_EMAIL` with an address on that domain. `onboarding@resend.dev` is useful for initial testing.
