@@ -67,6 +67,19 @@
         box-shadow: 0 10px 24px rgba(38, 54, 95, 0.12);
     }
 
+    .service-card-disabled {
+        cursor: not-allowed;
+        opacity: 0.62;
+        background: #f8fafc;
+    }
+
+    .service-card-disabled:hover,
+    .service-card-disabled:focus-visible {
+        border-color: var(--border-color);
+        box-shadow: none;
+        transform: none;
+    }
+
     .service-card h3 {
         margin: 0 0 0.65rem;
         font-family: var(--brand-font);
@@ -79,22 +92,11 @@
         margin: 0;
     }
 
-    .welcome-course-callout {
-        border: 1px solid rgba(38, 54, 95, 0.18);
-        border-radius: 8px;
-        background: #f8fafc;
-        padding: 1.25rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-
-    .welcome-course-callout p {
-        margin: 0;
-        color: var(--text-main);
-        font-weight: 600;
+    .service-card-note {
+        margin-top: 1rem;
+        color: var(--danger);
+        font-weight: 700;
+        font-size: 0.92rem;
     }
 
     @media (max-width: 720px) {
@@ -107,31 +109,49 @@
 
 <div class="card">
     <div class="service-home">
-        {% if current_user and saved_course_count == 0 %}
-            <div class="welcome-course-callout">
-                <p>{{ _('home.no_courses_message') }}</p>
-                <a href="{{ url_for('new_course') }}" class="btn">{{ _('home.add_course') }}</a>
-            </div>
-        {% endif %}
-
         <section class="service-level">
             <div class="service-level-header">
                 <h3>{{ _('home.course_level') }}</h3>
             </div>
             <div class="service-grid">
-                <a href="/clo-attainment?fresh=1" class="service-card service-card-primary">
+                <a href="{{ url_for('new_course') }}" class="service-card service-card-primary">
                     <div>
-                        <h3>{{ _('home.clo_title') }}</h3>
-                        <p>{{ _('home.clo_description') }}</p>
+                        <h3>+ {{ _('home.add_course_title') }}</h3>
+                        <p>{{ _('home.add_course_description') }}</p>
                     </div>
                 </a>
 
-                <a href="/course-report-service" class="service-card">
-                    <div>
-                        <h3>{{ _('home.course_report_title') }}</h3>
-                        <p>{{ _('home.course_report_description') }}</p>
+                {% if current_user and saved_course_count == 0 %}
+                    <div class="service-card service-card-disabled" aria-disabled="true">
+                        <div>
+                            <h3>{{ _('home.clo_title') }}</h3>
+                            <p>{{ _('home.clo_description') }}</p>
+                            <div class="service-card-note">{{ _('home.requires_course') }}</div>
+                        </div>
                     </div>
-                </a>
+
+                    <div class="service-card service-card-disabled" aria-disabled="true">
+                        <div>
+                            <h3>{{ _('home.course_report_title') }}</h3>
+                            <p>{{ _('home.course_report_description') }}</p>
+                            <div class="service-card-note">{{ _('home.requires_course') }}</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="/clo-attainment?fresh=1" class="service-card">
+                        <div>
+                            <h3>{{ _('home.clo_title') }}</h3>
+                            <p>{{ _('home.clo_description') }}</p>
+                        </div>
+                    </a>
+
+                    <a href="/course-report-service" class="service-card">
+                        <div>
+                            <h3>{{ _('home.course_report_title') }}</h3>
+                            <p>{{ _('home.course_report_description') }}</p>
+                        </div>
+                    </a>
+                {% endif %}
             </div>
         </section>
 

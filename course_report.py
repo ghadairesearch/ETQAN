@@ -255,7 +255,7 @@ LEGACY_UNIVERSITY_COLOR_DEFAULTS = {
 EN_TRANSLATIONS = {
     'app.title': 'ETQAN',
     'app.subtitle': 'Educational Transformation & Quality ANalytics',
-    'nav.services': 'Services',
+    'nav.services': 'Home',
     'nav.account': 'Account Info',
     'nav.my_reports': 'My Reports',
     'nav.my_courses': 'My Courses',
@@ -279,6 +279,9 @@ EN_TRANSLATIONS = {
     'home.program_level_description': 'Workflows that combine course evidence into program learning outcome analysis.',
     'home.clo_title': 'CLO Attainment Analysis',
     'home.clo_description': 'Measure CLO attainment from assessment data, identify performance gaps, and generate evidence-based reports.',
+    'home.add_course_title': 'Add Course',
+    'home.add_course_description': 'Create or import a course before generating reports and attainment analyses.',
+    'home.requires_course': 'Requires at least one course.',
     'home.question_mapping_title': 'Question CLO Mapping',
     'home.question_mapping_description': 'Upload an exam paper and map each question to the related CLOs before using the mapping in reports.',
     'home.assessment_balance_title': 'Assessment Balance Check',
@@ -714,7 +717,7 @@ TRANSLATIONS = {
     'ar': {
         'app.title': 'إتقان',
         'app.subtitle': 'Educational Transformation & Quality ANalytics',
-        'nav.services': 'الخدمات',
+        'nav.services': 'الرئيسية',
         'nav.account': 'معلومات الحساب',
         'nav.my_reports': 'تقاريري',
         'nav.my_courses': 'مقرراتي',
@@ -738,6 +741,9 @@ TRANSLATIONS = {
         'home.program_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u064a\u062c\u0645\u0639 \u0623\u062f\u0644\u0629 \u0627\u0644\u0645\u0642\u0631\u0631\u0627\u062a \u0644\u062a\u062d\u0644\u064a\u0644 \u0646\u0648\u0627\u062a\u062c \u062a\u0639\u0644\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c.',
         'home.clo_title': 'تحليل تحقق مخرجات تعلم المقرر',
         'home.clo_description': 'قياس تحقق مخرجات تعلم المقرر من بيانات التقييمات، وتحديد فجوات الأداء، وإنشاء تقارير قائمة على الأدلة.',
+        'home.add_course_title': 'إضافة مقرر',
+        'home.add_course_description': 'أنشئ أو استورد مقرراً قبل إنشاء التقارير وتحليلات التحقق.',
+        'home.requires_course': 'يتطلب إضافة مقرر واحد على الأقل.',
         'home.question_mapping_title': 'ربط أسئلة الاختبار بالمخرجات',
         'home.question_mapping_description': 'ارفع ورقة الاختبار واربط كل سؤال بنواتج تعلم المقرر قبل استخدام الربط في التقارير.',
         'home.assessment_balance_title': 'فحص توازن التقييم',
@@ -9624,7 +9630,6 @@ def new_course():
                         now
                     )
                 )
-        flash(translate('courses.saved'))
         return redirect(url_for('my_courses'))
 
     return render_template(
@@ -9802,7 +9807,6 @@ def edit_course(course_id):
                     user['id']
                 )
             )
-        flash(translate('courses.saved'))
         return redirect(url_for('my_courses'))
 
     return render_template(
