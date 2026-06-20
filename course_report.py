@@ -7758,6 +7758,20 @@ def localized_question_list_label(count):
     return 'Question' if count == 1 else 'Questions'
 
 
+def format_assessment_label(label):
+    label_text = str(label or '').strip()
+    language = get_language() if has_request_context() else 'en'
+    if language != 'ar':
+        return label_text
+    match = re.match(r'^(Final|Midterm|Quiz|Project|Assignment|Other)(?:\s+(\d+))?$', label_text, flags=re.I)
+    if not match:
+        return label_text
+    key = match.group(1).lower()
+    number = match.group(2)
+    translated = translate(f'assessment.{key}')
+    return f"{translated} {number}" if number else translated
+
+
 def format_question_label(question):
     question = str(question)
     language = get_language() if has_request_context() else 'en'
@@ -7861,7 +7875,7 @@ def format_missing_mapping_questions(missing_columns, assessment_files):
         local_questions = [column[len(prefix):] for column in group_columns]
         if local_questions:
             handled.update(group_columns)
-            parts.append(f"{label}: {compact_question_list(local_questions)}")
+            parts.append(f"{format_assessment_label(label)}: {compact_question_list(local_questions)}")
 
     remaining = [column for column in missing_columns if column not in handled]
     if remaining:
@@ -7884,7 +7898,7 @@ def format_mapped_questions_for_report(questions, assessment_files=None):
         group_questions = [question for question in question_keys if question.startswith(prefix)]
         local_questions = [question[len(prefix):] for question in group_questions]
         if local_questions:
-            parts.append(f"{label}: {compact_question_list(local_questions)}")
+            parts.append(f"{format_assessment_label(label)}: {compact_question_list(local_questions)}")
             handled.update(group_questions)
 
     remaining = [question for question in question_keys if question not in handled]
@@ -8135,8 +8149,10 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
     student_table_text = ParagraphStyle(
         'StudentReportTableText',
         parent=table_text,
-        fontSize=6.2,
-        leading=7.2,
+        fontSize=5.6,
+        leading=6.6,
+        alignment=TA_CENTER,
+        splitLongWords=0,
     )
     student_table_header = ParagraphStyle(
         'StudentReportTableHeader',
@@ -8249,7 +8265,7 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
             paragraph(str(data['students_achieved']), table_text),
             paragraph(f"{data['achievement_percentage']:.2f}%", table_text),
         ])
-    rows, summary_result_widths = rtl_table(rows, [2.65 * inch, 1.55 * inch, 0.58 * inch, 0.68 * inch, 0.62 * inch, 0.82 * inch])
+    rows, summary_result_widths = rtl_table(rows, [0.62 * inch, 2.55 * inch, 0.78 * inch, 1.03 * inch, 1.12 * inch, 0.80 * inch])
     summary_results = Table(rows, colWidths=summary_result_widths, repeatRows=1)
     summary_results.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), primary_color),
@@ -8276,7 +8292,8 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
                 cell = student_achievement_matrix['cells'].get(student_id, {}).get(clo)
                 if cell:
                     status = labels.get('achieved_status', labels['achieved']) if cell.get('achieved') else labels['not_achieved']
-                    row.append(paragraph(f"{cell.get('score', 0):.2f}\n{status}", student_table_text))
+                    status = str(status).replace(' ', '\u00a0')
+                    row.append(paragraph(f"{cell.get('score', 0):.2f}<br/>{status}", student_table_text))
                 else:
                     row.append(paragraph("-", student_table_text))
             student_rows.append(row)
@@ -9410,7 +9427,7 @@ def build_results_pdf_legacy(stats, total_students, course_info, student_achieve
     page_contents = [content_parts]
     table_x = 30
     table_y = 590
-    col_widths = [220, 125, 50, 55, 45, 65]
+    col_widths = [46, 198, 58, 78, 82, 58]
     headers = ["Code", "Questions", "Max", "Target", "Achieved", "Achievement"]
 
     def draw_table_header(parts, y_position):
@@ -9447,7 +9464,7 @@ def build_results_pdf_legacy(stats, total_students, course_info, student_achieve
     for clo, data in sorted_clo_items(stats):
         question_text = format_mapped_questions_for_report(data['questions'])
         clo_lines = wrap_pdf_text(clo_number(clo), 48)
-        question_lines = wrap_pdf_text(question_text, 26)
+        question_lines = wrap_pdf_text(question_text, 42)
         line_count = max(len(clo_lines), len(question_lines), 2)
         row_height = max(36, 16 + (line_count * 9))
 
