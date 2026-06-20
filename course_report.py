@@ -553,6 +553,9 @@ EN_TRANSLATIONS = {
     'detected.back_upload': 'Back to Upload',
     'detected.no_table': 'No question table could be detected from this file.',
     'detected.text_sample': 'View extracted text sample',
+    'detected.suggestion_source': 'Suggestion source:',
+    'detected.source_gemini': 'Gemini Flash',
+    'detected.source_local': 'Local semantic matching',
     'results.title': 'CLO Attainment Report',
     'results.course': 'Course:',
     'results.total_students': 'Total Students Evaluated:',
@@ -1034,6 +1037,9 @@ TRANSLATIONS = {
         'detected.back_upload': 'العودة إلى الرفع',
         'detected.no_table': 'لم يتم اكتشاف جدول أسئلة من هذا الملف.',
         'detected.text_sample': 'عرض عينة النص المستخرج',
+        'detected.suggestion_source': 'مصدر الاقتراح:',
+        'detected.source_gemini': 'Gemini Flash',
+        'detected.source_local': 'المطابقة الدلالية المحلية',
         'results.title': 'تقرير تحقق نواتج التعلم',
         'results.course': 'المقرر:',
         'results.total_students': 'إجمالي الطلاب:',
@@ -1088,7 +1094,7 @@ TRANSLATIONS = {
         'results.mapped_questions': 'الأسئلة المرتبطة',
         'results.max_possible': 'الدرجة الكلية',
         'results.target': 'المستهدف',
-        'results.students_achieved': 'عدد الطلاب المحققون',
+        'results.students_achieved': 'عدد الطلاب المحققين',
         'results.achievement_pct': 'نسبة التحقق',
         'results.mapped_question_count': 'سؤال مرتبط',
         'results.student_achievement': 'تحقق نواتج التعلم لكل طالب',
@@ -1291,7 +1297,8 @@ PDF_REPORT_LABELS = {
         'questions': 'Questions',
         'max': 'Max',
         'target': 'Target',
-        'achieved': 'Achieved',
+        'achieved': 'No of Students Achieved',
+        'achieved_status': 'Achieved',
         'achievement': 'Achievement',
         'student_achievement': 'Student CLO Achievement',
         'student_id': 'Student ID',
@@ -1315,7 +1322,8 @@ PDF_REPORT_LABELS = {
         'questions': 'الأسئلة',
         'max': 'الدرجة الكلية',
         'target': 'المستوى المستهدف',
-        'achieved': 'عدد الطلاب المحققون',
+        'achieved': 'عدد الطلاب المحققين',
+        'achieved_status': 'محقق',
         'achievement': 'نسبة التحقق',
         'student_achievement': 'تحقق نواتج التعلم لكل طالب',
         'student_id': 'معرّف الطالب',
@@ -4682,7 +4690,7 @@ def score_question_clo_match(question_text, clo, explicit=False):
 
     return {'score': round(min(score, 100), 2), 'reasons': reasons[:4]}
 
-def build_smart_clo_suggestions(metrics, clos):
+def build_smart_clo_suggestions(metrics, clos, only_unmapped=False):
     metrics = metrics or {}
     clos = list(clos or [])
     question_texts = metrics.get('question_texts') or {}
@@ -4691,6 +4699,8 @@ def build_smart_clo_suggestions(metrics, clos):
     detected = dict(explicit_mappings)
 
     for question in metrics.get('questions') or []:
+        if only_unmapped and detected.get(question):
+            continue
         question_text = question_texts.get(question) or question
         explicit_clos = set(resolve_detected_clos_to_course_list(explicit_mappings.get(question, []), clos))
         ranked = []
@@ -4716,6 +4726,152 @@ def build_smart_clo_suggestions(metrics, clos):
 
     metrics['smart_clo_suggestions'] = suggestions
     metrics['detected_clo_mappings'] = detected
+    if suggestions and not metrics.get('question_clo_suggestion_source'):
+        metrics['question_clo_suggestion_source'] = 'local'
+    return metrics
+
+
+def gemini_question_clo_prompt():
+    return (
+        "Map exam questions to Course Learning Outcomes. "
+        "Use question intent, required action, concepts, and CLO domain. "
+        "The questions and CLOs may be Arabic or English. "
+        "Return JSON only, with no markdown. Do not invent CLO codes. "
+        "Use only the provided CLO codes. A question may map to more than one CLO when justified. "
+        "Use this exact schema: "
+        '{"mappings":[{"question":"Q1","clos":["1.1"],"confidence":0.85,"reason":"short reason"}]}'
+    )
+
+
+def build_gemini_question_clo_suggestions(metrics, clos):
+    if not GEMINI_API_KEY:
+        return metrics
+    metrics = dict(metrics or {})
+    questions = list(metrics.get('questions') or [])
+    clos = list(clos or [])
+    if not questions or not clos:
+        return metrics
+
+    question_texts = metrics.get('question_texts') or {}
+    question_items = []
+    for question in questions[:80]:
+        text = compact_text(question_texts.get(question) or question)
+        question_items.append({
+            'question': question,
+            'text': text[:1200]
+        })
+
+    clo_items = [
+        {
+            'code': clo_number(clo),
+            'text': str(clo)
+        }
+        for clo in clos
+        if clo_number(clo)
+    ]
+    if not question_items or not clo_items:
+        return metrics
+
+    try:
+        payload = {
+            'contents': [
+                {
+                    'parts': [
+                        {'text': gemini_question_clo_prompt()},
+                        {
+                            'text': json.dumps(
+                                {
+                                    'course_learning_outcomes': clo_items,
+                                    'questions': question_items
+                                },
+                                ensure_ascii=False
+                            )
+                        }
+                    ]
+                }
+            ],
+            'generationConfig': {
+                'temperature': 0,
+                'responseMimeType': 'application/json'
+            }
+        }
+        endpoint = (
+            'https://generativelanguage.googleapis.com/v1beta/models/'
+            + urllib.parse.quote(GEMINI_MODEL, safe='')
+            + ':generateContent?key='
+            + urllib.parse.quote(GEMINI_API_KEY, safe='')
+        )
+        gemini_request = urllib.request.Request(
+            endpoint,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'ETQAN-QuestionCLOMapper/1.0'
+            },
+            method='POST'
+        )
+        with urllib.request.urlopen(gemini_request, timeout=90) as response:
+            gemini_payload = json.loads(response.read().decode('utf-8'))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode('utf-8', errors='replace')
+        app.logger.warning("Gemini question-CLO mapping failed with HTTP %s: %s", exc.code, body[:800])
+        return metrics
+    except Exception as exc:
+        app.logger.warning("Gemini question-CLO mapping failed: %s", exc)
+        return metrics
+
+    response_text = ''
+    for candidate in gemini_payload.get('candidates') or []:
+        content = candidate.get('content') or {}
+        for part in content.get('parts') or []:
+            response_text += part.get('text') or ''
+
+    parsed = parse_gemini_json_response(response_text)
+    mappings = parsed.get('mappings') if isinstance(parsed, dict) else []
+    if not isinstance(mappings, list):
+        return metrics
+
+    detected = dict(metrics.get('detected_clo_mappings') or {})
+    suggestions = dict(metrics.get('smart_clo_suggestions') or {})
+    mapped_count = 0
+    question_lookup = {str(question): str(question) for question in questions}
+    for item in mappings:
+        if not isinstance(item, dict):
+            continue
+        question = str(item.get('question') or '').strip()
+        question = question_lookup.get(question) or question_lookup.get(question.upper()) or question
+        if question not in question_lookup.values():
+            number = question_number_from_label(question)
+            if number:
+                question = next((q for q in questions if question_number_from_label(q) == number), question)
+        if question not in questions:
+            continue
+        resolved = resolve_detected_clos_to_course_list(item.get('clos') or [], clos)
+        if not resolved:
+            continue
+        confidence = item.get('confidence', 0.85)
+        try:
+            confidence_score = float(confidence)
+            if confidence_score <= 1:
+                confidence_score *= 100
+        except (TypeError, ValueError):
+            confidence_score = 85.0
+        reason = compact_text(item.get('reason') or 'Gemini Flash')
+        detected[question] = resolved
+        suggestions[question] = [
+            {
+                'clo': clo,
+                'score': round(max(0, min(confidence_score, 100)), 2),
+                'reasons': [reason or 'Gemini Flash']
+            }
+            for clo in resolved[:3]
+        ]
+        mapped_count += 1
+
+    if mapped_count:
+        metrics['detected_clo_mappings'] = detected
+        metrics['smart_clo_suggestions'] = suggestions
+        metrics['question_clo_suggestion_source'] = 'gemini'
     return metrics
 
 def parse_exam_paper_with_module(filepath):
@@ -7595,6 +7751,29 @@ def format_question_label(question):
         return f"{question_word} {match.group(1)}"
     return question
 
+def localized_question_list_label(count):
+    language = get_language() if has_request_context() else 'en'
+    if language == 'ar':
+        return '\u0627\u0644\u0633\u0624\u0627\u0644' if count == 1 else '\u0627\u0644\u0623\u0633\u0626\u0644\u0629'
+    return 'Question' if count == 1 else 'Questions'
+
+
+def format_question_label(question):
+    question = str(question)
+    language = get_language() if has_request_context() else 'en'
+    question_word = '\u0633\u0624\u0627\u0644' if language == 'ar' else 'Question'
+    match = re.match(r'^(.+?)\s+Q(\d+)$', question)
+    if match:
+        return f"{match.group(1)} {match.group(2)}"
+    match = re.match(r'^Q(\d+)$', question)
+    if match:
+        return f"{question_word} {match.group(1)}"
+    match = re.match(r'^Question\s+(\d+)$', question, flags=re.IGNORECASE)
+    if match:
+        return f"{question_word} {match.group(1)}"
+    return question
+
+
 def build_mapping_groups(columns, assessment_files):
     columns = list(columns or [])
     groups = []
@@ -7665,7 +7844,7 @@ def compact_question_list(question_keys):
     ranges.append((start, previous))
 
     range_text = ', '.join(str(start) if start == end else f"{start}-{end}" for start, end in ranges)
-    label = 'Question' if len(numbers) == 1 else 'Questions'
+    label = localized_question_list_label(len(numbers))
     return f"{label} {range_text}"
 
 def format_missing_mapping_questions(missing_columns, assessment_files):
@@ -8096,7 +8275,7 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
             for clo in all_clos:
                 cell = student_achievement_matrix['cells'].get(student_id, {}).get(clo)
                 if cell:
-                    status = labels['achieved'] if cell.get('achieved') else labels['not_achieved']
+                    status = labels.get('achieved_status', labels['achieved']) if cell.get('achieved') else labels['not_achieved']
                     row.append(paragraph(f"{cell.get('score', 0):.2f}\n{status}", student_table_text))
                 else:
                     row.append(paragraph("-", student_table_text))
@@ -9350,7 +9529,7 @@ def build_results_pdf_legacy(stats, total_students, course_info, student_achieve
                 for clo, width in zip(clo_chunk, col_widths[1:]):
                     cell = student_achievement_matrix['cells'].get(student_id, {}).get(clo)
                     if cell:
-                        status = "Achieved" if cell.get('achieved') else "Not Achieved"
+                        status = labels.get('achieved_status', 'Achieved') if cell.get('achieved') else labels.get('not_achieved', 'Not Achieved')
                         pdf_text(current_parts, cell_x + 5, row_y + 19, f"{cell.get('score', 0):.2f}", 7.5, "F1")
                         pdf_text(current_parts, cell_x + 5, row_y + 8, status, 6.8, "F1")
                     else:
@@ -11179,7 +11358,12 @@ def question_clo_mapping_service():
         paper_file.save(filepath)
         try:
             metrics = parse_exam_paper_with_module(filepath)
-            metrics = build_smart_clo_suggestions(metrics, clos)
+            metrics = build_gemini_question_clo_suggestions(metrics, clos)
+            metrics = build_smart_clo_suggestions(
+                metrics,
+                clos,
+                only_unmapped=metrics.get('question_clo_suggestion_source') == 'gemini'
+            )
         except Exception as e:
             flash(f"Error reading exam paper: {e}", "error")
             return redirect(request.url)
