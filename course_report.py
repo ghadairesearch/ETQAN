@@ -277,6 +277,9 @@ EN_TRANSLATIONS = {
     'home.course_level_description': 'Workflows for course CLO analysis, attainment evidence, and course reports.',
     'home.program_level': 'Program Level Services',
     'home.program_level_description': 'Workflows that combine course evidence into program learning outcome analysis.',
+    'home.add_program_title': 'Add Program',
+    'home.add_program_description': 'Create or import a program before generating PLO attainment analysis.',
+    'home.requires_program': 'Requires at least one program.',
     'home.clo_title': 'CLO Attainment Analysis',
     'home.clo_description': 'Measure CLO attainment from assessment data, identify performance gaps, and generate evidence-based reports.',
     'home.add_course_title': 'Add Course',
@@ -433,6 +436,16 @@ EN_TRANSLATIONS = {
     'courses.delete_confirm': 'Delete this saved course?',
     'courses.saved': 'Course saved.',
     'courses.deleted': 'Course deleted.',
+    'programs.login_required': 'Please login to manage your programs.',
+    'programs.add_title': 'Add Program',
+    'programs.program_name': 'Program Name',
+    'programs.program_code': 'Program Code',
+    'programs.college': 'College',
+    'programs.department': 'Department',
+    'programs.plos': 'PLOs',
+    'programs.plos_help': 'Paste one PLO per line, for example: K1 Demonstrate knowledge, S1 Apply skills, V1 Show values.',
+    'programs.save': 'Save Program',
+    'programs.invalid': 'Enter a program name and at least one PLO.',
     'courses.invalid': 'Enter a course name and at least one CLO, or upload a readable course specification PDF.',
     'courses.limit': 'Your plan does not allow saving more courses.',
     'courses.login_required': 'Please login to manage saved courses.',
@@ -739,6 +752,9 @@ TRANSLATIONS = {
         'home.course_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u062e\u0627\u0635 \u0628\u062a\u062d\u0644\u064a\u0644 \u0645\u062e\u0631\u062c\u0627\u062a \u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0642\u0631\u0631 \u0648\u0623\u062f\u0644\u0629 \u0627\u0644\u062a\u062d\u0642\u0642 \u0648\u062a\u0642\u0627\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'home.program_level': 'خدمات البرامج',
         'home.program_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u064a\u062c\u0645\u0639 \u0623\u062f\u0644\u0629 \u0627\u0644\u0645\u0642\u0631\u0631\u0627\u062a \u0644\u062a\u062d\u0644\u064a\u0644 \u0646\u0648\u0627\u062a\u062c \u062a\u0639\u0644\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c.',
+        'home.add_program_title': 'إضافة برنامج',
+        'home.add_program_description': 'أنشئ أو استورد برنامجاً قبل إنشاء تحليل تحقق مخرجات تعلم البرنامج.',
+        'home.requires_program': 'يتطلب إضافة برنامج واحد على الأقل.',
         'home.clo_title': 'تحليل تحقق مخرجات تعلم المقرر',
         'home.clo_description': 'قياس تحقق مخرجات تعلم المقرر من بيانات التقييمات، وتحديد فجوات الأداء، وإنشاء تقارير قائمة على الأدلة.',
         'home.add_course_title': 'إضافة مقرر',
@@ -895,6 +911,16 @@ TRANSLATIONS = {
         'courses.delete_confirm': 'حذف هذا المقرر المحفوظ؟',
         'courses.saved': 'تم حفظ المقرر.',
         'courses.deleted': 'تم حذف المقرر.',
+        'programs.login_required': 'يرجى تسجيل الدخول لإدارة البرامج.',
+        'programs.add_title': 'إضافة برنامج',
+        'programs.program_name': 'اسم البرنامج',
+        'programs.program_code': 'رمز البرنامج',
+        'programs.college': 'الكلية',
+        'programs.department': 'القسم',
+        'programs.plos': 'مخرجات تعلم البرنامج',
+        'programs.plos_help': 'اكتب كل مخرج تعلم في سطر مستقل، مثل: K1 المعرفة، S1 المهارات، V1 القيم.',
+        'programs.save': 'حفظ البرنامج',
+        'programs.invalid': 'أدخل اسم البرنامج ومخرج تعلم واحداً على الأقل.',
         'courses.invalid': 'أدخل اسم المقرر وناتج تعلم واحد على الأقل، أو ارفع ملف توصيف مقرر قابل للقراءة.',
         'courses.limit': 'خطتك لا تسمح بحفظ المزيد من المقررات.',
         'courses.login_required': 'يرجى تسجيل الدخول لإدارة المقررات المحفوظة.',
@@ -1560,6 +1586,21 @@ def init_postgres_db(conn):
         'topics_json': "TEXT DEFAULT '[]'",
         'clo_plos_json': "TEXT DEFAULT '{}'"
     })
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS user_programs (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            display_name TEXT NOT NULL,
+            program_name TEXT NOT NULL,
+            program_code TEXT DEFAULT '',
+            college TEXT DEFAULT '',
+            department TEXT DEFAULT '',
+            plos_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            UNIQUE(user_id, display_name)
+        )
+    """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS contact_requests (
             id SERIAL PRIMARY KEY,
@@ -2358,6 +2399,13 @@ def build_course_display_name(course_name, course_code=''):
     if course_name and course_code and course_code not in course_name:
         return f"{course_name} ({course_code})"
     return course_name or course_code
+
+def build_program_display_name(program_name, program_code=''):
+    program_name = re.sub(r'\s+', ' ', str(program_name or '').strip())
+    program_code = re.sub(r'\s+', '', str(program_code or '').strip())
+    if program_name and program_code and program_code not in program_name:
+        return f"{program_name} ({program_code})"
+    return program_name or program_code
 
 def build_course_select_label(course, language='ar'):
     course_name = re.sub(r'\s+', ' ', str((course or {}).get('course_name') or (course or {}).get('name') or '').strip())
@@ -9828,6 +9876,68 @@ def delete_saved_course(course_id):
     flash(translate('courses.deleted'))
     return redirect(url_for('my_courses'))
 
+@app.route('/account/programs/new', methods=['GET', 'POST'])
+def new_program():
+    user = current_user()
+    if not user:
+        flash(translate('programs.login_required'), "error")
+        return redirect(url_for('login'))
+    draft = {
+        'program_name': '',
+        'program_code': '',
+        'college': '',
+        'department': '',
+        'plos': ''
+    }
+    if request.method == 'POST':
+        program_name = (request.form.get('program_name') or '').strip()
+        program_code = (request.form.get('program_code') or '').strip()
+        college = (request.form.get('college') or '').strip()
+        department = (request.form.get('department') or '').strip()
+        plos_text = (request.form.get('plos') or '').strip()
+        plos = [line.strip() for line in plos_text.splitlines() if line.strip()]
+        draft = {
+            'program_name': program_name,
+            'program_code': program_code,
+            'college': college,
+            'department': department,
+            'plos': plos_text
+        }
+        display_name = build_program_display_name(program_name, program_code)
+        if not display_name or not plos:
+            flash(translate('programs.invalid'), "error")
+            return render_template('program_new.html', draft=draft)
+        now = datetime.now().strftime("%Y-%m-%d %H:%M")
+        with get_db() as conn:
+            conn.execute(
+                """
+                INSERT INTO user_programs
+                    (user_id, display_name, program_name, program_code, college, department, plos_json, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (user_id, display_name)
+                DO UPDATE SET
+                    program_name = EXCLUDED.program_name,
+                    program_code = EXCLUDED.program_code,
+                    college = EXCLUDED.college,
+                    department = EXCLUDED.department,
+                    plos_json = EXCLUDED.plos_json,
+                    updated_at = EXCLUDED.updated_at
+                """,
+                (
+                    user['id'],
+                    display_name,
+                    program_name or display_name,
+                    program_code,
+                    college,
+                    department,
+                    json.dumps(plos, ensure_ascii=False),
+                    now,
+                    now
+                )
+            )
+        return redirect(url_for('index'))
+    return render_template('program_new.html', draft=draft)
+
 @app.route('/account/organization', methods=['GET', 'POST'])
 def organization_settings():
     user = current_user()
@@ -10254,13 +10364,22 @@ def save_question_clos():
 def index():
     user = current_user()
     saved_course_count = 0
+    saved_program_count = 0
     if user:
         with get_db() as conn:
             saved_course_count = conn.execute(
                 "SELECT COUNT(*) AS count FROM user_courses WHERE user_id = ?",
                 (user['id'],)
             ).fetchone()['count']
-    return render_template('service_home.html', saved_course_count=saved_course_count)
+            saved_program_count = conn.execute(
+                "SELECT COUNT(*) AS count FROM user_programs WHERE user_id = ?",
+                (user['id'],)
+            ).fetchone()['count']
+    return render_template(
+        'service_home.html',
+        saved_course_count=saved_course_count,
+        saved_program_count=saved_program_count
+    )
 
 @app.route('/plo-analysis', methods=['GET', 'POST'])
 def plo_analysis_service():
@@ -10270,6 +10389,12 @@ def plo_analysis_service():
         return redirect(url_for('login'))
         
     with get_db() as conn:
+        saved_program_count = conn.execute(
+            "SELECT COUNT(*) AS count FROM user_programs WHERE user_id = ?",
+            (user['id'],)
+        ).fetchone()['count']
+        if saved_program_count == 0:
+            return redirect(url_for('new_program'))
         reports = conn.execute(
             "SELECT id, title, course_name, created_at, payload_json FROM saved_reports WHERE user_id = ? ORDER BY created_at DESC",
             (user['id'],)

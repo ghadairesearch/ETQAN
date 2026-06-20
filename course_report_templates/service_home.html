@@ -160,12 +160,29 @@
                 <h3>{{ _('home.program_level') }}</h3>
             </div>
             <div class="service-grid">
-                <a href="/plo-analysis" class="service-card service-card-primary">
+                <a href="{{ url_for('new_program') }}" class="service-card service-card-primary">
                     <div>
-                        <h3>{{ _('home.plo_title') }}</h3>
-                        <p>{{ _('home.plo_description') }}</p>
+                        <h3>{{ _('home.add_program_title') }}</h3>
+                        <p>{{ _('home.add_program_description') }}</p>
                     </div>
                 </a>
+
+                {% if current_user and saved_program_count == 0 %}
+                    <div class="service-card service-card-disabled" aria-disabled="true">
+                        <div>
+                            <h3>{{ _('home.plo_title') }}</h3>
+                            <p>{{ _('home.plo_description') }}</p>
+                            <div class="service-card-note">{{ _('home.requires_program') }}</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="/plo-analysis" class="service-card">
+                        <div>
+                            <h3>{{ _('home.plo_title') }}</h3>
+                            <p>{{ _('home.plo_description') }}</p>
+                        </div>
+                    </a>
+                {% endif %}
             </div>
         </section>
     </div>
