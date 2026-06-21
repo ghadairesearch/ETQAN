@@ -20,6 +20,14 @@
         </div>
     </section>
 
+    {% if course_report_warnings %}
+        <div class="alert alert-error" style="margin-bottom: 1.25rem;">
+            {% for warning in course_report_warnings %}
+                <div>{{ warning }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     {% if selected_reports %}
         <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff; margin-bottom: 1.25rem;">
             <h3 style="margin: 0 0 0.75rem;">{{ _('course_report.selected_reports') }}</h3>

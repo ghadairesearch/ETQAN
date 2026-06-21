@@ -2790,7 +2790,19 @@ def course_report_template_context_defaults(export_action, selected_course_name=
         'uncovered_reason_actions_json': json.dumps(UNCOVERED_TOPIC_REASON_ACTIONS, ensure_ascii=False),
         'total_students': 0,
         'stats_items': [],
+        'course_report_warnings': [],
     }
+
+def course_report_input_error_message(exc, report_ids=None, selected_course_name=''):
+    report_ids_text = ', '.join(str(report_id) for report_id in (report_ids or []) if str(report_id).strip()) or 'none'
+    course_text = str(selected_course_name or '').strip() or 'not provided'
+    if isinstance(exc, ValueError):
+        return f"{exc} Course: {course_text}. Report ID(s): {report_ids_text}."
+    if isinstance(exc, FileNotFoundError):
+        return f"A required file for the course report could not be found. Course: {course_text}. Report ID(s): {report_ids_text}."
+    if isinstance(exc, KeyError):
+        return f"The saved report is missing required field: {exc}. Course: {course_text}. Report ID(s): {report_ids_text}."
+    return f"Course report input error ({type(exc).__name__}): {exc}. Course: {course_text}. Report ID(s): {report_ids_text}."
 
 def load_course_report_records(report_ids, user_id):
     cleaned_ids = []
@@ -2918,6 +2930,11 @@ def build_course_report_context_from_records(records, export_action, selected_co
     except Exception:
         app.logger.exception("Failed to load course topics for course report inputs")
         course_topics = []
+    warnings = []
+    if selected_reports and not combined_stats:
+        warnings.append("The selected report was loaded, but no CLO summary rows were found in its saved data.")
+    if not course_info.get('course_name') and not course_info.get('raw_name'):
+        warnings.append("Course information could not be resolved from the selected report.")
 
     context.update({
         'selected_report_ids': selected_report_ids,
@@ -2925,6 +2942,7 @@ def build_course_report_context_from_records(records, export_action, selected_co
         'selected_reports': selected_reports,
         'course_info': course_info,
         'course_topics': course_topics,
+        'course_report_warnings': warnings,
         'total_students': max(total_students_candidates) if total_students_candidates else 0,
         'stats_items': sorted_clo_items(combined_stats),
     })
@@ -2932,6 +2950,13 @@ def build_course_report_context_from_records(records, export_action, selected_co
 
 def render_course_report_inputs_from_records(records, export_action, selected_course_name=''):
     context = build_course_report_context_from_records(records, export_action, selected_course_name)
+    if not context.get('selected_report_ids'):
+        raise ValueError("No saved CLO attainment report was selected.")
+    if not context.get('stats_items'):
+        raise ValueError(
+            "The selected CLO attainment report does not contain readable CLO summary data. "
+            "Create a new CLO Attainment Analysis report, then select it for the course report."
+        )
     return render_template('course_report_inputs.html', **context)
 
 def display_saved_report_title(row):
@@ -12627,7 +12652,7 @@ def course_report_service_inputs_multi():
             report_ids,
             request.form.get('course_name') or ''
         )
-        flash(f"Course report input error: {type(exc).__name__}: {exc}", "error")
+        flash(course_report_input_error_message(exc, report_ids, request.form.get('course_name') or ''), "error")
         return redirect(url_for('course_report_service'))
 
 @app.route('/course-report-service/report/<int:report_id>')
@@ -12652,7 +12677,7 @@ def course_report_service_inputs(report_id):
             user['id'],
             report_id
         )
-        flash(f"Course report input error: {type(exc).__name__}: {exc}", "error")
+        flash(course_report_input_error_message(exc, [report_id], records[0].get('course_name') if 'records' in locals() and records else ''), "error")
         return redirect(url_for('course_report_service'))
 
 @app.route('/course-report-service/report/<int:report_id>/export', methods=['POST'])
