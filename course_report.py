@@ -12600,30 +12600,6 @@ def course_report_service():
         associated_reports=None
     )
 
-def render_course_report_inputs(report_payloads, export_action, selected_course_name=''):
-    selected_course_name = selected_course_name or (request.form.get('course_name') if has_request_context() else '') or ''
-    combined_stats, course_info, total_students, selected_reports = aggregate_course_report_payloads(report_payloads, selected_course_name)
-    raw_course_name = course_info.get('raw_name') or course_info.get('course_name') or ''
-    selected_report_ids = [row_get(item.get('row'), 'id') for item in report_payloads]
-    selected_report_ids = [report_id for report_id in selected_report_ids if report_id]
-    return render_template(
-        'course_report_inputs.html',
-        export_action=export_action,
-        selected_report_ids=selected_report_ids,
-        selected_course_name=selected_course_name or raw_course_name,
-        selected_reports=selected_reports,
-        course_info=course_info,
-        course_topics=get_course_topics(raw_course_name),
-        course_improvement_recommendations=COURSE_IMPROVEMENT_RECOMMENDATIONS,
-        course_improvement_recommendation_groups=grouped_course_improvement_recommendations(),
-        course_improvement_action_options=COURSE_IMPROVEMENT_ACTION_OPTIONS,
-        course_improvement_support_options=COURSE_IMPROVEMENT_SUPPORT_OPTIONS,
-        uncovered_reason_actions=UNCOVERED_TOPIC_REASON_ACTIONS,
-        uncovered_reason_actions_json=json.dumps(UNCOVERED_TOPIC_REASON_ACTIONS, ensure_ascii=False),
-        total_students=total_students,
-        stats_items=sorted_clo_items(combined_stats)
-    )
-
 @app.route('/course-report-service/reports', methods=['POST'])
 def course_report_service_inputs_multi():
     user = current_user()
@@ -12644,14 +12620,14 @@ def course_report_service_inputs_multi():
             url_for('export_selected_course_report_docx'),
             request.form.get('course_name') or ''
         )
-    except Exception:
+    except Exception as exc:
         app.logger.exception(
             "Failed to open course report inputs for user_id=%s report_ids=%s course=%s",
             user['id'],
             report_ids,
             request.form.get('course_name') or ''
         )
-        flash("Could not open the course report inputs. Please recreate the CLO attainment report or contact support with this report ID.", "error")
+        flash(f"Course report input error: {type(exc).__name__}: {exc}", "error")
         return redirect(url_for('course_report_service'))
 
 @app.route('/course-report-service/report/<int:report_id>')
@@ -12670,13 +12646,13 @@ def course_report_service_inputs(report_id):
             url_for('export_saved_course_report_docx', report_id=report_id),
             records[0].get('course_name') or ''
         )
-    except Exception:
+    except Exception as exc:
         app.logger.exception(
             "Failed to open single course report input for user_id=%s report_id=%s",
             user['id'],
             report_id
         )
-        flash("Could not open the course report inputs. Please recreate the CLO attainment report or contact support with this report ID.", "error")
+        flash(f"Course report input error: {type(exc).__name__}: {exc}", "error")
         return redirect(url_for('course_report_service'))
 
 @app.route('/course-report-service/report/<int:report_id>/export', methods=['POST'])
