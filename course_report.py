@@ -2749,6 +2749,49 @@ def normalize_clo_summary_item(data):
         'achievement_percentage': safe_float_value(data.get('achievement_percentage', data.get('attainment_percentage', 0))),
     }
 
+def extract_saved_report_stats(payload):
+    if not isinstance(payload, dict):
+        return {}
+    candidates = [
+        payload.get('stats'),
+        (payload.get('stats') or {}).get('clo_overall') if isinstance(payload.get('stats'), dict) else None,
+        payload.get('clo_overall'),
+        payload.get('results'),
+    ]
+    for candidate in candidates:
+        if isinstance(candidate, dict):
+            if isinstance(candidate.get('clo_overall'), dict):
+                candidate = candidate.get('clo_overall') or {}
+            usable = {
+                str(clo): value
+                for clo, value in candidate.items()
+                if isinstance(value, dict)
+            }
+            if usable:
+                return usable
+    return {}
+
+def course_report_template_context_defaults(export_action, selected_course_name=''):
+    return {
+        'export_action': export_action,
+        'selected_report_ids': [],
+        'selected_course_name': selected_course_name or '',
+        'selected_reports': [],
+        'course_info': enrich_course_info_from_course(
+            {'course_name': selected_course_name or '', 'raw_name': selected_course_name or ''},
+            selected_course_name or ''
+        ),
+        'course_topics': [],
+        'course_improvement_recommendations': COURSE_IMPROVEMENT_RECOMMENDATIONS,
+        'course_improvement_recommendation_groups': grouped_course_improvement_recommendations(),
+        'course_improvement_action_options': COURSE_IMPROVEMENT_ACTION_OPTIONS,
+        'course_improvement_support_options': COURSE_IMPROVEMENT_SUPPORT_OPTIONS,
+        'uncovered_reason_actions': UNCOVERED_TOPIC_REASON_ACTIONS,
+        'uncovered_reason_actions_json': json.dumps(UNCOVERED_TOPIC_REASON_ACTIONS, ensure_ascii=False),
+        'total_students': 0,
+        'stats_items': [],
+    }
+
 def load_course_report_records(report_ids, user_id):
     cleaned_ids = []
     for report_id in report_ids or []:
@@ -2791,38 +2834,54 @@ def load_course_report_records(report_ids, user_id):
     return records
 
 def build_course_report_context_from_records(records, export_action, selected_course_name=''):
+    context = course_report_template_context_defaults(export_action, selected_course_name)
     combined_stats = {}
     selected_reports = []
-    total_students = 0
+    total_students_candidates = []
     course_info = {}
-    first_course_name = ''
+    first_course_name = selected_course_name or ''
+    selected_report_ids = []
 
     for record in records or []:
-        payload = normalize_saved_report_payload(record.get('payload') or {})
-        report_students = safe_int_value(payload.get('total_students'))
-        total_students += report_students
+        record = record or {}
+        payload = record.get('payload') or {}
+        if not isinstance(payload, dict):
+            payload = {}
+        report_id = safe_int_value(record.get('id'))
+        if report_id:
+            selected_report_ids.append(report_id)
         report_title = record.get('display_title') or record.get('title') or 'CLO Attainment Report'
         report_course_name = record.get('course_name') or ''
         if not first_course_name:
             first_course_name = report_course_name
+
+        report_students = safe_int_value(
+            payload.get('total_students')
+            or payload.get('students')
+            or payload.get('total_students_evaluated')
+        )
+        if report_students:
+            total_students_candidates.append(report_students)
+
         selected_reports.append({
-            'id': record.get('id'),
+            'id': report_id,
             'display_title': report_title,
-            'created_at': record.get('created_at'),
+            'created_at': record.get('created_at') or '',
             'total_students': report_students,
         })
+
         if not course_info:
             payload_course_info = payload.get('course_info') if isinstance(payload.get('course_info'), dict) else {}
-            course_info = payload_course_info or {
-                'course_name': report_course_name,
-                'raw_name': report_course_name,
-            }
+            course_info = dict(payload_course_info or {})
+            if not course_info:
+                course_info = {'course_name': report_course_name, 'raw_name': report_course_name}
 
-        for clo, raw_data in (payload.get('stats') or {}).items():
+        report_stats = extract_saved_report_stats(payload)
+        for clo, raw_data in report_stats.items():
             data = normalize_clo_summary_item(raw_data)
             if not data:
                 continue
-            target = combined_stats.setdefault(clo, {
+            target = combined_stats.setdefault(str(clo), {
                 'questions': [],
                 'students_achieved': 0,
                 'total_possible_score': 0.0,
@@ -2835,9 +2894,10 @@ def build_course_report_context_from_records(records, export_action, selected_co
             target['students_achieved'] += data['students_achieved']
             target['total_possible_score'] += data['total_possible_score']
             target['target_score'] += data['target_score']
-            target['target_pct_total'] += data['target_pct'] * max(report_students, 1)
-            target['target_pct_weight'] += max(report_students, 1)
-            target['_total_students'] += report_students
+            student_weight = report_students or safe_int_value(raw_data.get('total_students') if isinstance(raw_data, dict) else 0) or 1
+            target['target_pct_total'] += data['target_pct'] * student_weight
+            target['target_pct_weight'] += student_weight
+            target['_total_students'] += student_weight
 
     for data in combined_stats.values():
         clo_total_students = int(data.pop('_total_students', 0) or 0)
@@ -2849,6 +2909,8 @@ def build_course_report_context_from_records(records, export_action, selected_co
         data['target_score'] = round(float(data.get('target_score') or 0), 2)
 
     selected_course_name = selected_course_name or first_course_name
+    if not course_info:
+        course_info = {'course_name': selected_course_name, 'raw_name': selected_course_name}
     course_info = enrich_course_info_from_course(course_info, selected_course_name)
     raw_course_name = course_info.get('raw_name') or course_info.get('course_name') or selected_course_name
     try:
@@ -2857,22 +2919,16 @@ def build_course_report_context_from_records(records, export_action, selected_co
         app.logger.exception("Failed to load course topics for course report inputs")
         course_topics = []
 
-    return {
-        'export_action': export_action,
-        'selected_report_ids': [record.get('id') for record in records or [] if record.get('id')],
+    context.update({
+        'selected_report_ids': selected_report_ids,
         'selected_course_name': selected_course_name or raw_course_name,
         'selected_reports': selected_reports,
         'course_info': course_info,
         'course_topics': course_topics,
-        'course_improvement_recommendations': COURSE_IMPROVEMENT_RECOMMENDATIONS,
-        'course_improvement_recommendation_groups': grouped_course_improvement_recommendations(),
-        'course_improvement_action_options': COURSE_IMPROVEMENT_ACTION_OPTIONS,
-        'course_improvement_support_options': COURSE_IMPROVEMENT_SUPPORT_OPTIONS,
-        'uncovered_reason_actions': UNCOVERED_TOPIC_REASON_ACTIONS,
-        'uncovered_reason_actions_json': json.dumps(UNCOVERED_TOPIC_REASON_ACTIONS, ensure_ascii=False),
-        'total_students': total_students,
+        'total_students': max(total_students_candidates) if total_students_candidates else 0,
         'stats_items': sorted_clo_items(combined_stats),
-    }
+    })
+    return context
 
 def render_course_report_inputs_from_records(records, export_action, selected_course_name=''):
     context = build_course_report_context_from_records(records, export_action, selected_course_name)
@@ -12578,15 +12634,25 @@ def course_report_service_inputs_multi():
     if not report_ids:
         flash(translate('course_report.select_one_report'), "error")
         return redirect(url_for('course_report_service'))
-    records = load_course_report_records(report_ids, user['id'])
-    if not records:
-        flash("CLO attainment report not found.", "error")
+    try:
+        records = load_course_report_records(report_ids, user['id'])
+        if not records:
+            flash("CLO attainment report not found.", "error")
+            return redirect(url_for('course_report_service'))
+        return render_course_report_inputs_from_records(
+            records,
+            url_for('export_selected_course_report_docx'),
+            request.form.get('course_name') or ''
+        )
+    except Exception:
+        app.logger.exception(
+            "Failed to open course report inputs for user_id=%s report_ids=%s course=%s",
+            user['id'],
+            report_ids,
+            request.form.get('course_name') or ''
+        )
+        flash("Could not open the course report inputs. Please recreate the CLO attainment report or contact support with this report ID.", "error")
         return redirect(url_for('course_report_service'))
-    return render_course_report_inputs_from_records(
-        records,
-        url_for('export_selected_course_report_docx'),
-        request.form.get('course_name') or ''
-    )
 
 @app.route('/course-report-service/report/<int:report_id>')
 def course_report_service_inputs(report_id):
@@ -12594,15 +12660,24 @@ def course_report_service_inputs(report_id):
     if not user:
         flash("Please login to create a course report.", "error")
         return redirect(url_for('login'))
-    records = load_course_report_records([report_id], user['id'])
-    if not records:
-        flash("CLO attainment report not found.", "error")
+    try:
+        records = load_course_report_records([report_id], user['id'])
+        if not records:
+            flash("CLO attainment report not found.", "error")
+            return redirect(url_for('course_report_service'))
+        return render_course_report_inputs_from_records(
+            records,
+            url_for('export_saved_course_report_docx', report_id=report_id),
+            records[0].get('course_name') or ''
+        )
+    except Exception:
+        app.logger.exception(
+            "Failed to open single course report input for user_id=%s report_id=%s",
+            user['id'],
+            report_id
+        )
+        flash("Could not open the course report inputs. Please recreate the CLO attainment report or contact support with this report ID.", "error")
         return redirect(url_for('course_report_service'))
-    return render_course_report_inputs_from_records(
-        records,
-        url_for('export_saved_course_report_docx', report_id=report_id),
-        records[0].get('course_name') or ''
-    )
 
 @app.route('/course-report-service/report/<int:report_id>/export', methods=['POST'])
 def export_saved_course_report_docx(report_id):
