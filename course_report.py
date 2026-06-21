@@ -2559,7 +2559,21 @@ def load_saved_report_payload(report_id, user_id):
         ).fetchone()
     if not row:
         return None, None
-    return row, safe_json_loads(row_get(row, 'payload_json'), {})
+    return row, normalize_saved_report_payload(safe_json_loads(row_get(row, 'payload_json'), {}))
+
+def normalize_saved_report_payload(payload):
+    if not isinstance(payload, dict):
+        return {}
+    payload = dict(payload)
+    stats = payload.get('stats') or {}
+    if isinstance(stats, dict) and isinstance(stats.get('clo_overall'), dict):
+        stats = stats.get('clo_overall') or {}
+    if not isinstance(stats, dict):
+        stats = {}
+    payload['stats'] = stats
+    payload['course_info'] = payload.get('course_info') if isinstance(payload.get('course_info'), dict) else {}
+    payload['total_students'] = safe_int_value(payload.get('total_students'))
+    return payload
 
 def row_get(row, key, default=''):
     try:
@@ -2608,7 +2622,7 @@ def load_selected_report_payloads(report_ids, user_id):
         row = rows_by_id.get(report_id)
         if not row:
             continue
-        reports.append({'row': row, 'payload': safe_json_loads(row_get(row, 'payload_json'), {})})
+        reports.append({'row': row, 'payload': normalize_saved_report_payload(safe_json_loads(row_get(row, 'payload_json'), {}))})
     return reports
 
 def aggregate_course_report_payloads(report_payloads, selected_course_name=''):
@@ -2623,7 +2637,7 @@ def aggregate_course_report_payloads(report_payloads, selected_course_name=''):
 
     for item in report_payloads:
         row = (item or {}).get('row') or {}
-        payload = (item or {}).get('payload') or {}
+        payload = normalize_saved_report_payload((item or {}).get('payload') or {})
         if not first_report_course_name:
             first_report_course_name = row_get(row, 'course_name')
         report_title = display_saved_report_title(row)
@@ -2640,6 +2654,8 @@ def aggregate_course_report_payloads(report_payloads, selected_course_name=''):
             course_info = payload.get('course_info') or {'course_name': row_course_name, 'raw_name': row_course_name}
 
         for clo, data in (payload.get('stats') or {}).items():
+            if not isinstance(data, dict):
+                continue
             target = combined_stats.setdefault(clo, {
                 'questions': [],
                 'students_achieved': 0,
