@@ -1,7 +1,65 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card" style="max-width: 980px; margin: 0 auto;">
+<style>
+    .question-review-box {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #f9fafb;
+        overflow: hidden;
+    }
+
+    .question-review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap;
+    }
+
+    .question-review-counts {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .question-review-detected {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        align-self: center;
+    }
+
+    .question-review-count {
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 0.35rem 0.6rem;
+        background: #f9fafb;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .question-review-table {
+        margin: 0;
+        background: var(--bg-card);
+    }
+
+    .question-review-table textarea {
+        min-height: 92px;
+        resize: vertical;
+    }
+
+    @media (max-width: 760px) {
+        .question-review-box {
+            overflow-x: auto;
+        }
+    }
+</style>
+
+<div class="card" style="max-width: 1100px; margin: 0 auto;">
     <h2 style="margin-top: 0;">{{ _('question_mapping.review_title') }}</h2>
     <p style="color: var(--text-muted); margin-top: -0.5rem;">
         {{ _('question_mapping.review_description') }}
@@ -13,18 +71,50 @@
 
     <form method="POST" action="{{ url_for('question_clo_mapping_map') }}">
         <input type="hidden" name="draft_id" value="{{ draft_id }}">
-        <div id="questionList" style="display: grid; gap: 0.85rem;">
-            {% set question_items = metrics.questions if metrics and metrics.questions else ['Q1'] %}
-            {% for question in question_items %}
-                <div class="question-edit-card" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff;">
-                    <label class="form-label" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
-                        <span class="question-number">{{ _('mapping.question') }} {{ loop.index }}</span>
-                        <button type="button" class="remove-question" style="border: 0; background: transparent; color: var(--danger); font-weight: 700; cursor: pointer;">×</button>
-                    </label>
-                    <textarea name="question_text" class="form-control" rows="4" style="resize: vertical;">{{ metrics.question_texts.get(question, question) if metrics and metrics.question_texts else '' }}</textarea>
+        {% set question_items = metrics.questions if metrics and metrics.questions else ['Q1'] %}
+        <section class="question-review-box">
+            <div class="question-review-header">
+                <div>
+                    <strong>{{ filename }}</strong>
                 </div>
-            {% endfor %}
-        </div>
+                <div class="question-review-counts">
+                    <span class="question-review-detected">{{ _('mapping.detected') }}</span>
+                    <span class="question-review-count">{{ question_items|length }} {{ count_unit('question', question_items|length) }}</span>
+                </div>
+            </div>
+            <table id="questionTable" class="question-review-table">
+                <thead>
+                    <tr>
+                        <th style="width: 150px;">{{ _('mapping.question') }}</th>
+                        <th>{{ _('question_mapping.question_text') }}</th>
+                        <th style="width: 320px;">{{ _('question_mapping.paper_clo') }}</th>
+                        <th style="width: 70px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="questionList">
+                    {% for question in question_items %}
+                        {% set detected_clos = resolve_detected_clos_to_course_list(metrics.detected_clo_mappings.get(question, []) if metrics and metrics.detected_clo_mappings else [], clos) %}
+                        <tr class="question-edit-row">
+                            <td><strong class="question-number">{{ _('mapping.question') }} {{ loop.index }}</strong></td>
+                            <td>
+                                <textarea name="question_text" class="form-control" rows="4">{{ metrics.question_texts.get(question, question) if metrics and metrics.question_texts else '' }}</textarea>
+                            </td>
+                            <td>
+                                <select name="paper_clo_{{ loop.index0 }}" class="form-control paper-clo-select" multiple size="5" style="padding: 0.5rem; background: var(--bg-base);">
+                                    {% for clo in clos %}
+                                        <option value="{{ clo }}" {% if clo in detected_clos %}selected{% endif %}>{{ clo }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small style="color: var(--text-muted); display: block; margin-top: 0.4rem;">{{ _('question_mapping.paper_clo_help') }}</small>
+                            </td>
+                            <td style="text-align: center;">
+                                <button type="button" class="remove-question" style="border: 0; background: transparent; color: var(--danger); font-weight: 700; cursor: pointer;">&times;</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
 
         <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap;">
             <button type="button" id="addQuestionBtn" class="btn" style="background: #6b7280;">{{ _('question_mapping.add_question') }}</button>
@@ -34,13 +124,23 @@
 </div>
 
 <template id="questionTemplate">
-    <div class="question-edit-card" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff;">
-        <label class="form-label" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
-            <span class="question-number"></span>
-            <button type="button" class="remove-question" style="border: 0; background: transparent; color: var(--danger); font-weight: 700; cursor: pointer;">×</button>
-        </label>
-        <textarea name="question_text" class="form-control" rows="4" style="resize: vertical;"></textarea>
-    </div>
+    <tr class="question-edit-row">
+        <td><strong class="question-number"></strong></td>
+        <td>
+            <textarea name="question_text" class="form-control" rows="4"></textarea>
+        </td>
+        <td>
+            <select class="form-control paper-clo-select" multiple size="5" style="padding: 0.5rem; background: var(--bg-base);">
+                {% for clo in clos %}
+                    <option value="{{ clo }}">{{ clo }}</option>
+                {% endfor %}
+            </select>
+            <small style="color: var(--text-muted); display: block; margin-top: 0.4rem;">{{ _('question_mapping.paper_clo_help') }}</small>
+        </td>
+        <td style="text-align: center;">
+            <button type="button" class="remove-question" style="border: 0; background: transparent; color: var(--danger); font-weight: 700; cursor: pointer;">&times;</button>
+        </td>
+    </tr>
 </template>
 
 <script>
@@ -51,23 +151,34 @@
         const questionWord = {{ _('mapping.question')|tojson }};
 
         function renumberQuestions() {
-            list.querySelectorAll('.question-edit-card').forEach(function(card, index) {
-                const label = card.querySelector('.question-number');
+            list.querySelectorAll('.question-edit-row').forEach(function(row, index) {
+                const label = row.querySelector('.question-number');
                 if (label) {
                     label.textContent = questionWord + ' ' + (index + 1);
+                }
+                const select = row.querySelector('.paper-clo-select');
+                if (select) {
+                    select.name = 'paper_clo_' + index;
                 }
             });
         }
 
         list.addEventListener('click', function(event) {
             if (!event.target.classList.contains('remove-question')) return;
-            const cards = list.querySelectorAll('.question-edit-card');
-            if (cards.length <= 1) {
-                const textarea = event.target.closest('.question-edit-card').querySelector('textarea');
+            const rows = list.querySelectorAll('.question-edit-row');
+            if (rows.length <= 1) {
+                const row = event.target.closest('.question-edit-row');
+                const textarea = row.querySelector('textarea');
                 if (textarea) textarea.value = '';
+                const select = row.querySelector('select');
+                if (select) {
+                    Array.from(select.options).forEach(function(option) {
+                        option.selected = false;
+                    });
+                }
                 return;
             }
-            event.target.closest('.question-edit-card').remove();
+            event.target.closest('.question-edit-row').remove();
             renumberQuestions();
         });
 
@@ -75,7 +186,7 @@
             const fragment = template.content.cloneNode(true);
             list.appendChild(fragment);
             renumberQuestions();
-            const lastTextarea = list.querySelector('.question-edit-card:last-child textarea');
+            const lastTextarea = list.querySelector('.question-edit-row:last-child textarea');
             if (lastTextarea) lastTextarea.focus();
         });
 

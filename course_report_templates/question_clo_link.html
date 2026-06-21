@@ -15,6 +15,8 @@
         <div class="alert" style="margin-bottom: 1.5rem;">
             {% if metrics.question_clo_suggestion_source == 'gemini' %}
                 {{ _('detected.mapping_used_gemini') }}
+            {% elif metrics.question_clo_suggestion_source == 'qwen' %}
+                {{ _('detected.mapping_used_qwen') }}
             {% else %}
                 {{ _('detected.mapping_used_local') }}
             {% endif %}
@@ -33,17 +35,18 @@
             <tbody>
                 {% for question in metrics.questions %}
                     {% set suggestions = metrics.smart_clo_suggestions.get(question, []) if metrics.smart_clo_suggestions else [] %}
-                    {% set selected_clo = suggestions[0].clo if suggestions else '' %}
+                    {% set detected_clos = resolve_detected_clos_to_course_list(metrics.detected_clo_mappings.get(question, []) if metrics.detected_clo_mappings else [], clos) %}
+                    {% set selected_clos = detected_clos if detected_clos else ([suggestions[0].clo] if suggestions else []) %}
                     <tr>
                         <td><strong>{{ _('mapping.question') }} {{ loop.index }}</strong></td>
                         <td style="white-space: pre-wrap;">{{ metrics.question_texts.get(question, '') }}</td>
                         <td>
                             <select name="question_clo_{{ question }}" class="form-control" multiple size="5">
                                 {% for clo in clos %}
-                                    <option value="{{ clo }}" {% if clo == selected_clo or (metrics.detected_clo_mappings and clo in metrics.detected_clo_mappings.get(question, [])) %}selected{% endif %}>{{ clo }}</option>
+                                    <option value="{{ clo }}" {% if clo in selected_clos %}selected{% endif %}>{{ clo }}</option>
                                 {% endfor %}
                             </select>
-                            {% if suggestions %}
+                            {% if suggestions and not detected_clos %}
                                 <div style="margin-top: 0.45rem; color: var(--text-muted); font-size: 0.82rem;">
                                     {{ _('detected.suggestion_source') }}
                                     {% for suggestion in suggestions[:3] %}

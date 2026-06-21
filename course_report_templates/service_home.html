@@ -32,6 +32,29 @@
         font-size: 0.92rem;
     }
 
+    .service-level-inactive {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        opacity: 0.78;
+    }
+
+    .service-level-inactive .service-level-header {
+        background: #e5e7eb;
+    }
+
+    .service-inactive-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.45rem;
+        padding: 0.18rem 0.55rem;
+        border-radius: 999px;
+        background: #d1d5db;
+        color: #4b5563;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
     .service-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -172,34 +195,27 @@
             </div>
         </section>
 
-        <section class="service-level">
+        <section class="service-level service-level-inactive" aria-disabled="true">
             <div class="service-level-header">
                 <h3>{{ _('home.program_level') }}</h3>
+                <span class="service-inactive-badge">{{ _('home.inactive') }}</span>
             </div>
             <div class="service-grid">
-                <a href="{{ url_for('new_program') }}" class="service-card service-card-primary">
+                <div class="service-card service-card-disabled" aria-disabled="true">
                     <div>
                         <h3>{{ _('home.add_program_title') }}</h3>
                         <p>{{ _('home.add_program_description') }}</p>
+                        <div class="service-card-note">{{ _('home.inactive') }}</div>
                     </div>
-                </a>
+                </div>
 
-                {% if current_user and saved_program_count == 0 %}
-                    <div class="service-card service-card-disabled" aria-disabled="true">
-                        <div>
-                            <h3>{{ _('home.plo_title') }}</h3>
-                            <p>{{ _('home.plo_description') }}</p>
-                            <div class="service-card-note">{{ _('home.requires_program') }}</div>
-                        </div>
+                <div class="service-card service-card-disabled" aria-disabled="true">
+                    <div>
+                        <h3>{{ _('home.plo_title') }}</h3>
+                        <p>{{ _('home.plo_description') }}</p>
+                        <div class="service-card-note">{{ _('home.inactive') }}</div>
                     </div>
-                {% else %}
-                    <a href="/plo-analysis" class="service-card">
-                        <div>
-                            <h3>{{ _('home.plo_title') }}</h3>
-                            <p>{{ _('home.plo_description') }}</p>
-                        </div>
-                    </a>
-                {% endif %}
+                </div>
             </div>
         </section>
     </div>

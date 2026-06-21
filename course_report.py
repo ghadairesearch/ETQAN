@@ -92,6 +92,9 @@ SMTP_USE_TLS = os.environ.get('SMTP_USE_TLS', 'true').strip().lower() not in {'0
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '').strip()
 GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-3.5-flash').strip() or 'gemini-3.5-flash'
 GEMINI_MAX_INLINE_BYTES = int_env('GEMINI_MAX_INLINE_BYTES', 18 * 1024 * 1024)
+GROQ_KEY = os.environ.get('GROQ_KEY', '').strip()
+GROQ_MODEL = os.environ.get('GROQ_MODEL', 'qwen/qwen3-32b').strip() or 'qwen/qwen3-32b'
+GROQ_API_URL = os.environ.get('GROQ_API_URL', 'https://api.groq.com/openai/v1/chat/completions').strip()
 SMTP_TIMEOUT_SECONDS = int(os.environ.get('SMTP_TIMEOUT_SECONDS') or 10)
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '').strip()
 RESEND_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', '').strip() or SMTP_FROM_EMAIL
@@ -416,6 +419,7 @@ EN_TRANSLATIONS = {
     'home.add_program_title': 'Add Program',
     'home.add_program_description': 'Add a program to generate reports.',
     'home.requires_program': 'Requires at least one program.',
+    'home.inactive': 'Inactive',
     'home.clo_title': 'CLO Attainment Analysis',
     'home.clo_description': 'Measure CLO attainment from assessment data, identify performance gaps, and generate evidence-based reports.',
     'home.add_course_title': 'Add Course',
@@ -429,6 +433,8 @@ EN_TRANSLATIONS = {
     'question_mapping.add_question': 'Add Question',
     'question_mapping.map_to_clos': 'Map to CLOs',
     'question_mapping.question_text': 'Question text',
+    'question_mapping.paper_clo': 'CLO from exam paper',
+    'question_mapping.paper_clo_help': 'Only CLOs detected in the exam paper are selected here.',
     'question_mapping.link_title': 'Map Questions to CLOs',
     'question_mapping.link_description': 'Review each question number and the related CLO suggested by ETQAN.',
     'question_mapping.related_clo': 'Related CLO',
@@ -449,7 +455,7 @@ EN_TRANSLATIONS = {
     'course_report.associated_reports_help': 'Select one or more CLO attainment reports to use for this course report.',
     'course_report.no_associated_reports': 'There is no associated CLO attainment report for this course. You have to create one before creating the course report.',
     'course_report.use_report': 'Use this report',
-    'course_report.create_report': 'Create Course Report',
+    'course_report.create_report': 'Next',
     'course_report.select_one_report': 'Select at least one CLO attainment report.',
     'course_report.selected_reports': 'Selected CLO Attainment Reports',
     'course_report.continue': 'Continue',
@@ -581,6 +587,7 @@ EN_TRANSLATIONS = {
     'courses.extracted': 'Course information extracted. Review it, then click Save Course.',
     'courses.extraction_method_prefix': 'Extraction method:',
     'courses.extraction_method_gemini': 'Gemini Flash',
+    'courses.extraction_method_qwen': 'Qwen via Groq',
     'courses.extraction_method_local': 'Local text/OCR',
     'courses.save': 'Save Course',
     'courses.empty': 'No saved courses yet. Add a course from the home page.',
@@ -683,6 +690,7 @@ EN_TRANSLATIONS = {
     'detected.source_gemini': 'Gemini Flash',
     'detected.source_local': 'Local semantic matching',
     'detected.mapping_used_gemini': 'Question-CLO mapping used Gemini Flash.',
+    'detected.mapping_used_qwen': 'Question-CLO mapping used Qwen via Groq.',
     'detected.mapping_used_local': 'Question-CLO mapping used local semantic matching.',
     'detected.question_text': 'Question text',
     'results.title': 'CLO Attainment Report',
@@ -918,12 +926,13 @@ TRANSLATIONS = {
         'home.add_program_title': 'إضافة برنامج',
         'home.add_program_description': 'أضف برنامجًا لتتمكن من إنشاء التقارير.',
         'home.requires_program': 'يتطلب إضافة برنامج واحد على الأقل.',
+        'home.inactive': '\u063a\u064a\u0631 \u0645\u0641\u0639\u0644',
         'home.clo_title': 'تحليل تحقق مخرجات تعلم المقرر',
         'home.clo_description': 'قياس تحقق مخرجات تعلم المقرر من بيانات التقييمات، وتحديد فجوات الأداء، وإنشاء تقارير قائمة على الأدلة.',
         'home.add_course_title': 'إضافة مقرر',
         'home.add_course_description': 'أضف مقرراً لتتمكن من إنشاء التقارير.',
         'home.requires_course': 'يتطلب إضافة مقرر واحد على الأقل.',
-        'home.question_mapping_title': 'ربط أسئلة الاختبار بالمخرجات',
+        'home.question_mapping_title': 'ربط أسئلة الاختبار بمخرجات التعلم',
         'home.question_mapping_description': 'ارفع ورقة الاختبار لربط الأسئلة بنواتج تعلم المقرر.',
         'home.question_mapping_extract': 'استخراج الأسئلة',
         'question_mapping.review_title': 'مراجعة الأسئلة المستخرجة',
@@ -931,6 +940,8 @@ TRANSLATIONS = {
         'question_mapping.add_question': 'إضافة سؤال',
         'question_mapping.map_to_clos': 'ربط بالمخرجات',
         'question_mapping.question_text': 'نص السؤال',
+        'question_mapping.paper_clo': 'مخرج التعلم من الورقة',
+        'question_mapping.paper_clo_help': 'تظهر هنا فقط المخرجات المكتشفة من ورقة الاختبار.',
         'question_mapping.link_title': 'ربط الأسئلة بالمخرجات',
         'question_mapping.link_description': 'راجع رقم كل سؤال وناتج التعلم المرتبط الذي يقترحه إتقان.',
         'question_mapping.related_clo': 'المخرج المرتبط',
@@ -947,11 +958,11 @@ TRANSLATIONS = {
         'course_report.need_clo_report': '\u0644\u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631\u060c \u062a\u062d\u062a\u0627\u062c \u0623\u0648\u0644\u0627\u064b \u0625\u0644\u0649 \u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'course_report.create_clo_prompt': '\u0647\u0644 \u062a\u0631\u063a\u0628 \u0628\u0625\u0646\u0634\u0627\u0621 \u0648\u0627\u062d\u062f \u0627\u0644\u0622\u0646\u061f',
         'course_report.create_clo_report': '\u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 CLO',
-        'course_report.associated_reports': '\u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 CLO \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629',
+        'course_report.associated_reports': '\u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629',
         'course_report.associated_reports_help': '\u062d\u062f\u062f \u062a\u0642\u0631\u064a\u0631\u0627\u064b \u0648\u0627\u062d\u062f\u0627\u064b \u0623\u0648 \u0623\u0643\u062b\u0631 \u0645\u0646 \u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0644\u0627\u0633\u062a\u062e\u062f\u0627\u0645\u0647\u0627 \u0641\u064a \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
-        'course_report.no_associated_reports': '\u0644\u0627 \u064a\u0648\u062c\u062f \u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 CLO \u0645\u0631\u062a\u0628\u0637 \u0628\u0647\u0630\u0627 \u0627\u0644\u0645\u0642\u0631\u0631. \u064a\u062c\u0628 \u0625\u0646\u0634\u0627\u0621 \u0648\u0627\u062d\u062f \u0642\u0628\u0644 \u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
+        'course_report.no_associated_reports': '\u0644\u0627 \u064a\u0648\u062c\u062f \u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0645\u0631\u062a\u0628\u0637 \u0628\u0647\u0630\u0627 \u0627\u0644\u0645\u0642\u0631\u0631. \u064a\u062c\u0628 \u0625\u0646\u0634\u0627\u0621 \u0648\u0627\u062d\u062f \u0642\u0628\u0644 \u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'course_report.use_report': '\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0647\u0630\u0627 \u0627\u0644\u062a\u0642\u0631\u064a\u0631',
-        'course_report.create_report': '\u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631',
+        'course_report.create_report': '\u0627\u0644\u062a\u0627\u0644\u064a',
         'course_report.select_one_report': '\u062d\u062f\u062f \u062a\u0642\u0631\u064a\u0631 CLO \u0648\u0627\u062d\u062f\u0627\u064b \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644.',
         'course_report.selected_reports': '\u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 CLO \u0627\u0644\u0645\u062d\u062f\u062f\u0629',
         'course_report.continue': '\u0645\u062a\u0627\u0628\u0639\u0629',
@@ -1075,6 +1086,7 @@ TRANSLATIONS = {
         'courses.extracted': 'تم استخراج بيانات المقرر. راجعها ثم اضغط حفظ المقرر.',
         'courses.extraction_method_prefix': 'طريقة الاستخراج:',
         'courses.extraction_method_gemini': 'Gemini Flash',
+        'courses.extraction_method_qwen': 'Qwen via Groq',
         'courses.extraction_method_local': 'النص المحلي / OCR',
         'courses.clos': 'نواتج التعلم للمقرر',
         'courses.clo': '\u0646\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
@@ -1185,6 +1197,7 @@ TRANSLATIONS = {
         'detected.source_gemini': 'Gemini Flash',
         'detected.source_local': 'المطابقة الدلالية المحلية',
         'detected.mapping_used_gemini': 'تم ربط الأسئلة بالمخرجات باستخدام Gemini Flash.',
+        'detected.mapping_used_qwen': 'تم ربط الأسئلة بالمخرجات باستخدام Qwen عبر Groq.',
         'detected.mapping_used_local': 'تم ربط الأسئلة بالمخرجات باستخدام المطابقة الدلالية المحلية.',
         'detected.question_text': 'نص السؤال',
         'results.title': 'تقرير تحقق نواتج التعلم',
@@ -2037,6 +2050,7 @@ def inject_global_template_data():
         'page_dir': 'rtl' if language == 'ar' else 'ltr',
         '_': translate,
         'count_unit': count_unit,
+        'resolve_detected_clos_to_course_list': resolve_detected_clos_to_course_list,
         'display_student_id': display_student_id
     }
 
@@ -2908,6 +2922,13 @@ def get_available_courses():
                 courses.append(course)
                 existing_names.add(course.get('name'))
     return courses
+
+def safe_available_courses():
+    try:
+        return get_available_courses()
+    except Exception:
+        app.logger.exception("Failed to load available courses")
+        return []
 
 def get_course_clos(course_name):
     courses = get_available_courses()
@@ -4502,6 +4523,46 @@ def parse_gemini_json_response(text):
     return None
 
 
+def call_groq_json(system_prompt, user_payload, timeout=90):
+    if not GROQ_KEY:
+        return None
+    try:
+        payload = {
+            'model': GROQ_MODEL,
+            'temperature': 0,
+            'response_format': {'type': 'json_object'},
+            'messages': [
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_payload},
+            ],
+        }
+        groq_request = urllib.request.Request(
+            GROQ_API_URL,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={
+                'Authorization': f'Bearer {GROQ_KEY}',
+                'Content-Type': 'application/json',
+                'User-Agent': 'ETQAN-GroqQwenFallback/1.0',
+            },
+            method='POST',
+        )
+        with urllib.request.urlopen(groq_request, timeout=timeout) as response:
+            groq_payload = json.loads(response.read().decode('utf-8'))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode('utf-8', errors='replace')
+        app.logger.warning("Groq/Qwen request failed with HTTP %s: %s", exc.code, body[:800])
+        return None
+    except Exception as exc:
+        app.logger.warning("Groq/Qwen request failed: %s", exc)
+        return None
+
+    content = ''
+    for choice in groq_payload.get('choices') or []:
+        message = choice.get('message') or {}
+        content += message.get('content') or ''
+    return parse_gemini_json_response(content)
+
+
 def normalize_gemini_clos(raw_clos):
     if isinstance(raw_clos, dict):
         raw_clos = [
@@ -4673,10 +4734,32 @@ def extract_course_spec_with_gemini(filepath, filename=''):
     return set_gemini_spec_cache(file_hash, False) or None
 
 
+def extract_course_spec_with_groq_text(text):
+    if not GROQ_KEY or not compact_text(text):
+        return None
+    user_payload = (
+        gemini_course_spec_prompt()
+        + "\n\nCourse specification text:\n"
+        + compact_text(text)[:60000]
+    )
+    parsed = call_groq_json(
+        "You extract structured course specification data. Return valid JSON only.",
+        user_payload
+    )
+    extracted = normalize_gemini_course_spec(parsed)
+    if course_spec_extraction_is_usable(extracted):
+        extracted['extraction_method'] = 'qwen'
+        return extracted
+    return None
+
+
 def extract_course_spec_document(filepath, filename=''):
     file_ext = os.path.splitext(filename or filepath)[1].lower()
     if file_ext == '.docx':
         text = extract_docx_text(filepath)
+        qwen_extracted = extract_course_spec_with_groq_text(text)
+        if qwen_extracted:
+            return text, qwen_extracted
         extracted = extract_course_spec_metadata(text, filename)
         extracted['extraction_method'] = 'local'
         return text, extracted
@@ -4685,7 +4768,17 @@ def extract_course_spec_document(filepath, filename=''):
     if gemini_extracted:
         return '', gemini_extracted
 
-    text = extract_pdf_text(filepath, allow_ocr=True)
+    text = extract_pdf_text(filepath, allow_ocr=False)
+    qwen_extracted = extract_course_spec_with_groq_text(text)
+    if qwen_extracted:
+        return text, qwen_extracted
+
+    if not compact_text(text):
+        text = extract_pdf_text(filepath, allow_ocr=True)
+    else:
+        ocr_text = extract_pdf_text(filepath, allow_ocr=True)
+        if len(compact_text(ocr_text)) > len(compact_text(text)):
+            text = ocr_text
     extracted = extract_course_spec_metadata(text, filename)
     extracted['extraction_method'] = 'local'
     if extracted.get('course_name') and extracted.get('course_code') and extracted.get('clos'):
@@ -4704,6 +4797,8 @@ def flash_course_spec_extraction_method(extracted):
     method = (extracted or {}).get('extraction_method')
     if method == 'gemini':
         method_label = translate('courses.extraction_method_gemini')
+    elif method == 'qwen':
+        method_label = translate('courses.extraction_method_qwen')
     else:
         method_label = translate('courses.extraction_method_local')
     flash(f"{translate('courses.extraction_method_prefix')} {method_label}", "info")
@@ -4962,32 +5057,108 @@ def gemini_question_clo_prompt():
     )
 
 
+def apply_llm_question_clo_mappings(metrics, clos, parsed, source, reason_fallback):
+    metrics = dict(metrics or {})
+    questions = list(metrics.get('questions') or [])
+    mappings = parsed.get('mappings') if isinstance(parsed, dict) else []
+    if not isinstance(mappings, list):
+        return metrics
+
+    detected = dict(metrics.get('detected_clo_mappings') or {})
+    suggestions = dict(metrics.get('smart_clo_suggestions') or {})
+    mapped_count = 0
+    question_lookup = {str(question): str(question) for question in questions}
+    question_lookup.update({str(question).upper(): str(question) for question in questions})
+
+    for item in mappings:
+        if not isinstance(item, dict):
+            continue
+        question = str(item.get('question') or '').strip()
+        question = question_lookup.get(question) or question_lookup.get(question.upper()) or question
+        if question not in questions:
+            number = question_number_from_label(question)
+            if number:
+                question = next((q for q in questions if question_number_from_label(q) == number), question)
+        if question not in questions:
+            continue
+        resolved = resolve_detected_clos_to_course_list(item.get('clos') or [], clos)
+        if not resolved:
+            continue
+        confidence = item.get('confidence', 0.85)
+        try:
+            confidence_score = float(confidence)
+            if confidence_score <= 1:
+                confidence_score *= 100
+        except (TypeError, ValueError):
+            confidence_score = 85.0
+        reason = compact_text(item.get('reason') or reason_fallback)
+        detected[question] = resolved
+        suggestions[question] = [
+            {
+                'clo': clo,
+                'score': round(max(0, min(confidence_score, 100)), 2),
+                'reasons': [reason or reason_fallback]
+            }
+            for clo in resolved[:3]
+        ]
+        mapped_count += 1
+
+    if mapped_count:
+        metrics['detected_clo_mappings'] = detected
+        metrics['smart_clo_suggestions'] = suggestions
+        metrics['question_clo_suggestion_source'] = source
+    return metrics
+
+
+def question_clo_llm_payload(metrics, clos):
+    questions = list((metrics or {}).get('questions') or [])
+    question_texts = (metrics or {}).get('question_texts') or {}
+    question_items = [
+        {
+            'question': question,
+            'text': compact_text(question_texts.get(question) or question)[:1200]
+        }
+        for question in questions[:80]
+    ]
+    clo_items = [
+        {'code': clo_number(clo), 'text': str(clo)}
+        for clo in list(clos or [])
+        if clo_number(clo)
+    ]
+    return question_items, clo_items
+
+
+def build_qwen_question_clo_suggestions(metrics, clos):
+    if not GROQ_KEY:
+        return metrics
+    question_items, clo_items = question_clo_llm_payload(metrics, clos)
+    if not question_items or not clo_items:
+        return metrics
+    parsed = call_groq_json(
+        "You map exam questions to Course Learning Outcomes. Return valid JSON only.",
+        gemini_question_clo_prompt()
+        + "\n\nInput JSON:\n"
+        + json.dumps(
+            {
+                'course_learning_outcomes': clo_items,
+                'questions': question_items
+            },
+            ensure_ascii=False
+        )
+    )
+    return apply_llm_question_clo_mappings(metrics, clos, parsed, 'qwen', 'Qwen via Groq')
+
+
 def build_gemini_question_clo_suggestions(metrics, clos):
     if not GEMINI_API_KEY:
-        return metrics
+        return build_qwen_question_clo_suggestions(metrics, clos)
     metrics = dict(metrics or {})
     questions = list(metrics.get('questions') or [])
     clos = list(clos or [])
     if not questions or not clos:
         return metrics
 
-    question_texts = metrics.get('question_texts') or {}
-    question_items = []
-    for question in questions[:80]:
-        text = compact_text(question_texts.get(question) or question)
-        question_items.append({
-            'question': question,
-            'text': text[:1200]
-        })
-
-    clo_items = [
-        {
-            'code': clo_number(clo),
-            'text': str(clo)
-        }
-        for clo in clos
-        if clo_number(clo)
-    ]
+    question_items, clo_items = question_clo_llm_payload(metrics, clos)
     if not question_items or not clo_items:
         return metrics
 
@@ -5034,10 +5205,10 @@ def build_gemini_question_clo_suggestions(metrics, clos):
     except urllib.error.HTTPError as exc:
         body = exc.read().decode('utf-8', errors='replace')
         app.logger.warning("Gemini question-CLO mapping failed with HTTP %s: %s", exc.code, body[:800])
-        return metrics
+        return build_qwen_question_clo_suggestions(metrics, clos)
     except Exception as exc:
         app.logger.warning("Gemini question-CLO mapping failed: %s", exc)
-        return metrics
+        return build_qwen_question_clo_suggestions(metrics, clos)
 
     response_text = ''
     for candidate in gemini_payload.get('candidates') or []:
@@ -5048,50 +5219,11 @@ def build_gemini_question_clo_suggestions(metrics, clos):
     parsed = parse_gemini_json_response(response_text)
     mappings = parsed.get('mappings') if isinstance(parsed, dict) else []
     if not isinstance(mappings, list):
-        return metrics
-
-    detected = dict(metrics.get('detected_clo_mappings') or {})
-    suggestions = dict(metrics.get('smart_clo_suggestions') or {})
-    mapped_count = 0
-    question_lookup = {str(question): str(question) for question in questions}
-    for item in mappings:
-        if not isinstance(item, dict):
-            continue
-        question = str(item.get('question') or '').strip()
-        question = question_lookup.get(question) or question_lookup.get(question.upper()) or question
-        if question not in question_lookup.values():
-            number = question_number_from_label(question)
-            if number:
-                question = next((q for q in questions if question_number_from_label(q) == number), question)
-        if question not in questions:
-            continue
-        resolved = resolve_detected_clos_to_course_list(item.get('clos') or [], clos)
-        if not resolved:
-            continue
-        confidence = item.get('confidence', 0.85)
-        try:
-            confidence_score = float(confidence)
-            if confidence_score <= 1:
-                confidence_score *= 100
-        except (TypeError, ValueError):
-            confidence_score = 85.0
-        reason = compact_text(item.get('reason') or 'Gemini Flash')
-        detected[question] = resolved
-        suggestions[question] = [
-            {
-                'clo': clo,
-                'score': round(max(0, min(confidence_score, 100)), 2),
-                'reasons': [reason or 'Gemini Flash']
-            }
-            for clo in resolved[:3]
-        ]
-        mapped_count += 1
-
-    if mapped_count:
-        metrics['detected_clo_mappings'] = detected
-        metrics['smart_clo_suggestions'] = suggestions
-        metrics['question_clo_suggestion_source'] = 'gemini'
-    return metrics
+        return build_qwen_question_clo_suggestions(metrics, clos)
+    mapped_metrics = apply_llm_question_clo_mappings(metrics, clos, parsed, 'gemini', 'Gemini Flash')
+    if mapped_metrics.get('question_clo_suggestion_source') == 'gemini':
+        return mapped_metrics
+    return build_qwen_question_clo_suggestions(metrics, clos)
 
 def parse_exam_paper_with_module(filepath):
     try:
@@ -5108,13 +5240,10 @@ def parse_exam_paper_with_module(filepath):
             questions.append(q_id)
             # Create a rich text representation for the UI
             full_text = f"[{q['question_type']}] {q['question_text']}"
-            if q.get('options'):
-                opts = " | ".join([f"{k}: {v}" for k, v in q['options'].items()])
-                full_text += f"\nOptions: {opts}"
             if q.get('marks', 1.0) != 1.0:
                 full_text += f"\nMarks: {q['marks']}"
                 
-            question_texts[q_id] = full_text[:900] + ('...' if len(full_text) > 900 else '')
+            question_texts[q_id] = full_text[:2500] + ('...' if len(full_text) > 2500 else '')
             tags = detect_clo_tags_from_text(q['question_text'])
             if tags:
                 detected_clo_mappings[q_id] = tags
@@ -8231,28 +8360,28 @@ def get_report_pdf_font_paths():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     regular_candidates = [
         os.environ.get('REPORT_PDF_FONT_REGULAR'),
-        os.path.join(base_dir, 'public', 'fonts', 'RB.ttf'),
         os.path.join(base_dir, 'fonts', 'NotoNaskhArabic-Regular.ttf'),
         os.path.join(base_dir, 'fonts', 'NotoSansArabic-Regular.ttf'),
         os.path.join(base_dir, 'fonts', 'DejaVuSans.ttf'),
-        r'C:\Windows\Fonts\tahoma.ttf',
-        r'C:\Windows\Fonts\arial.ttf',
         '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
         '/usr/share/fonts/truetype/noto/NotoNaskhArabic-Regular.ttf',
         '/usr/share/fonts/truetype/noto/NotoSansArabic-Regular.ttf',
+        r'C:\Windows\Fonts\tahoma.ttf',
+        r'C:\Windows\Fonts\arial.ttf',
+        os.path.join(base_dir, 'public', 'fonts', 'RB.ttf'),
     ]
     bold_candidates = [
         os.environ.get('REPORT_PDF_FONT_BOLD'),
-        os.path.join(base_dir, 'public', 'fonts', 'RBTitle.ttf'),
-        os.path.join(base_dir, 'public', 'fonts', 'RB.ttf'),
         os.path.join(base_dir, 'fonts', 'NotoNaskhArabic-Bold.ttf'),
         os.path.join(base_dir, 'fonts', 'NotoSansArabic-Bold.ttf'),
         os.path.join(base_dir, 'fonts', 'DejaVuSans-Bold.ttf'),
-        r'C:\Windows\Fonts\tahomabd.ttf',
-        r'C:\Windows\Fonts\arialbd.ttf',
         '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
         '/usr/share/fonts/truetype/noto/NotoNaskhArabic-Bold.ttf',
         '/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf',
+        r'C:\Windows\Fonts\tahomabd.ttf',
+        r'C:\Windows\Fonts\arialbd.ttf',
+        os.path.join(base_dir, 'public', 'fonts', 'RBTitle.ttf'),
+        os.path.join(base_dir, 'public', 'fonts', 'RB.ttf'),
     ]
 
     regular_path = next((path for path in regular_candidates if path and os.path.exists(path)), '')
@@ -11705,6 +11834,7 @@ def question_clo_mapping_service():
         return render_template(
             'question_clo_review.html',
             course_name=course_name,
+            clos=clos,
             metrics=metrics,
             filename=paper_file.filename,
             draft_id=draft_id
@@ -11737,10 +11867,22 @@ def question_clo_mapping_map():
         return render_template(
             'question_clo_review.html',
             course_name=course_name,
+            clos=clos,
             metrics=draft.get('metrics') or {},
             filename=draft.get('filename') or '',
             draft_id=draft_id
         )
+
+    paper_detected_mappings = {}
+    for index, question in enumerate(metrics.get('questions') or []):
+        selected_from_paper = request.form.getlist(f'paper_clo_{index}')
+        resolved_from_paper = resolve_detected_clos_to_course_list(selected_from_paper, clos)
+        if resolved_from_paper:
+            paper_detected_mappings[question] = resolved_from_paper
+    if paper_detected_mappings:
+        detected = dict(metrics.get('detected_clo_mappings') or {})
+        detected.update(paper_detected_mappings)
+        metrics['detected_clo_mappings'] = detected
 
     metrics = build_gemini_question_clo_suggestions(metrics, clos)
     metrics = build_smart_clo_suggestions(
@@ -11748,6 +11890,10 @@ def question_clo_mapping_map():
         clos,
         only_unmapped=metrics.get('question_clo_suggestion_source') == 'gemini'
     )
+    if paper_detected_mappings:
+        detected = dict(metrics.get('detected_clo_mappings') or {})
+        detected.update(paper_detected_mappings)
+        metrics['detected_clo_mappings'] = detected
     if not metrics.get('question_clo_suggestion_source'):
         metrics['question_clo_suggestion_source'] = 'local'
 
@@ -11767,27 +11913,38 @@ def course_report_service():
         if not course_name:
             flash(translate('index.error_course'), "error")
             return redirect(url_for('course_report_service'))
+        courses = safe_available_courses()
             
         if not user:
             session['selected_course_name'] = course_name
             return render_template(
                 'course_report_select.html',
-                courses=get_available_courses(),
+                courses=courses,
                 error_no_report=True,
                 selected_course_name=course_name
             )
-            
-        with get_db() as conn:
-            report_rows = conn.execute(
-                "SELECT id, title, course_name, created_at FROM saved_reports WHERE user_id = ? AND course_name = ? ORDER BY id DESC",
-                (user['id'], course_name)
-            ).fetchall()
+
+        try:
+            with get_db() as conn:
+                report_rows = conn.execute(
+                    "SELECT id, title, course_name, created_at FROM saved_reports WHERE user_id = ? AND course_name = ? ORDER BY id DESC",
+                    (user['id'], course_name)
+                ).fetchall()
+        except Exception:
+            app.logger.exception("Failed to load associated course reports")
+            flash("Could not load associated reports for this course. Please try again.", "error")
+            return render_template(
+                'course_report_select.html',
+                courses=courses,
+                selected_course_name=course_name,
+                associated_reports=[]
+            )
             
         associated_reports = [
             {
-                'id': row['id'],
+                'id': row_get(row, 'id'),
                 'display_title': display_saved_report_title(row),
-                'created_at': row['created_at']
+                'created_at': row_get(row, 'created_at')
             }
             for row in report_rows
         ]
@@ -11796,7 +11953,7 @@ def course_report_service():
             session['selected_course_name'] = course_name
             return render_template(
                 'course_report_select.html',
-                courses=get_available_courses(),
+                courses=courses,
                 error_no_report=True,
                 selected_course_name=course_name,
                 associated_reports=[]
@@ -11804,14 +11961,14 @@ def course_report_service():
             
         return render_template(
             'course_report_select.html',
-            courses=get_available_courses(),
+            courses=courses,
             selected_course_name=course_name,
             associated_reports=associated_reports
         )
 
     return render_template(
         'course_report_select.html',
-        courses=get_available_courses(),
+        courses=safe_available_courses(),
         associated_reports=None
     )
 
@@ -11851,11 +12008,16 @@ def course_report_service_inputs_multi():
     if not report_payloads:
         flash("CLO attainment report not found.", "error")
         return redirect(url_for('course_report_service'))
-    return render_course_report_inputs(
-        report_payloads,
-        url_for('export_selected_course_report_docx'),
-        request.form.get('course_name') or ''
-    )
+    try:
+        return render_course_report_inputs(
+            report_payloads,
+            url_for('export_selected_course_report_docx'),
+            request.form.get('course_name') or ''
+        )
+    except Exception:
+        app.logger.exception("Failed to render course report inputs")
+        flash("Could not open the course report inputs. Please try another report or recreate the CLO attainment report.", "error")
+        return redirect(url_for('course_report_service'))
 
 @app.route('/course-report-service/report/<int:report_id>')
 def course_report_service_inputs(report_id):
