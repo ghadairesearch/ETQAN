@@ -222,7 +222,7 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const uncoveredReasonActions = {{ uncovered_reason_actions|tojson }};
+        const uncoveredReasonActions = {{ uncovered_reason_actions_json|safe }};
         const actionPlaceholder = {{ _('results.uncovered_action_select')|tojson }};
         const otherActionLabel = {{ _('results.action_other')|tojson }};
         const group = document.getElementById('uncovered_topics_group');

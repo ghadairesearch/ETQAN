@@ -1488,6 +1488,41 @@ PDF_REPORT_LABELS = {
     }
 }
 
+PDF_REPORT_LABELS['ar'] = {
+    'title': '\u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
+    'university': '\u0627\u0644\u062c\u0627\u0645\u0639\u0629',
+    'department': '\u0627\u0644\u0642\u0633\u0645',
+    'course_name': '\u0627\u0633\u0645 \u0627\u0644\u0645\u0642\u0631\u0631',
+    'course_id': '\u0631\u0645\u0632 \u0627\u0644\u0645\u0642\u0631\u0631',
+    'report_date': '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0642\u0631\u064a\u0631',
+    'total_students': '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0637\u0644\u0627\u0628',
+    'mapped_clos': '\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629',
+    'clo_definitions': '\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
+    'domain': '\u0627\u0644\u0645\u062c\u0627\u0644',
+    'clo': '\u0627\u0644\u0631\u0645\u0632',
+    'wording': '\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
+    'summary': '\u0645\u0644\u062e\u0635 \u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
+    'questions': '\u0627\u0644\u0623\u0633\u0626\u0644\u0629',
+    'max': '\u0627\u0644\u062f\u0631\u062c\u0629 \u0627\u0644\u0643\u0644\u064a\u0629',
+    'target': '\u0627\u0644\u0645\u0633\u062a\u0648\u0649 \u0627\u0644\u0645\u0633\u062a\u0647\u062f\u0641',
+    'achieved': '\u0639\u062f\u062f \u0627\u0644\u0637\u0644\u0627\u0628 \u0627\u0644\u0645\u062d\u0642\u0642\u064a\u0646',
+    'achieved_status': '\u0645\u062d\u0642\u0642',
+    'student_achieved_status': '\u0645\u062d\u0642\u0642',
+    'achievement': '\u0646\u0633\u0628\u0629 \u0627\u0644\u062a\u062d\u0642\u0642',
+    'student_achievement': '\u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0644\u0643\u0644 \u0637\u0627\u0644\u0628',
+    'student_id': '\u0645\u0639\u0631\u0651\u0641 \u0627\u0644\u0637\u0627\u0644\u0628',
+    'not_achieved': '\u063a\u064a\u0631 \u0645\u062d\u0642\u0642',
+    'student_not_achieved_status': '\u063a\u064a\u0631 \u0645\u062d\u0642\u0642',
+    'na': '\u063a\u064a\u0631 \u0645\u062a\u0648\u0641\u0631',
+}
+
+AR_CLO_DOMAIN_LABELS = {
+    'Knowledge': '1.0 \u0627\u0644\u0645\u0639\u0631\u0641\u0629 \u0648\u0627\u0644\u0641\u0647\u0645',
+    'Skills': '2.0 \u0627\u0644\u0645\u0647\u0627\u0631\u0627\u062a',
+    'Values': '3.0 \u0627\u0644\u0642\u064a\u0645',
+    'Other': '\u0623\u062e\u0631\u0649',
+}
+
 def pdf_report_labels(language=None):
     language = language if language in {'en', 'ar'} else get_export_report_language()
     return PDF_REPORT_LABELS.get(language, PDF_REPORT_LABELS['en'])
@@ -1515,6 +1550,8 @@ def localized_university_name(value, language=None):
 def localized_clo_domain(domain, language=None):
     domain = str(domain or '').strip()
     language = language or get_language()
+    if language == 'ar':
+        return AR_CLO_DOMAIN_LABELS.get(domain, domain)
     if language == 'ar':
         return {
             'Knowledge': '1.0 المعرفة والفهم',
@@ -2468,7 +2505,31 @@ def load_saved_report_payload(report_id, user_id):
         ).fetchone()
     if not row:
         return None, None
-    return row, json.loads(row['payload_json'])
+    return row, safe_json_loads(row_get(row, 'payload_json'), {})
+
+def row_get(row, key, default=''):
+    try:
+        return row[key]
+    except (KeyError, IndexError, TypeError):
+        return default
+
+def safe_json_loads(value, default=None):
+    try:
+        return json.loads(value or '')
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return default
+
+def safe_int_value(value, default=0):
+    try:
+        return int(value or 0)
+    except (TypeError, ValueError):
+        return default
+
+def safe_float_value(value, default=0.0):
+    try:
+        return float(value or 0)
+    except (TypeError, ValueError):
+        return default
 
 def load_selected_report_payloads(report_ids, user_id):
     cleaned_ids = []
@@ -2493,7 +2554,7 @@ def load_selected_report_payloads(report_ids, user_id):
         row = rows_by_id.get(report_id)
         if not row:
             continue
-        reports.append({'row': row, 'payload': json.loads(row['payload_json'])})
+        reports.append({'row': row, 'payload': safe_json_loads(row_get(row, 'payload_json'), {})})
     return reports
 
 def aggregate_course_report_payloads(report_payloads, selected_course_name=''):
@@ -2510,18 +2571,19 @@ def aggregate_course_report_payloads(report_payloads, selected_course_name=''):
         row = item['row']
         payload = item['payload'] or {}
         if not first_report_course_name:
-            first_report_course_name = row['course_name']
+            first_report_course_name = row_get(row, 'course_name')
         report_title = display_saved_report_title(row)
-        report_total_students = int(payload.get('total_students') or 0)
+        report_total_students = safe_int_value(payload.get('total_students'))
         total_students += report_total_students
         selected_reports.append({
-            'id': row['id'],
+            'id': row_get(row, 'id'),
             'display_title': report_title,
-            'created_at': row['created_at'],
+            'created_at': row_get(row, 'created_at'),
             'total_students': report_total_students,
         })
         if not course_info:
-            course_info = payload.get('course_info') or {'course_name': row['course_name'], 'raw_name': row['course_name']}
+            row_course_name = row_get(row, 'course_name')
+            course_info = payload.get('course_info') or {'course_name': row_course_name, 'raw_name': row_course_name}
 
         for clo, data in (payload.get('stats') or {}).items():
             target = combined_stats.setdefault(clo, {
@@ -2535,10 +2597,10 @@ def aggregate_course_report_payloads(report_payloads, selected_course_name=''):
             })
             questions = data.get('questions') or []
             target['questions'].extend([f"{report_title}: {question}" for question in questions])
-            target['students_achieved'] += int(data.get('students_achieved') or 0)
-            target['total_possible_score'] += float(data.get('total_possible_score') or 0)
-            target['target_score'] += float(data.get('target_score') or 0)
-            target['target_pct_total'] += float(data.get('target_pct') or 0) * max(report_total_students, 1)
+            target['students_achieved'] += safe_int_value(data.get('students_achieved'))
+            target['total_possible_score'] += safe_float_value(data.get('total_possible_score'))
+            target['target_score'] += safe_float_value(data.get('target_score'))
+            target['target_pct_total'] += safe_float_value(data.get('target_pct')) * max(report_total_students, 1)
             target['target_pct_weight'] += max(report_total_students, 1)
             target['_total_students'] += report_total_students
 
@@ -2559,8 +2621,8 @@ def aggregate_course_report_payloads(report_payloads, selected_course_name=''):
     return dict(sorted_clo_items(combined_stats)), course_info, total_students, selected_reports
 
 def display_saved_report_title(row):
-    title = str(row['title'] or '').strip()
-    course_name = str(row['course_name'] or '').strip()
+    title = str(row_get(row, 'title') or '').strip()
+    course_name = str(row_get(row, 'course_name') or '').strip()
     if title and course_name and title.endswith(f" - {course_name}"):
         return title[:-(len(course_name) + 3)].strip() or title
     return title or "CLO Attainment Report"
@@ -5191,6 +5253,12 @@ def normalize_course_spec_text(text):
     text = (text or '').translate(ARABIC_DIGIT_TRANSLATION)
     text = re.sub(r'[\u200e\u200f\u061c\u202a-\u202e]', '', text)
     text = text.replace('\xa0', ' ')
+    return text
+
+def clean_report_pdf_text(value):
+    text = str(value or '')
+    text = re.sub(r'[\u200b-\u200f\u061c\u202a-\u202e\ufeff\ufffc]', '', text)
+    text = text.replace('\ufffd', '').replace('\xa0', ' ')
     return text
 
 def contains_arabic(text):
@@ -8221,7 +8289,7 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
         pdfmetrics.registerFont(TTFont(bold_font, bold_font_path or regular_font_path))
 
     def display_text(value, reorder_arabic=True):
-        text = str(value or '')
+        text = clean_report_pdf_text(value)
         if contains_arabic(text) and arabic_reshaper:
             reshaped = arabic_reshaper.reshape(text)
             if reorder_arabic and get_display:
@@ -11764,6 +11832,7 @@ def render_course_report_inputs(report_payloads, export_action, selected_course_
         course_improvement_action_options=COURSE_IMPROVEMENT_ACTION_OPTIONS,
         course_improvement_support_options=COURSE_IMPROVEMENT_SUPPORT_OPTIONS,
         uncovered_reason_actions=UNCOVERED_TOPIC_REASON_ACTIONS,
+        uncovered_reason_actions_json=json.dumps(UNCOVERED_TOPIC_REASON_ACTIONS, ensure_ascii=False),
         total_students=total_students,
         stats_items=sorted_clo_items(combined_stats)
     )
