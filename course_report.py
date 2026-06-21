@@ -398,6 +398,7 @@ EN_TRANSLATIONS = {
     'nav.account': 'Account Info',
     'nav.my_reports': 'My Reports',
     'nav.my_courses': 'My Courses',
+    'nav.my_exams': 'My Exams',
     'nav.home': 'Home',
     'nav.faq': 'FAQ',
     'nav.contact': 'Contact Us',
@@ -433,12 +434,22 @@ EN_TRANSLATIONS = {
     'question_mapping.add_question': 'Add Question',
     'question_mapping.map_to_clos': 'Map to CLOs',
     'question_mapping.question_text': 'Question text',
+    'question_mapping.question_type': 'Question type',
     'question_mapping.paper_clo': 'CLO from exam paper',
-    'question_mapping.paper_clo_help': 'Only CLOs detected in the exam paper are selected here.',
+    'question_mapping.paper_clo_help': 'Only learning outcomes explicitly mentioned in the exam paper are shown here.',
     'question_mapping.link_title': 'Map Questions to CLOs',
     'question_mapping.link_description': 'Review each question number and the related CLO suggested by ETQAN.',
     'question_mapping.related_clo': 'Related CLO',
+    'question_mapping.save_mapping': 'Save',
+    'question_mapping.back': 'Back',
     'question_mapping.no_questions': 'No questions were extracted. Add at least one question before mapping.',
+    'exams.title': 'My Exams',
+    'exams.empty': 'No saved exams yet.',
+    'exams.saved': 'Exam mapping saved.',
+    'exams.exam': 'Exam',
+    'exams.course': 'Course',
+    'exams.questions': 'Questions',
+    'exams.created': 'Created',
     'home.assessment_balance_title': 'Assessment Balance Check',
     'home.assessment_balance_description': 'Review assessment coverage, score distribution, and balance across learning outcomes before reporting.',
     'home.plo_title': 'PLO Attainment Analysis',
@@ -774,6 +785,7 @@ EN_TRANSLATIONS = {
     'history.rename_save': 'Save',
     'history.renamed': 'Report renamed.',
     'history.rename_invalid': 'Enter a report name.',
+    'history.rename_duplicate': 'A report with this name already exists for this course.',
     'history.delete': 'Delete',
     'history.delete_confirm': 'Are you sure you want to delete this report? This action cannot be undone.',
     'history.deleted': 'Report deleted.',
@@ -1281,6 +1293,7 @@ TRANSLATIONS = {
         'history.rename_save': '\u062d\u0641\u0638',
         'history.renamed': '\u062a\u0645\u062a \u0625\u0639\u0627\u062f\u0629 \u062a\u0633\u0645\u064a\u0629 \u0627\u0644\u062a\u0642\u0631\u064a\u0631.',
         'history.rename_invalid': '\u0623\u062f\u062e\u0644 \u0627\u0633\u0645\u0627\u064b \u0644\u0644\u062a\u0642\u0631\u064a\u0631.',
+        'history.rename_duplicate': '\u064a\u0648\u062c\u062f \u062a\u0642\u0631\u064a\u0631 \u0628\u0647\u0630\u0627 \u0627\u0644\u0627\u0633\u0645 \u0644\u0647\u0630\u0627 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'history.delete': 'حذف',
         'history.delete_confirm': 'هل أنت متأكد من حذف هذا التقرير؟ لا يمكن التراجع عن هذا الإجراء.',
         'history.deleted': 'تم حذف التقرير.',
@@ -1404,6 +1417,21 @@ TRANSLATIONS = {
         'checkout.pay': 'ادفع الآن',
     }
 }
+
+TRANSLATIONS['ar'].update({
+    'nav.my_exams': '\u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a\u064a',
+    'question_mapping.question_type': '\u0646\u0648\u0639 \u0627\u0644\u0633\u0624\u0627\u0644',
+    'question_mapping.paper_clo_help': '\u062a\u064f\u0639\u0631\u0636 \u0647\u0646\u0627 \u0641\u0642\u0637 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0630\u0643\u0648\u0631\u0629 \u0628\u0634\u0643\u0644 \u0635\u0631\u064a\u062d \u0641\u064a \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631.',
+    'question_mapping.save_mapping': '\u062d\u0641\u0638',
+    'question_mapping.back': '\u0631\u062c\u0648\u0639',
+    'exams.title': '\u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a\u064a',
+    'exams.empty': '\u0644\u0627 \u062a\u0648\u062c\u062f \u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a \u0645\u062d\u0641\u0648\u0638\u0629 \u0628\u0639\u062f.',
+    'exams.saved': '\u062a\u0645 \u062d\u0641\u0638 \u0631\u0628\u0637 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631.',
+    'exams.exam': '\u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631',
+    'exams.course': '\u0627\u0644\u0645\u0642\u0631\u0631',
+    'exams.questions': '\u0627\u0644\u0623\u0633\u0626\u0644\u0629',
+    'exams.created': '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
+})
 
 SUPPORTED_LANGUAGES = {'en', 'ar'}
 
@@ -1818,6 +1846,17 @@ def init_postgres_db(conn):
         )
     """)
     conn.execute("""
+        CREATE TABLE IF NOT EXISTS saved_exams (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            course_name TEXT NOT NULL,
+            filename TEXT DEFAULT '',
+            payload_json TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS user_courses (
             id SERIAL PRIMARY KEY,
             user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -2051,7 +2090,8 @@ def inject_global_template_data():
         '_': translate,
         'count_unit': count_unit,
         'resolve_detected_clos_to_course_list': resolve_detected_clos_to_course_list,
-        'display_student_id': display_student_id
+        'display_student_id': display_student_id,
+        'text_direction': text_direction
     }
 
 def is_valid_hex_color(value):
@@ -2563,7 +2603,7 @@ def load_selected_report_payloads(report_ids, user_id):
             f"SELECT * FROM saved_reports WHERE user_id = ? AND id IN ({placeholders}) ORDER BY id DESC",
             [user_id] + cleaned_ids
         ).fetchall()
-    rows_by_id = {row['id']: row for row in rows}
+    rows_by_id = {safe_int_value(row_get(row, 'id')): row for row in rows}
     for report_id in cleaned_ids:
         row = rows_by_id.get(report_id)
         if not row:
@@ -2582,8 +2622,8 @@ def aggregate_course_report_payloads(report_payloads, selected_course_name=''):
     first_report_course_name = ''
 
     for item in report_payloads:
-        row = item['row']
-        payload = item['payload'] or {}
+        row = (item or {}).get('row') or {}
+        payload = (item or {}).get('payload') or {}
         if not first_report_course_name:
             first_report_course_name = row_get(row, 'course_name')
         report_title = display_saved_report_title(row)
@@ -2640,6 +2680,38 @@ def display_saved_report_title(row):
     if title and course_name and title.endswith(f" - {course_name}"):
         return title[:-(len(course_name) + 3)].strip() or title
     return title or "CLO Attainment Report"
+
+def normalize_report_title(value):
+    return re.sub(r'\s+', ' ', str(value or '').strip())[:160]
+
+def default_saved_report_title(course_name=''):
+    course_name = normalize_report_title(course_name)
+    if course_name:
+        return f"CLO Attainment Report - {course_name}"
+    return "CLO Attainment Report"
+
+def report_title_exists(conn, user_id, course_name, title, exclude_report_id=None):
+    query = """
+        SELECT id FROM saved_reports
+         WHERE user_id = ? AND course_name = ? AND lower(title) = lower(?)
+    """
+    params = [user_id, course_name, title]
+    if exclude_report_id:
+        query += " AND id <> ?"
+        params.append(exclude_report_id)
+    return conn.execute(query, params).fetchone() is not None
+
+def unique_saved_report_title(conn, user_id, course_name, base_title):
+    base_title = normalize_report_title(base_title) or "CLO Attainment Report"
+    if not report_title_exists(conn, user_id, course_name, base_title):
+        return base_title
+    index = 1
+    while True:
+        suffix = f" ({index})"
+        candidate = f"{base_title[:160 - len(suffix)]}{suffix}"
+        if not report_title_exists(conn, user_id, course_name, candidate):
+            return candidate
+        index += 1
 
 def student_rows_from_matrix(student_achievement_matrix):
     rows = []
@@ -2741,7 +2813,7 @@ def save_report_snapshot(stats, total_students, student_achievement_matrix, cour
     hash_payload.pop('created_at', None)
     payload_json = json.dumps(payload, ensure_ascii=False, sort_keys=True)
     report_hash = hashlib.sha256(json.dumps(hash_payload, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest()
-    title = "CLO Attainment Report"
+    course_name = course_info.get('raw_name') or course_info.get('course_name') or ''
     with get_db() as conn:
         existing = conn.execute(
             "SELECT id FROM saved_reports WHERE user_id = ? AND report_hash = ?",
@@ -2758,6 +2830,12 @@ def save_report_snapshot(stats, total_students, student_achievement_matrix, cour
         if not entitlement:
             return {'allowed': False, 'saved': False, 'reason': 'billing_required'}
 
+        title = unique_saved_report_title(
+            conn,
+            user['id'],
+            course_name,
+            default_saved_report_title(course_name)
+        )
         conn.execute(
             """
             INSERT INTO saved_reports
@@ -2767,7 +2845,7 @@ def save_report_snapshot(stats, total_students, student_achievement_matrix, cour
             (
                 user['id'],
                 title,
-                course_info.get('raw_name') or course_info.get('course_name') or '',
+                course_name,
                 payload_json,
                 report_hash,
                 created_at
@@ -2931,22 +3009,39 @@ def safe_available_courses():
         return []
 
 def get_course_clos(course_name):
-    courses = get_available_courses()
+    try:
+        courses = get_available_courses()
+    except Exception:
+        app.logger.exception("Failed to load course CLOs")
+        courses = []
     return next((c.get('clos', []) for c in courses if c.get('name') == course_name), [])
 
 def get_course_topics(course_name):
-    courses = get_available_courses()
+    try:
+        courses = get_available_courses()
+    except Exception:
+        app.logger.exception("Failed to load course topics")
+        courses = []
     return next((c.get('topics', []) for c in courses if c.get('name') == course_name), [])
 
 def get_course_clo_plos(course_name):
-    courses = get_available_courses()
+    try:
+        courses = get_available_courses()
+    except Exception:
+        app.logger.exception("Failed to load course CLO-PLO mappings")
+        courses = []
     return next((c.get('clo_plos', {}) for c in courses if c.get('name') == course_name), {})
 
 def get_course_by_name(course_name):
     course_name = str(course_name or '').strip()
     if not course_name:
         return {}
-    for course in get_available_courses():
+    try:
+        courses = get_available_courses()
+    except Exception:
+        app.logger.exception("Failed to load course by name")
+        courses = []
+    for course in courses:
         names = {
             str(course.get('name') or '').strip(),
             str(course.get('course_name') or '').strip(),
@@ -5233,13 +5328,14 @@ def parse_exam_paper_with_module(filepath):
         
         questions = []
         question_texts = {}
+        question_types = {}
         detected_clo_mappings = {}
         
         for q in parsed_questions:
             q_id = q['question_id']
             questions.append(q_id)
-            # Create a rich text representation for the UI
-            full_text = f"[{q['question_type']}] {q['question_text']}"
+            question_types[q_id] = str(q.get('question_type') or '').strip()
+            full_text = str(q.get('question_text') or '').strip()
             if q.get('marks', 1.0) != 1.0:
                 full_text += f"\nMarks: {q['marks']}"
                 
@@ -5255,6 +5351,7 @@ def parse_exam_paper_with_module(filepath):
             'confidence': 'High' if questions else 'Low',
             'text_sample': (parser.raw_text[:150] + '...') if hasattr(parser, 'raw_text') else '',
             'question_texts': question_texts,
+            'question_types': question_types,
             'detected_clo_mappings': detected_clo_mappings
         }
     except Exception as e:
@@ -5285,10 +5382,12 @@ def load_question_mapping_draft(draft_id):
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
-def build_question_mapping_metrics_from_texts(question_texts):
+def build_question_mapping_metrics_from_texts(question_texts, question_types=None):
     questions = []
     normalized_texts = {}
+    normalized_types = {}
     detected_clo_mappings = {}
+    question_types = question_types or []
     for index, text in enumerate(question_texts, start=1):
         cleaned = re.sub(r'\s+', ' ', str(text or '')).strip()
         if not cleaned:
@@ -5296,6 +5395,10 @@ def build_question_mapping_metrics_from_texts(question_texts):
         question_id = f"Q{len(questions) + 1}"
         questions.append(question_id)
         normalized_texts[question_id] = cleaned
+        if index - 1 < len(question_types):
+            normalized_types[question_id] = re.sub(r'\s+', ' ', str(question_types[index - 1] or '')).strip()
+        else:
+            normalized_types[question_id] = ''
         tags = detect_clo_tags_from_text(cleaned)
         if tags:
             detected_clo_mappings[question_id] = tags
@@ -5306,6 +5409,7 @@ def build_question_mapping_metrics_from_texts(question_texts):
         'confidence': 'Edited',
         'text_sample': '',
         'question_texts': normalized_texts,
+        'question_types': normalized_types,
         'detected_clo_mappings': detected_clo_mappings
     }
 
@@ -5392,6 +5496,9 @@ def clean_report_pdf_text(value):
 
 def contains_arabic(text):
     return bool(re.search(r'[\u0600-\u06FF]', text or ''))
+
+def text_direction(text):
+    return 'rtl' if contains_arabic(str(text or '')) else 'ltr'
 
 def extract_first_int(patterns, text):
     for pattern in patterns:
@@ -11151,13 +11258,23 @@ def rename_saved_report(report_id):
         flash("Please login to view saved reports.", "error")
         return redirect(url_for('login'))
 
-    title = re.sub(r'\s+', ' ', (request.form.get('title') or '').strip())
+    title = normalize_report_title(request.form.get('title'))
     if not title:
         flash(translate('history.rename_invalid'), "error")
         return redirect(url_for('reports'))
-    title = title[:160]
 
     with get_db() as conn:
+        report_row = conn.execute(
+            "SELECT id, course_name FROM saved_reports WHERE id = ? AND user_id = ?",
+            (report_id, user['id'])
+        ).fetchone()
+        if not report_row:
+            flash("Report not found.", "error")
+            return redirect(url_for('reports'))
+        course_name = row_get(report_row, 'course_name')
+        if report_title_exists(conn, user['id'], course_name, title, exclude_report_id=report_id):
+            flash(translate('history.rename_duplicate'), "error")
+            return redirect(url_for('reports'))
         result = conn.execute(
             "UPDATE saved_reports SET title = ? WHERE id = ? AND user_id = ?",
             (title, report_id, user['id'])
@@ -11409,19 +11526,95 @@ def manual_report():
 
 @app.route('/save-question-clos', methods=['POST'])
 def save_question_clos():
-    mapped = []
-    question_ids = set()
-    for key in request.form.keys():
-        if key.startswith('question_clo_'):
-            question_ids.add(key.replace('question_clo_', ''))
+    user = current_user()
+    if not user:
+        flash(translate('courses.login_required'), "error")
+        return redirect(url_for('login'))
 
-    for question in sorted(question_ids, key=lambda item: int(item[1:]) if re.match(r'^Q\d+$', item) else item):
+    course_name = (request.form.get('course_name') or '').strip()
+    filename = (request.form.get('filename') or '').strip()
+    question_ids = request.form.getlist('question_ids')
+    if not question_ids:
+        for key in request.form.keys():
+            if key.startswith('question_clo_'):
+                question_ids.append(key.replace('question_clo_', ''))
+
+    cleaned_questions = []
+    seen_questions = set()
+    for question in question_ids:
+        question = str(question or '').strip()
+        if not question or question in seen_questions:
+            continue
+        seen_questions.add(question)
         clos = [clo for clo in request.form.getlist(f'question_clo_{question}') if clo and clo != 'IGNORE']
-        if clos:
-            mapped.append({'question': question, 'clos': clos})
+        cleaned_questions.append({
+            'question': question,
+            'text': (request.form.get(f'question_text_{question}') or '').strip(),
+            'type': (request.form.get(f'question_type_{question}') or '').strip(),
+            'clos': clos,
+        })
 
-    flash(f"Saved CLO selections for {len(mapped)} question(s).")
-    return redirect(url_for('clo_attainment'))
+    created_at = datetime.now().strftime('%Y-%m-%d %H:%M')
+    base_title = os.path.splitext(os.path.basename(filename or ''))[0].strip() or course_name or 'Question CLO Mapping'
+    payload = {
+        'course_name': course_name,
+        'filename': filename,
+        'questions': cleaned_questions,
+        'created_at': created_at,
+    }
+    with get_db() as conn:
+        existing_titles = {
+            row['title']
+            for row in conn.execute(
+                "SELECT title FROM saved_exams WHERE user_id = ?",
+                (user['id'],)
+            ).fetchall()
+        }
+        title = base_title
+        counter = 2
+        while title in existing_titles:
+            title = f"{base_title} ({counter})"
+            counter += 1
+        conn.execute(
+            """
+            INSERT INTO saved_exams (user_id, title, course_name, filename, payload_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (user['id'], title, course_name, filename, json.dumps(payload, ensure_ascii=False), created_at)
+        )
+
+    flash(translate('exams.saved'))
+    return redirect(url_for('my_exams'))
+
+@app.route('/account/exams')
+def my_exams():
+    user = current_user()
+    if not user:
+        flash(translate('courses.login_required'), "error")
+        return redirect(url_for('login'))
+    with get_db() as conn:
+        rows = conn.execute(
+            """
+            SELECT id, title, course_name, filename, payload_json, created_at
+              FROM saved_exams
+             WHERE user_id = ?
+             ORDER BY id DESC
+            """,
+            (user['id'],)
+        ).fetchall()
+
+    exams = []
+    for row in rows:
+        payload = safe_json_loads(row_get(row, 'payload_json'), {}) or {}
+        exams.append({
+            'id': row_get(row, 'id'),
+            'title': row_get(row, 'title'),
+            'course_name': row_get(row, 'course_name'),
+            'filename': row_get(row, 'filename'),
+            'question_count': len(payload.get('questions') or []),
+            'created_at': row_get(row, 'created_at'),
+        })
+    return render_template('exam_history.html', exams=exams)
 
 @app.route('/')
 def index():
@@ -11861,7 +12054,8 @@ def question_clo_mapping_map():
         return redirect(url_for('question_clo_mapping_service'))
 
     question_texts = request.form.getlist('question_text')
-    metrics = build_question_mapping_metrics_from_texts(question_texts)
+    question_types = request.form.getlist('question_type')
+    metrics = build_question_mapping_metrics_from_texts(question_texts, question_types)
     if not metrics.get('questions'):
         flash(translate('question_mapping.no_questions'), "error")
         return render_template(
@@ -11976,10 +12170,12 @@ def render_course_report_inputs(report_payloads, export_action, selected_course_
     selected_course_name = selected_course_name or (request.form.get('course_name') if has_request_context() else '') or ''
     combined_stats, course_info, total_students, selected_reports = aggregate_course_report_payloads(report_payloads, selected_course_name)
     raw_course_name = course_info.get('raw_name') or course_info.get('course_name') or ''
+    selected_report_ids = [row_get(item.get('row'), 'id') for item in report_payloads]
+    selected_report_ids = [report_id for report_id in selected_report_ids if report_id]
     return render_template(
         'course_report_inputs.html',
         export_action=export_action,
-        selected_report_ids=[item['row']['id'] for item in report_payloads],
+        selected_report_ids=selected_report_ids,
         selected_course_name=selected_course_name or raw_course_name,
         selected_reports=selected_reports,
         course_info=course_info,
@@ -12029,11 +12225,16 @@ def course_report_service_inputs(report_id):
     if not row:
         flash("CLO attainment report not found.", "error")
         return redirect(url_for('course_report_service'))
-    return render_course_report_inputs(
-        [{'row': row, 'payload': payload}],
-        url_for('export_saved_course_report_docx', report_id=report_id),
-        row['course_name']
-    )
+    try:
+        return render_course_report_inputs(
+            [{'row': row, 'payload': payload}],
+            url_for('export_saved_course_report_docx', report_id=report_id),
+            row_get(row, 'course_name')
+        )
+    except Exception:
+        app.logger.exception("Failed to render course report inputs for saved report %s", report_id)
+        flash("Could not open the course report inputs. Please try another report or recreate the CLO attainment report.", "error")
+        return redirect(url_for('course_report_service'))
 
 @app.route('/course-report-service/report/<int:report_id>/export', methods=['POST'])
 def export_saved_course_report_docx(report_id):

@@ -52,6 +52,12 @@
         resize: vertical;
     }
 
+    .question-review-toolbar {
+        display: flex;
+        justify-content: flex-start;
+        margin: 0 0 0.75rem;
+    }
+
     @media (max-width: 760px) {
         .question-review-box {
             overflow-x: auto;
@@ -72,6 +78,9 @@
     <form method="POST" action="{{ url_for('question_clo_mapping_map') }}">
         <input type="hidden" name="draft_id" value="{{ draft_id }}">
         {% set question_items = metrics.questions if metrics and metrics.questions else ['Q1'] %}
+        <div class="question-review-toolbar">
+            <button type="button" id="addQuestionBtn" class="btn" style="background-color: var(--accent-secondary); padding: 0.65rem 1rem;">{{ _('question_mapping.add_question') }}</button>
+        </div>
         <section class="question-review-box">
             <div class="question-review-header">
                 <div>
@@ -79,7 +88,7 @@
                 </div>
                 <div class="question-review-counts">
                     <span class="question-review-detected">{{ _('mapping.detected') }}</span>
-                    <span class="question-review-count">{{ question_items|length }} {{ count_unit('question', question_items|length) }}</span>
+                    <span class="question-review-count" id="questionCount">{{ question_items|length }} {{ count_unit('question', question_items|length) }}</span>
                 </div>
             </div>
             <table id="questionTable" class="question-review-table">
@@ -87,17 +96,23 @@
                     <tr>
                         <th style="width: 150px;">{{ _('mapping.question') }}</th>
                         <th>{{ _('question_mapping.question_text') }}</th>
-                        <th style="width: 320px;">{{ _('question_mapping.paper_clo') }}</th>
+                        <th style="width: 320px;">
+                            {{ _('question_mapping.paper_clo') }}
+                            <small style="display: block; margin-top: 0.25rem; color: rgba(255,255,255,0.86); font-weight: 500;">{{ _('question_mapping.paper_clo_help') }}</small>
+                        </th>
                         <th style="width: 70px;"></th>
                     </tr>
                 </thead>
                 <tbody id="questionList">
                     {% for question in question_items %}
                         {% set detected_clos = resolve_detected_clos_to_course_list(metrics.detected_clo_mappings.get(question, []) if metrics and metrics.detected_clo_mappings else [], clos) %}
+                        {% set question_text = metrics.question_texts.get(question, question) if metrics and metrics.question_texts else '' %}
+                        {% set question_type = metrics.question_types.get(question, '') if metrics and metrics.question_types else '' %}
                         <tr class="question-edit-row">
                             <td><strong class="question-number">{{ _('mapping.question') }} {{ loop.index }}</strong></td>
                             <td>
-                                <textarea name="question_text" class="form-control" rows="4">{{ metrics.question_texts.get(question, question) if metrics and metrics.question_texts else '' }}</textarea>
+                                <textarea name="question_text" class="form-control" rows="4" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</textarea>
+                                <input type="hidden" name="question_type" value="{{ question_type }}">
                             </td>
                             <td>
                                 <select name="paper_clo_{{ loop.index0 }}" class="form-control paper-clo-select" multiple size="5" style="padding: 0.5rem; background: var(--bg-base);">
@@ -105,7 +120,6 @@
                                         <option value="{{ clo }}" {% if clo in detected_clos %}selected{% endif %}>{{ clo }}</option>
                                     {% endfor %}
                                 </select>
-                                <small style="color: var(--text-muted); display: block; margin-top: 0.4rem;">{{ _('question_mapping.paper_clo_help') }}</small>
                             </td>
                             <td style="text-align: center;">
                                 <button type="button" class="remove-question" style="border: 0; background: transparent; color: var(--danger); font-weight: 700; cursor: pointer;">&times;</button>
@@ -117,7 +131,6 @@
         </section>
 
         <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap;">
-            <button type="button" id="addQuestionBtn" class="btn" style="background: #6b7280;">{{ _('question_mapping.add_question') }}</button>
             <button type="submit" class="btn">{{ _('question_mapping.map_to_clos') }}</button>
         </div>
     </form>
@@ -128,6 +141,7 @@
         <td><strong class="question-number"></strong></td>
         <td>
             <textarea name="question_text" class="form-control" rows="4"></textarea>
+            <input type="hidden" name="question_type" value="">
         </td>
         <td>
             <select class="form-control paper-clo-select" multiple size="5" style="padding: 0.5rem; background: var(--bg-base);">
@@ -135,7 +149,6 @@
                     <option value="{{ clo }}">{{ clo }}</option>
                 {% endfor %}
             </select>
-            <small style="color: var(--text-muted); display: block; margin-top: 0.4rem;">{{ _('question_mapping.paper_clo_help') }}</small>
         </td>
         <td style="text-align: center;">
             <button type="button" class="remove-question" style="border: 0; background: transparent; color: var(--danger); font-weight: 700; cursor: pointer;">&times;</button>
@@ -148,10 +161,23 @@
         const list = document.getElementById('questionList');
         const template = document.getElementById('questionTemplate');
         const addButton = document.getElementById('addQuestionBtn');
+        const questionCount = document.getElementById('questionCount');
         const questionWord = {{ _('mapping.question')|tojson }};
+        const unitOne = {{ count_unit('question', 1)|tojson }};
+        const unitTwo = {{ count_unit('question', 2)|tojson }};
+        const unitMany = {{ count_unit('question', 3)|tojson }};
+        const unitLarge = {{ count_unit('question', 11)|tojson }};
+
+        function applyTextDirection(textarea) {
+            if (!textarea) return;
+            const isArabic = /[\u0600-\u06FF]/.test(textarea.value || '');
+            textarea.dir = isArabic ? 'rtl' : 'ltr';
+            textarea.style.textAlign = isArabic ? 'right' : 'left';
+        }
 
         function renumberQuestions() {
-            list.querySelectorAll('.question-edit-row').forEach(function(row, index) {
+            const rows = list.querySelectorAll('.question-edit-row');
+            rows.forEach(function(row, index) {
                 const label = row.querySelector('.question-number');
                 if (label) {
                     label.textContent = questionWord + ' ' + (index + 1);
@@ -160,8 +186,20 @@
                 if (select) {
                     select.name = 'paper_clo_' + index;
                 }
+                applyTextDirection(row.querySelector('textarea'));
             });
+            if (questionCount) {
+                const count = rows.length;
+                const unit = count === 1 ? unitOne : (count === 2 ? unitTwo : (count <= 10 ? unitMany : unitLarge));
+                questionCount.textContent = count + ' ' + unit;
+            }
         }
+
+        list.addEventListener('input', function(event) {
+            if (event.target.matches('textarea[name="question_text"]')) {
+                applyTextDirection(event.target);
+            }
+        });
 
         list.addEventListener('click', function(event) {
             if (!event.target.classList.contains('remove-question')) return;

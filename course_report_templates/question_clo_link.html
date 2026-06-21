@@ -24,10 +24,13 @@
     {% endif %}
 
     <form method="POST" action="/save-question-clos">
+        <input type="hidden" name="course_name" value="{{ course_name }}">
+        <input type="hidden" name="filename" value="{{ filename }}">
         <table>
             <thead>
                 <tr>
                     <th style="width: 140px;">{{ _('mapping.question') }}</th>
+                    <th style="width: 150px;">{{ _('question_mapping.question_type') }}</th>
                     <th>{{ _('question_mapping.question_text') }}</th>
                     <th style="width: 300px;">{{ _('question_mapping.related_clo') }}</th>
                 </tr>
@@ -37,9 +40,17 @@
                     {% set suggestions = metrics.smart_clo_suggestions.get(question, []) if metrics.smart_clo_suggestions else [] %}
                     {% set detected_clos = resolve_detected_clos_to_course_list(metrics.detected_clo_mappings.get(question, []) if metrics.detected_clo_mappings else [], clos) %}
                     {% set selected_clos = detected_clos if detected_clos else ([suggestions[0].clo] if suggestions else []) %}
+                    {% set question_text = metrics.question_texts.get(question, '') %}
+                    {% set question_type = metrics.question_types.get(question, '') if metrics.question_types else '' %}
                     <tr>
-                        <td><strong>{{ _('mapping.question') }} {{ loop.index }}</strong></td>
-                        <td style="white-space: pre-wrap;">{{ metrics.question_texts.get(question, '') }}</td>
+                        <td>
+                            <input type="hidden" name="question_ids" value="{{ question }}">
+                            <input type="hidden" name="question_text_{{ question }}" value="{{ question_text }}">
+                            <input type="hidden" name="question_type_{{ question }}" value="{{ question_type }}">
+                            <strong>{{ _('mapping.question') }} {{ loop.index }}</strong>
+                        </td>
+                        <td>{{ question_type or '-' }}</td>
+                        <td dir="{{ text_direction(question_text) }}" style="white-space: pre-wrap; text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</td>
                         <td>
                             <select name="question_clo_{{ question }}" class="form-control" multiple size="5">
                                 {% for clo in clos %}
@@ -59,6 +70,10 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap;">
+            <button type="button" class="btn" style="background-color: var(--border-color); color: var(--text-main);" onclick="history.back()">{{ _('question_mapping.back') }}</button>
+            <button type="submit" class="btn">{{ _('question_mapping.save_mapping') }}</button>
+        </div>
     </form>
 </div>
 {% endblock %}
