@@ -437,11 +437,32 @@ EN_TRANSLATIONS = {
     'question_mapping.question_type': 'Question type',
     'question_mapping.paper_clo': 'CLO from exam paper',
     'question_mapping.paper_clo_help': 'Only learning outcomes explicitly mentioned in the exam paper are shown here.',
+    'question_mapping.step2_title': 'Step 2: Question Extraction and Explicit Mapping',
+    'question_mapping.step2_description': 'Review extracted questions, detected question types, and any CLOs explicitly mentioned in the exam paper.',
+    'question_mapping.total_questions': 'Total Questions',
+    'question_mapping.auto_mapped_questions': 'Automatically Mapped Questions',
+    'question_mapping.ai_required_questions': 'Questions Requiring AI Mapping',
+    'question_mapping.question_number': 'Question Number',
+    'question_mapping.explicit_clo': 'Explicit CLO',
+    'question_mapping.status': 'Status',
+    'question_mapping.mapped_automatically': 'Mapped Automatically',
+    'question_mapping.requires_ai_mapping': 'Requires AI Mapping',
+    'question_mapping.all_mapped_success': 'All questions were mapped successfully.',
+    'question_mapping.final_review': 'Final Review',
+    'question_mapping.continue_ai_mapping': 'Continue to AI Mapping',
+    'question_mapping.step3_title': 'Step 3: AI Mapping for Unmapped Questions',
+    'question_mapping.step3_description': 'Review AI recommendations for questions without an explicitly mentioned CLO.',
+    'question_mapping.suggested_clo': 'Suggested CLO',
+    'question_mapping.confidence_score': 'Confidence Score',
+    'question_mapping.select_clo': 'Select CLO',
+    'question_mapping.choose_clo': 'Choose a CLO...',
+    'question_mapping.all_course_clos': 'All Course CLOs',
     'question_mapping.link_title': 'Map Questions to CLOs',
     'question_mapping.link_description': 'Review each question number and the related CLO suggested by ETQAN.',
     'question_mapping.related_clo': 'Related CLO',
     'question_mapping.save_mapping': 'Save',
     'question_mapping.back': 'Back',
+    'question_mapping.review_saved': 'Question review saved.',
     'question_mapping.no_questions': 'No questions were extracted. Add at least one question before mapping.',
     'exams.title': 'My Exams',
     'exams.empty': 'No saved exams yet.',
@@ -1422,8 +1443,29 @@ TRANSLATIONS['ar'].update({
     'nav.my_exams': '\u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a\u064a',
     'question_mapping.question_type': '\u0646\u0648\u0639 \u0627\u0644\u0633\u0624\u0627\u0644',
     'question_mapping.paper_clo_help': '\u062a\u064f\u0639\u0631\u0636 \u0647\u0646\u0627 \u0641\u0642\u0637 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0630\u0643\u0648\u0631\u0629 \u0628\u0634\u0643\u0644 \u0635\u0631\u064a\u062d \u0641\u064a \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631.',
+    'question_mapping.step2_title': '\u0627\u0644\u062e\u0637\u0648\u0629 2: \u0627\u0633\u062a\u062e\u0631\u0627\u062c \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0648\u0627\u0644\u0631\u0628\u0637 \u0627\u0644\u0635\u0631\u064a\u062d',
+    'question_mapping.step2_description': '\u0631\u0627\u062c\u0639 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u0645\u0633\u062a\u062e\u0631\u062c\u0629\u060c \u0648\u0623\u0646\u0648\u0627\u0639\u0647\u0627\u060c \u0648\u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0630\u0643\u0648\u0631\u0629 \u0635\u0631\u0627\u062d\u0629 \u0641\u064a \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631.',
+    'question_mapping.total_questions': '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0623\u0633\u0626\u0644\u0629',
+    'question_mapping.auto_mapped_questions': '\u0623\u0633\u0626\u0644\u0629 \u0631\u064f\u0628\u0637\u062a \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b',
+    'question_mapping.ai_required_questions': '\u0623\u0633\u0626\u0644\u0629 \u062a\u062d\u062a\u0627\u062c \u0631\u0628\u0637\u0627\u064b \u0628\u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
+    'question_mapping.question_number': '\u0631\u0642\u0645 \u0627\u0644\u0633\u0624\u0627\u0644',
+    'question_mapping.explicit_clo': '\u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0635\u0631\u064a\u062d',
+    'question_mapping.status': '\u0627\u0644\u062d\u0627\u0644\u0629',
+    'question_mapping.mapped_automatically': '\u0631\u064f\u0628\u0637 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b',
+    'question_mapping.requires_ai_mapping': '\u064a\u062d\u062a\u0627\u062c \u0631\u0628\u0637\u0627\u064b \u0628\u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
+    'question_mapping.all_mapped_success': '\u062a\u0645 \u0631\u0628\u0637 \u062c\u0645\u064a\u0639 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0628\u0646\u062c\u0627\u062d.',
+    'question_mapping.final_review': '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0646\u0647\u0627\u0626\u064a\u0629',
+    'question_mapping.continue_ai_mapping': '\u0645\u062a\u0627\u0628\u0639\u0629 \u0627\u0644\u0631\u0628\u0637 \u0628\u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
+    'question_mapping.step3_title': '\u0627\u0644\u062e\u0637\u0648\u0629 3: \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u063a\u064a\u0631 \u0627\u0644\u0645\u0631\u0628\u0648\u0637\u0629 \u0628\u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
+    'question_mapping.step3_description': '\u0631\u0627\u062c\u0639 \u0627\u0642\u062a\u0631\u0627\u062d\u0627\u062a \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a \u0644\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u062a\u064a \u0644\u0645 \u064a\u0630\u0643\u0631 \u0641\u064a\u0647\u0627 \u0645\u062e\u0631\u062c \u062a\u0639\u0644\u0645 \u0628\u0634\u0643\u0644 \u0635\u0631\u064a\u062d.',
+    'question_mapping.suggested_clo': '\u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0642\u062a\u0631\u062d',
+    'question_mapping.confidence_score': '\u062f\u0631\u062c\u0629 \u0627\u0644\u062b\u0642\u0629',
+    'question_mapping.select_clo': '\u0627\u062e\u062a\u0631 \u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
+    'question_mapping.choose_clo': '\u0627\u062e\u062a\u0631 \u0645\u062e\u0631\u062c\u0627\u064b...',
+    'question_mapping.all_course_clos': '\u062c\u0645\u064a\u0639 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u0645\u0642\u0631\u0631',
     'question_mapping.save_mapping': '\u062d\u0641\u0638',
     'question_mapping.back': '\u0631\u062c\u0648\u0639',
+    'question_mapping.review_saved': '\u062a\u0645 \u062d\u0641\u0638 \u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0623\u0633\u0626\u0644\u0629.',
     'exams.title': '\u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a\u064a',
     'exams.empty': '\u0644\u0627 \u062a\u0648\u062c\u062f \u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a \u0645\u062d\u0641\u0648\u0638\u0629 \u0628\u0639\u062f.',
     'exams.saved': '\u062a\u0645 \u062d\u0641\u0638 \u0631\u0628\u0637 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631.',
@@ -2689,6 +2731,152 @@ def aggregate_course_report_payloads(report_payloads, selected_course_name=''):
     )
 
     return dict(sorted_clo_items(combined_stats)), course_info, total_students, selected_reports
+
+def normalize_clo_summary_item(data):
+    if not isinstance(data, dict):
+        return None
+    questions = data.get('questions') or data.get('mapped_questions') or []
+    if isinstance(questions, str):
+        questions = [questions]
+    if not isinstance(questions, list):
+        questions = []
+    return {
+        'questions': [str(question or '').strip() for question in questions if str(question or '').strip()],
+        'students_achieved': safe_int_value(data.get('students_achieved', data.get('achieved_students', 0))),
+        'total_possible_score': safe_float_value(data.get('total_possible_score', data.get('max_score', 0))),
+        'target_score': safe_float_value(data.get('target_score', data.get('target', 0))),
+        'target_pct': safe_float_value(data.get('target_pct', data.get('target_percentage', 0))),
+        'achievement_percentage': safe_float_value(data.get('achievement_percentage', data.get('attainment_percentage', 0))),
+    }
+
+def load_course_report_records(report_ids, user_id):
+    cleaned_ids = []
+    for report_id in report_ids or []:
+        try:
+            cleaned_ids.append(int(report_id))
+        except (TypeError, ValueError):
+            continue
+    cleaned_ids = list(dict.fromkeys(cleaned_ids))
+    if not cleaned_ids:
+        return []
+
+    placeholders = ','.join('?' for _ in cleaned_ids)
+    with get_db() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT id, title, course_name, payload_json, created_at
+              FROM saved_reports
+             WHERE user_id = ?
+               AND id IN ({placeholders})
+             ORDER BY id DESC
+            """,
+            [user_id] + cleaned_ids
+        ).fetchall()
+
+    rows_by_id = {safe_int_value(row_get(row, 'id')): row for row in rows}
+    records = []
+    for report_id in cleaned_ids:
+        row = rows_by_id.get(report_id)
+        if not row:
+            continue
+        payload = normalize_saved_report_payload(safe_json_loads(row_get(row, 'payload_json'), {}))
+        records.append({
+            'id': safe_int_value(row_get(row, 'id')),
+            'title': row_get(row, 'title') or 'CLO Attainment Report',
+            'display_title': display_saved_report_title(row),
+            'course_name': row_get(row, 'course_name'),
+            'created_at': row_get(row, 'created_at'),
+            'payload': payload,
+        })
+    return records
+
+def build_course_report_context_from_records(records, export_action, selected_course_name=''):
+    combined_stats = {}
+    selected_reports = []
+    total_students = 0
+    course_info = {}
+    first_course_name = ''
+
+    for record in records or []:
+        payload = normalize_saved_report_payload(record.get('payload') or {})
+        report_students = safe_int_value(payload.get('total_students'))
+        total_students += report_students
+        report_title = record.get('display_title') or record.get('title') or 'CLO Attainment Report'
+        report_course_name = record.get('course_name') or ''
+        if not first_course_name:
+            first_course_name = report_course_name
+        selected_reports.append({
+            'id': record.get('id'),
+            'display_title': report_title,
+            'created_at': record.get('created_at'),
+            'total_students': report_students,
+        })
+        if not course_info:
+            payload_course_info = payload.get('course_info') if isinstance(payload.get('course_info'), dict) else {}
+            course_info = payload_course_info or {
+                'course_name': report_course_name,
+                'raw_name': report_course_name,
+            }
+
+        for clo, raw_data in (payload.get('stats') or {}).items():
+            data = normalize_clo_summary_item(raw_data)
+            if not data:
+                continue
+            target = combined_stats.setdefault(clo, {
+                'questions': [],
+                'students_achieved': 0,
+                'total_possible_score': 0.0,
+                'target_score': 0.0,
+                'target_pct_total': 0.0,
+                'target_pct_weight': 0,
+                '_total_students': 0,
+            })
+            target['questions'].extend([f"{report_title}: {question}" for question in data['questions']])
+            target['students_achieved'] += data['students_achieved']
+            target['total_possible_score'] += data['total_possible_score']
+            target['target_score'] += data['target_score']
+            target['target_pct_total'] += data['target_pct'] * max(report_students, 1)
+            target['target_pct_weight'] += max(report_students, 1)
+            target['_total_students'] += report_students
+
+    for data in combined_stats.values():
+        clo_total_students = int(data.pop('_total_students', 0) or 0)
+        target_pct_weight = int(data.pop('target_pct_weight', 0) or 0)
+        target_pct_total = float(data.pop('target_pct_total', 0) or 0)
+        data['target_pct'] = round(target_pct_total / target_pct_weight, 2) if target_pct_weight else 0
+        data['achievement_percentage'] = round((data['students_achieved'] / clo_total_students) * 100, 2) if clo_total_students else 0
+        data['total_possible_score'] = round(float(data.get('total_possible_score') or 0), 2)
+        data['target_score'] = round(float(data.get('target_score') or 0), 2)
+
+    selected_course_name = selected_course_name or first_course_name
+    course_info = enrich_course_info_from_course(course_info, selected_course_name)
+    raw_course_name = course_info.get('raw_name') or course_info.get('course_name') or selected_course_name
+    try:
+        course_topics = get_course_topics(raw_course_name)
+    except Exception:
+        app.logger.exception("Failed to load course topics for course report inputs")
+        course_topics = []
+
+    return {
+        'export_action': export_action,
+        'selected_report_ids': [record.get('id') for record in records or [] if record.get('id')],
+        'selected_course_name': selected_course_name or raw_course_name,
+        'selected_reports': selected_reports,
+        'course_info': course_info,
+        'course_topics': course_topics,
+        'course_improvement_recommendations': COURSE_IMPROVEMENT_RECOMMENDATIONS,
+        'course_improvement_recommendation_groups': grouped_course_improvement_recommendations(),
+        'course_improvement_action_options': COURSE_IMPROVEMENT_ACTION_OPTIONS,
+        'course_improvement_support_options': COURSE_IMPROVEMENT_SUPPORT_OPTIONS,
+        'uncovered_reason_actions': UNCOVERED_TOPIC_REASON_ACTIONS,
+        'uncovered_reason_actions_json': json.dumps(UNCOVERED_TOPIC_REASON_ACTIONS, ensure_ascii=False),
+        'total_students': total_students,
+        'stats_items': sorted_clo_items(combined_stats),
+    }
+
+def render_course_report_inputs_from_records(records, export_action, selected_course_name=''):
+    context = build_course_report_context_from_records(records, export_action, selected_course_name)
+    return render_template('course_report_inputs.html', **context)
 
 def display_saved_report_title(row):
     title = str(row_get(row, 'title') or '').strip()
@@ -5428,6 +5616,113 @@ def build_question_mapping_metrics_from_texts(question_texts, question_types=Non
         'question_types': normalized_types,
         'detected_clo_mappings': detected_clo_mappings
     }
+
+def build_question_review_metrics_from_form(clos):
+    question_texts = request.form.getlist('question_text')
+    question_types = request.form.getlist('question_type')
+    metrics = build_question_mapping_metrics_from_texts(question_texts, question_types)
+    paper_detected_mappings = {}
+    for index, question in enumerate(metrics.get('questions') or []):
+        selected_from_paper = request.form.getlist(f'paper_clo_{index}')
+        resolved_from_paper = resolve_detected_clos_to_course_list(selected_from_paper, clos)
+        if resolved_from_paper:
+            paper_detected_mappings[question] = resolved_from_paper
+    if paper_detected_mappings:
+        detected = dict(metrics.get('detected_clo_mappings') or {})
+        detected.update(paper_detected_mappings)
+        metrics['detected_clo_mappings'] = detected
+    return metrics, paper_detected_mappings
+
+def build_question_review_summary(metrics, clos):
+    metrics = metrics or {}
+    explicit_by_question = {}
+    needs_ai_questions = []
+    for question in metrics.get('questions') or []:
+        resolved = resolve_detected_clos_to_course_list(
+            (metrics.get('detected_clo_mappings') or {}).get(question, []),
+            clos
+        )
+        explicit_by_question[question] = resolved
+        if not resolved:
+            needs_ai_questions.append(question)
+
+    total = len(metrics.get('questions') or [])
+    needs_ai = len(needs_ai_questions)
+    return {
+        'total': total,
+        'auto_mapped': max(total - needs_ai, 0),
+        'needs_ai': needs_ai,
+        'all_mapped': bool(total) and needs_ai == 0,
+        'needs_ai_questions': needs_ai_questions,
+        'explicit_by_question': explicit_by_question,
+    }
+
+def build_question_final_metrics_from_form(clos):
+    question_ids = [str(item or '').strip() for item in request.form.getlist('question_ids')]
+    question_ids = [item for item in question_ids if item]
+    if not question_ids:
+        return build_question_review_metrics_from_form(clos)[0]
+
+    metrics = {
+        'questions': [],
+        'total_questions': 0,
+        'total_students': 0,
+        'confidence': 'Edited',
+        'text_sample': '',
+        'question_texts': {},
+        'question_types': {},
+        'detected_clo_mappings': {},
+    }
+    seen = set()
+    for raw_question in question_ids:
+        question = raw_question
+        if question in seen:
+            continue
+        seen.add(question)
+        metrics['questions'].append(question)
+        metrics['question_texts'][question] = re.sub(
+            r'\s+',
+            ' ',
+            str(request.form.get(f'question_text_{question}') or '').strip()
+        )
+        metrics['question_types'][question] = re.sub(
+            r'\s+',
+            ' ',
+            str(request.form.get(f'question_type_{question}') or '').strip()
+        )
+        selected_clos = request.form.getlist(f'question_clo_{question}')
+        resolved = resolve_detected_clos_to_course_list(selected_clos, clos)
+        if resolved:
+            metrics['detected_clo_mappings'][question] = resolved
+    metrics['total_questions'] = len(metrics['questions'])
+    return metrics
+
+def build_ai_suggestions_for_unmapped(metrics, clos, review_summary):
+    metrics = dict(metrics or {})
+    unmapped_questions = list((review_summary or {}).get('needs_ai_questions') or [])
+    if not unmapped_questions:
+        return metrics
+
+    ai_metrics = dict(metrics)
+    ai_metrics['questions'] = unmapped_questions
+    ai_metrics['detected_clo_mappings'] = {}
+    ai_metrics['smart_clo_suggestions'] = {}
+    ai_metrics.pop('question_clo_suggestion_source', None)
+
+    ai_metrics = build_gemini_question_clo_suggestions(ai_metrics, clos)
+    ai_metrics = build_smart_clo_suggestions(
+        ai_metrics,
+        clos,
+        only_unmapped=ai_metrics.get('question_clo_suggestion_source') == 'gemini'
+    )
+
+    merged = dict(metrics)
+    merged['smart_clo_suggestions'] = dict(ai_metrics.get('smart_clo_suggestions') or {})
+    if ai_metrics.get('question_clo_suggestion_source'):
+        merged['question_clo_suggestion_source'] = ai_metrics.get('question_clo_suggestion_source')
+    elif merged['smart_clo_suggestions']:
+        merged['question_clo_suggestion_source'] = 'local'
+    return merged
 
 def apply_exam_paper_mappings(report_metrics, exam_metrics):
     if not exam_metrics:
@@ -12045,6 +12340,7 @@ def question_clo_mapping_service():
             course_name=course_name,
             clos=clos,
             metrics=metrics,
+            review_summary=build_question_review_summary(metrics, clos),
             filename=paper_file.filename,
             draft_id=draft_id
         )
@@ -12069,43 +12365,109 @@ def question_clo_mapping_map():
         flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
         return redirect(url_for('question_clo_mapping_service'))
 
-    question_texts = request.form.getlist('question_text')
-    question_types = request.form.getlist('question_type')
-    metrics = build_question_mapping_metrics_from_texts(question_texts, question_types)
+    metrics, paper_detected_mappings = build_question_review_metrics_from_form(clos)
     if not metrics.get('questions'):
         flash(translate('question_mapping.no_questions'), "error")
+        existing_metrics = draft.get('metrics') or {}
         return render_template(
             'question_clo_review.html',
             course_name=course_name,
             clos=clos,
-            metrics=draft.get('metrics') or {},
+            metrics=existing_metrics,
+            review_summary=build_question_review_summary(existing_metrics, clos),
             filename=draft.get('filename') or '',
             draft_id=draft_id
         )
 
-    paper_detected_mappings = {}
-    for index, question in enumerate(metrics.get('questions') or []):
-        selected_from_paper = request.form.getlist(f'paper_clo_{index}')
-        resolved_from_paper = resolve_detected_clos_to_course_list(selected_from_paper, clos)
-        if resolved_from_paper:
-            paper_detected_mappings[question] = resolved_from_paper
     if paper_detected_mappings:
         detected = dict(metrics.get('detected_clo_mappings') or {})
         detected.update(paper_detected_mappings)
         metrics['detected_clo_mappings'] = detected
+    review_summary = build_question_review_summary(metrics, clos)
+    draft['metrics'] = metrics
+    with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
+        json.dump(draft, f, ensure_ascii=False)
 
-    metrics = build_gemini_question_clo_suggestions(metrics, clos)
-    metrics = build_smart_clo_suggestions(
-        metrics,
-        clos,
-        only_unmapped=metrics.get('question_clo_suggestion_source') == 'gemini'
+    if review_summary['all_mapped']:
+        flash(translate('question_mapping.all_mapped_success'))
+        return render_template(
+            'question_clo_link.html',
+            course_name=course_name,
+            clos=clos,
+            metrics=metrics,
+            filename=draft.get('filename') or ''
+        )
+
+    metrics = build_ai_suggestions_for_unmapped(metrics, clos, review_summary)
+
+    return render_template(
+        'question_clo_ai.html',
+        course_name=course_name,
+        clos=clos,
+        metrics=metrics,
+        review_summary=review_summary,
+        filename=draft.get('filename') or '',
+        draft_id=draft_id
     )
-    if paper_detected_mappings:
-        detected = dict(metrics.get('detected_clo_mappings') or {})
-        detected.update(paper_detected_mappings)
-        metrics['detected_clo_mappings'] = detected
-    if not metrics.get('question_clo_suggestion_source'):
-        metrics['question_clo_suggestion_source'] = 'local'
+
+@app.route('/question-clo-mapping/save-review', methods=['POST'])
+def question_clo_mapping_save_review():
+    draft_id = (request.form.get('draft_id') or '').strip()
+    try:
+        draft = load_question_mapping_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    course_name = (draft.get('course_name') or '').strip()
+    clos = get_course_clos(course_name)
+    if not clos:
+        flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    metrics, _paper_detected_mappings = build_question_review_metrics_from_form(clos)
+    if not metrics.get('questions'):
+        flash(translate('question_mapping.no_questions'), "error")
+        metrics = draft.get('metrics') or {}
+    else:
+        draft['metrics'] = metrics
+        with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
+            json.dump(draft, f, ensure_ascii=False)
+        flash(translate('question_mapping.review_saved'))
+
+    return render_template(
+        'question_clo_review.html',
+        course_name=course_name,
+        clos=clos,
+        metrics=metrics,
+        review_summary=build_question_review_summary(metrics, clos),
+        filename=draft.get('filename') or '',
+        draft_id=draft_id
+    )
+
+@app.route('/question-clo-mapping/final', methods=['POST'])
+def question_clo_mapping_final():
+    draft_id = (request.form.get('draft_id') or '').strip()
+    try:
+        draft = load_question_mapping_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    course_name = (draft.get('course_name') or '').strip()
+    clos = get_course_clos(course_name)
+    if not clos:
+        flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    metrics = build_question_final_metrics_from_form(clos)
+    if not metrics.get('questions'):
+        flash(translate('question_mapping.no_questions'), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    draft['metrics'] = metrics
+    with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
+        json.dump(draft, f, ensure_ascii=False)
 
     return render_template(
         'question_clo_link.html',
@@ -12216,20 +12578,15 @@ def course_report_service_inputs_multi():
     if not report_ids:
         flash(translate('course_report.select_one_report'), "error")
         return redirect(url_for('course_report_service'))
-    report_payloads = load_selected_report_payloads(report_ids, user['id'])
-    if not report_payloads:
+    records = load_course_report_records(report_ids, user['id'])
+    if not records:
         flash("CLO attainment report not found.", "error")
         return redirect(url_for('course_report_service'))
-    try:
-        return render_course_report_inputs(
-            report_payloads,
-            url_for('export_selected_course_report_docx'),
-            request.form.get('course_name') or ''
-        )
-    except Exception:
-        app.logger.exception("Failed to render course report inputs")
-        flash("Could not open the course report inputs. Please try another report or recreate the CLO attainment report.", "error")
-        return redirect(url_for('course_report_service'))
+    return render_course_report_inputs_from_records(
+        records,
+        url_for('export_selected_course_report_docx'),
+        request.form.get('course_name') or ''
+    )
 
 @app.route('/course-report-service/report/<int:report_id>')
 def course_report_service_inputs(report_id):
@@ -12237,20 +12594,15 @@ def course_report_service_inputs(report_id):
     if not user:
         flash("Please login to create a course report.", "error")
         return redirect(url_for('login'))
-    row, payload = load_saved_report_payload(report_id, user['id'])
-    if not row:
+    records = load_course_report_records([report_id], user['id'])
+    if not records:
         flash("CLO attainment report not found.", "error")
         return redirect(url_for('course_report_service'))
-    try:
-        return render_course_report_inputs(
-            [{'row': row, 'payload': payload}],
-            url_for('export_saved_course_report_docx', report_id=report_id),
-            row_get(row, 'course_name')
-        )
-    except Exception:
-        app.logger.exception("Failed to render course report inputs for saved report %s", report_id)
-        flash("Could not open the course report inputs. Please try another report or recreate the CLO attainment report.", "error")
-        return redirect(url_for('course_report_service'))
+    return render_course_report_inputs_from_records(
+        records,
+        url_for('export_saved_course_report_docx', report_id=report_id),
+        records[0].get('course_name') or ''
+    )
 
 @app.route('/course-report-service/report/<int:report_id>/export', methods=['POST'])
 def export_saved_course_report_docx(report_id):

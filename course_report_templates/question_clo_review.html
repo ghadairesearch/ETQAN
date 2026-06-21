@@ -20,10 +20,38 @@
         flex-wrap: wrap;
     }
 
-    .question-review-counts {
+    .question-review-counts,
+    .question-summary-grid {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.75rem;
         flex-wrap: wrap;
+    }
+
+    .question-summary-grid {
+        margin: 1rem 0 1.25rem;
+    }
+
+    .question-summary-card {
+        flex: 1 1 190px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--bg-card);
+        padding: 0.9rem 1rem;
+    }
+
+    .question-summary-card span {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .question-summary-card strong {
+        display: block;
+        margin-top: 0.25rem;
+        color: var(--text-main);
+        font-size: 1.75rem;
+        line-height: 1;
     }
 
     .question-review-detected {
@@ -52,10 +80,37 @@
         resize: vertical;
     }
 
+    .explicit-clo-pill,
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0.25rem 0.55rem;
+        font-size: 0.82rem;
+        font-weight: 700;
+        margin: 0.12rem;
+        white-space: nowrap;
+    }
+
+    .explicit-clo-pill {
+        background: color-mix(in srgb, var(--accent-primary) 12%, white);
+        color: var(--accent-primary);
+    }
+
+    .status-auto {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-ai {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
     .question-review-toolbar {
         display: flex;
         justify-content: flex-start;
-        margin: 0 0 0.75rem;
+        margin: 1rem 0 0;
     }
 
     @media (max-width: 760px) {
@@ -65,22 +120,39 @@
     }
 </style>
 
-<div class="card" style="max-width: 1100px; margin: 0 auto;">
-    <h2 style="margin-top: 0;">{{ _('question_mapping.review_title') }}</h2>
+<div class="card" style="max-width: 1180px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ _('question_mapping.step2_title') }}</h2>
     <p style="color: var(--text-muted); margin-top: -0.5rem;">
-        {{ _('question_mapping.review_description') }}
+        {{ _('question_mapping.step2_description') }}
     </p>
     <p style="color: var(--text-muted);">
         {{ _('mapping.course') }} <strong>{{ course_name }}</strong><br>
         {{ _('detected.source') }} <strong>{{ filename }}</strong>
     </p>
 
+    {% set question_items = metrics.questions if metrics and metrics.questions else ['Q1'] %}
+    {% set summary = review_summary or {'total': question_items|length, 'auto_mapped': 0, 'needs_ai': question_items|length, 'all_mapped': false, 'explicit_by_question': {}} %}
+    <div class="question-summary-grid">
+        <div class="question-summary-card">
+            <span>{{ _('question_mapping.total_questions') }}</span>
+            <strong id="totalQuestionsCount">{{ summary.total }}</strong>
+        </div>
+        <div class="question-summary-card">
+            <span>{{ _('question_mapping.auto_mapped_questions') }}</span>
+            <strong id="autoMappedCount">{{ summary.auto_mapped }}</strong>
+        </div>
+        <div class="question-summary-card">
+            <span>{{ _('question_mapping.ai_required_questions') }}</span>
+            <strong id="aiRequiredCount">{{ summary.needs_ai }}</strong>
+        </div>
+    </div>
+
+    {% if summary.all_mapped %}
+        <div class="alert" style="margin-bottom: 1rem;">{{ _('question_mapping.all_mapped_success') }}</div>
+    {% endif %}
+
     <form method="POST" action="{{ url_for('question_clo_mapping_map') }}">
         <input type="hidden" name="draft_id" value="{{ draft_id }}">
-        {% set question_items = metrics.questions if metrics and metrics.questions else ['Q1'] %}
-        <div class="question-review-toolbar">
-            <button type="button" id="addQuestionBtn" class="btn" style="background-color: var(--accent-secondary); padding: 0.65rem 1rem;">{{ _('question_mapping.add_question') }}</button>
-        </div>
         <section class="question-review-box">
             <div class="question-review-header">
                 <div>
@@ -94,32 +166,47 @@
             <table id="questionTable" class="question-review-table">
                 <thead>
                     <tr>
-                        <th style="width: 150px;">{{ _('mapping.question') }}</th>
+                        <th style="width: 140px;">{{ _('question_mapping.question_number') }}</th>
                         <th>{{ _('question_mapping.question_text') }}</th>
-                        <th style="width: 320px;">
-                            {{ _('question_mapping.paper_clo') }}
+                        <th style="width: 170px;">{{ _('question_mapping.question_type') }}</th>
+                        <th style="width: 260px;">
+                            {{ _('question_mapping.explicit_clo') }}
                             <small style="display: block; margin-top: 0.25rem; color: rgba(255,255,255,0.86); font-weight: 500;">{{ _('question_mapping.paper_clo_help') }}</small>
                         </th>
+                        <th style="width: 190px;">{{ _('question_mapping.status') }}</th>
                         <th style="width: 70px;"></th>
                     </tr>
                 </thead>
                 <tbody id="questionList">
                     {% for question in question_items %}
-                        {% set detected_clos = resolve_detected_clos_to_course_list(metrics.detected_clo_mappings.get(question, []) if metrics and metrics.detected_clo_mappings else [], clos) %}
+                        {% set q_index = loop.index0 %}
+                        {% set detected_clos = summary.explicit_by_question.get(question, []) %}
                         {% set question_text = metrics.question_texts.get(question, question) if metrics and metrics.question_texts else '' %}
                         {% set question_type = metrics.question_types.get(question, '') if metrics and metrics.question_types else '' %}
                         <tr class="question-edit-row">
                             <td><strong class="question-number">{{ _('mapping.question') }} {{ loop.index }}</strong></td>
                             <td>
                                 <textarea name="question_text" class="form-control" rows="4" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</textarea>
-                                <input type="hidden" name="question_type" value="{{ question_type }}">
                             </td>
                             <td>
-                                <select name="paper_clo_{{ loop.index0 }}" class="form-control paper-clo-select" multiple size="5" style="padding: 0.5rem; background: var(--bg-base);">
-                                    {% for clo in clos %}
-                                        <option value="{{ clo }}" {% if clo in detected_clos %}selected{% endif %}>{{ clo }}</option>
+                                <input type="text" name="question_type" class="form-control" value="{{ question_type }}">
+                            </td>
+                            <td class="explicit-clo-cell">
+                                {% if detected_clos %}
+                                    {% for clo in detected_clos %}
+                                        <span class="explicit-clo-pill">{{ clo.split(' ')[0] }}</span>
+                                        <input type="hidden" class="paper-clo-hidden" name="paper_clo_{{ q_index }}" value="{{ clo }}">
                                     {% endfor %}
-                                </select>
+                                {% else %}
+                                    <span style="color: var(--text-muted);">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="status-cell">
+                                {% if detected_clos %}
+                                    <span class="status-pill status-auto">{{ _('question_mapping.mapped_automatically') }}</span>
+                                {% else %}
+                                    <span class="status-pill status-ai">{{ _('question_mapping.requires_ai_mapping') }}</span>
+                                {% endif %}
                             </td>
                             <td style="text-align: center;">
                                 <button type="button" class="remove-question" style="border: 0; background: transparent; color: var(--danger); font-weight: 700; cursor: pointer;">&times;</button>
@@ -130,8 +217,16 @@
             </table>
         </section>
 
+        <div class="question-review-toolbar">
+            <button type="button" id="addQuestionBtn" class="btn" style="background-color: var(--accent-secondary); padding: 0.65rem 1rem;">{{ _('question_mapping.add_question') }}</button>
+        </div>
         <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap;">
-            <button type="submit" class="btn">{{ _('question_mapping.map_to_clos') }}</button>
+            <button type="submit" class="btn" formaction="{{ url_for('question_clo_mapping_save_review') }}" style="background-color: var(--border-color); color: var(--text-main);">{{ _('question_mapping.save_mapping') }}</button>
+            {% if summary.all_mapped %}
+                <button type="submit" class="btn" formaction="{{ url_for('question_clo_mapping_final') }}">{{ _('question_mapping.final_review') }}</button>
+            {% else %}
+                <button type="submit" class="btn">{{ _('question_mapping.continue_ai_mapping') }}</button>
+            {% endif %}
         </div>
     </form>
 </div>
@@ -141,15 +236,12 @@
         <td><strong class="question-number"></strong></td>
         <td>
             <textarea name="question_text" class="form-control" rows="4"></textarea>
-            <input type="hidden" name="question_type" value="">
         </td>
         <td>
-            <select class="form-control paper-clo-select" multiple size="5" style="padding: 0.5rem; background: var(--bg-base);">
-                {% for clo in clos %}
-                    <option value="{{ clo }}">{{ clo }}</option>
-                {% endfor %}
-            </select>
+            <input type="text" name="question_type" class="form-control" value="">
         </td>
+        <td class="explicit-clo-cell"><span style="color: var(--text-muted);">-</span></td>
+        <td class="status-cell"><span class="status-pill status-ai">{{ _('question_mapping.requires_ai_mapping') }}</span></td>
         <td style="text-align: center;">
             <button type="button" class="remove-question" style="border: 0; background: transparent; color: var(--danger); font-weight: 700; cursor: pointer;">&times;</button>
         </td>
@@ -162,11 +254,15 @@
         const template = document.getElementById('questionTemplate');
         const addButton = document.getElementById('addQuestionBtn');
         const questionCount = document.getElementById('questionCount');
+        const totalQuestionsCount = document.getElementById('totalQuestionsCount');
+        const autoMappedCount = document.getElementById('autoMappedCount');
+        const aiRequiredCount = document.getElementById('aiRequiredCount');
         const questionWord = {{ _('mapping.question')|tojson }};
         const unitOne = {{ count_unit('question', 1)|tojson }};
         const unitTwo = {{ count_unit('question', 2)|tojson }};
         const unitMany = {{ count_unit('question', 3)|tojson }};
         const unitLarge = {{ count_unit('question', 11)|tojson }};
+        const requiresAiHtml = {{ ('<span class="status-pill status-ai">' ~ _('question_mapping.requires_ai_mapping') ~ '</span>')|tojson }};
 
         function applyTextDirection(textarea) {
             if (!textarea) return;
@@ -177,14 +273,20 @@
 
         function renumberQuestions() {
             const rows = list.querySelectorAll('.question-edit-row');
+            let autoMapped = 0;
+            let needsAi = 0;
             rows.forEach(function(row, index) {
                 const label = row.querySelector('.question-number');
                 if (label) {
                     label.textContent = questionWord + ' ' + (index + 1);
                 }
-                const select = row.querySelector('.paper-clo-select');
-                if (select) {
-                    select.name = 'paper_clo_' + index;
+                row.querySelectorAll('.paper-clo-hidden').forEach(function(input) {
+                    input.name = 'paper_clo_' + index;
+                });
+                if (row.querySelector('.status-auto')) {
+                    autoMapped += 1;
+                } else {
+                    needsAi += 1;
                 }
                 applyTextDirection(row.querySelector('textarea'));
             });
@@ -193,6 +295,9 @@
                 const unit = count === 1 ? unitOne : (count === 2 ? unitTwo : (count <= 10 ? unitMany : unitLarge));
                 questionCount.textContent = count + ' ' + unit;
             }
+            if (totalQuestionsCount) totalQuestionsCount.textContent = rows.length;
+            if (autoMappedCount) autoMappedCount.textContent = autoMapped;
+            if (aiRequiredCount) aiRequiredCount.textContent = needsAi;
         }
 
         list.addEventListener('input', function(event) {
@@ -208,12 +313,16 @@
                 const row = event.target.closest('.question-edit-row');
                 const textarea = row.querySelector('textarea');
                 if (textarea) textarea.value = '';
-                const select = row.querySelector('select');
-                if (select) {
-                    Array.from(select.options).forEach(function(option) {
-                        option.selected = false;
-                    });
-                }
+                const typeInput = row.querySelector('input[name="question_type"]');
+                if (typeInput) typeInput.value = '';
+                row.querySelectorAll('.paper-clo-hidden').forEach(function(input) {
+                    input.remove();
+                });
+                const explicitCell = row.querySelector('.explicit-clo-cell');
+                if (explicitCell) explicitCell.innerHTML = '<span style="color: var(--text-muted);">-</span>';
+                const statusCell = row.querySelector('.status-cell');
+                if (statusCell) statusCell.innerHTML = requiresAiHtml;
+                renumberQuestions();
                 return;
             }
             event.target.closest('.question-edit-row').remove();
