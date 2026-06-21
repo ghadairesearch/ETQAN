@@ -326,14 +326,34 @@
                             ? courseTargetPercentages[clo]
                         : 60;
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td style="padding: 0.5rem;">
-                            <textarea name="clo_text_${idx}" class="form-control" rows="2" style="width: 100%; resize: vertical;" required>${clo}</textarea>
-                        </td>
-                        <td style="padding: 0.5rem; vertical-align: top;">
-                            <input type="number" name="target_${idx}" class="form-control" value="${savedTarget}" min="1" max="100" required>
-                        </td>
-                    `;
+                    const cloCell = document.createElement('td');
+                    cloCell.style.padding = '0.5rem';
+                    const cloText = document.createElement('div');
+                    cloText.style.whiteSpace = 'pre-wrap';
+                    cloText.style.lineHeight = '1.45';
+                    cloText.textContent = clo;
+                    const cloInput = document.createElement('input');
+                    cloInput.type = 'hidden';
+                    cloInput.name = `clo_text_${idx}`;
+                    cloInput.value = clo;
+                    cloCell.appendChild(cloText);
+                    cloCell.appendChild(cloInput);
+
+                    const targetCell = document.createElement('td');
+                    targetCell.style.padding = '0.5rem';
+                    targetCell.style.verticalAlign = 'top';
+                    const targetInput = document.createElement('input');
+                    targetInput.type = 'number';
+                    targetInput.name = `target_${idx}`;
+                    targetInput.className = 'form-control';
+                    targetInput.value = savedTarget;
+                    targetInput.min = '1';
+                    targetInput.max = '100';
+                    targetInput.required = true;
+                    targetCell.appendChild(targetInput);
+
+                    tr.appendChild(cloCell);
+                    tr.appendChild(targetCell);
                     
                     if (clo.startsWith('1.')) {
                         tbKnowledge.appendChild(tr);

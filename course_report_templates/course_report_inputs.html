@@ -55,7 +55,6 @@
 
         <div class="form-group" id="uncovered_topics_group" style="display: none;">
             <label class="form-label">{{ _('results.uncovered_topics') }}</label>
-            <p style="color: var(--text-muted); margin: -0.25rem 0 0.75rem; font-size: 0.9rem;">{{ _('results.uncovered_topics_help') }}</p>
             {% if course_topics %}
                 <div style="display: grid; gap: 0.75rem; max-height: 520px; overflow: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.75rem; background: #fff;">
                     {% for topic in course_topics %}
@@ -77,10 +76,13 @@
                                         <option value="Course content overload">{{ _('results.reason_overload') }}</option>
                                         <option value="Equipment unavailability">{{ _('results.reason_equipment') }}</option>
                                         <option value="Topic replaced with a more current topic">{{ _('results.reason_replaced') }}</option>
+                                        <option value="Official holidays/suspension of classes">{{ _('results.reason_holidays') }}</option>
+                                        <option value="Technical/laboratory limitations">{{ _('results.reason_lab_limitations') }}</option>
+                                        <option value="Prerequisite knowledge gap">{{ _('results.reason_prerequisite_gap') }}</option>
                                         <option value="Other">{{ _('results.reason_other') }}</option>
                                     </select>
                                     <div id="uncovered_reason_other_group_{{ topic_index }}" style="display: none; margin-top: 0.5rem;">
-                                        <label class="form-label">{{ _('results.reason_other_explanation') }}</label>
+                                        <label class="form-label">{{ _('results.please_explain') }}</label>
                                         <textarea name="uncovered_reason_other_{{ topic_index }}" class="form-control" rows="2"></textarea>
                                     </div>
                                 </div>
@@ -93,15 +95,13 @@
                                         <option value="High">{{ _('results.impact_high') }}</option>
                                     </select>
                                 </div>
-                                <div class="form-group" style="margin-bottom: 0;">
+                                <div class="form-group" id="uncovered_action_group_{{ topic_index }}" style="display: none; margin-bottom: 0;">
                                     <label class="form-label">{{ _('results.uncovered_action') }}</label>
                                     <select name="uncovered_action_{{ topic_index }}" class="form-control" data-action-select="{{ topic_index }}">
-                                        <option value="Supplementary learning resources provided">{{ _('results.action_supplementary_resources') }}</option>
-                                        <option value="No action required">{{ _('results.action_none_required') }}</option>
-                                        <option value="Other">{{ _('results.action_other') }}</option>
+                                        <option value="">{{ _('results.uncovered_reason_select') }}</option>
                                     </select>
                                     <div id="uncovered_action_other_group_{{ topic_index }}" style="display: none; margin-top: 0.5rem;">
-                                        <label class="form-label">{{ _('results.action_other_explanation') }}</label>
+                                        <label class="form-label">{{ _('results.please_explain') }}</label>
                                         <textarea name="uncovered_action_other_{{ topic_index }}" class="form-control" rows="2"></textarea>
                                     </div>
                                 </div>
@@ -115,9 +115,11 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label">{{ _('results.final_grades_file') }}</label>
+            <label class="form-label" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                <span>{{ _('results.final_grades_file') }}</span>
+                <span title="{{ _('results.final_grades_help') }}" aria-label="{{ _('results.final_grades_help') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: help;">i</span>
+            </label>
             <input type="file" name="final_grades_file" class="form-control" accept=".csv,.xlsx,.xls,.pdf" required style="padding: 0.5rem;">
-            <p style="color: var(--text-muted); margin: 0.45rem 0 0; font-size: 0.9rem;">{{ _('results.final_grades_help') }}</p>
         </div>
 
         <div class="form-group">
@@ -133,8 +135,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for recommendation in course_improvement_recommendations %}
-                            {% set recommendation_index = loop.index0 %}
+                        {% for group in course_improvement_recommendation_groups %}
+                            <tr>
+                                <td style="vertical-align: top; padding: 0.6rem 0.65rem; border-top: 1px solid var(--border-color); background: #f3f4f6; font-weight: 700; color: var(--accent);">
+                                    {{ group.heading }}
+                                </td>
+                                <td style="border-top: 1px solid var(--border-color); background: #f3f4f6;"></td>
+                                <td style="border-top: 1px solid var(--border-color); background: #f3f4f6;"></td>
+                            </tr>
+                            {% for recommendation_item in group.items %}
+                            {% set recommendation = recommendation_item.text %}
+                            {% set recommendation_index = recommendation_item.index %}
                             <tr>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
                                     <label style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; align-items: start;">
@@ -149,7 +160,7 @@
                                         {% endfor %}
                                     </select>
                                     <div id="course_improvement_action_other_group_{{ recommendation_index }}" style="display: none; margin-top: 0.5rem;">
-                                        <label class="form-label">{{ _('results.action_other_explanation') }}</label>
+                                        <label class="form-label">{{ _('results.please_explain') }}</label>
                                         <textarea name="course_improvement_action_other_{{ recommendation_index }}" class="form-control" rows="2"></textarea>
                                     </div>
                                 </td>
@@ -160,12 +171,47 @@
                                         {% endfor %}
                                     </select>
                                     <div id="course_improvement_support_other_group_{{ recommendation_index }}" style="display: none; margin-top: 0.5rem;">
-                                        <label class="form-label">{{ _('results.support_other_explanation') }}</label>
+                                        <label class="form-label">{{ _('results.please_explain') }}</label>
                                         <textarea name="course_improvement_support_other_{{ recommendation_index }}" class="form-control" rows="2"></textarea>
                                     </div>
                                 </td>
                             </tr>
+                            {% endfor %}
                         {% endfor %}
+                        <tr>
+                            <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                                <label style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; align-items: start;">
+                                    <input type="checkbox" name="course_improvement_other_selected" value="1" style="margin-top: 0.2rem;" data-improvement-other-recommendation>
+                                    <span>{{ _('results.reason_other') }}</span>
+                                </label>
+                                <div id="course_improvement_other_recommendation_group" style="display: none; margin-top: 0.5rem;">
+                                    <label class="form-label">{{ _('results.please_explain') }}</label>
+                                    <textarea name="course_improvement_other_recommendation" class="form-control" rows="2"></textarea>
+                                </div>
+                            </td>
+                            <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                                <select name="course_improvement_action_other_recommendation" class="form-control" data-improvement-action-select="other_recommendation">
+                                    {% for action_option in course_improvement_action_options %}
+                                        <option value="{{ action_option }}">{{ action_option }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div id="course_improvement_action_other_group_other_recommendation" style="display: none; margin-top: 0.5rem;">
+                                    <label class="form-label">{{ _('results.please_explain') }}</label>
+                                    <textarea name="course_improvement_action_other_recommendation_text" class="form-control" rows="2"></textarea>
+                                </div>
+                            </td>
+                            <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                                <select name="course_improvement_support_other_recommendation" class="form-control" data-improvement-support-select="other_recommendation">
+                                    {% for support_option in course_improvement_support_options %}
+                                        <option value="{{ support_option }}">{{ support_option }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div id="course_improvement_support_other_group_other_recommendation" style="display: none; margin-top: 0.5rem;">
+                                    <label class="form-label">{{ _('results.please_explain') }}</label>
+                                    <textarea name="course_improvement_support_other_recommendation_text" class="form-control" rows="2"></textarea>
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -176,6 +222,9 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const uncoveredReasonActions = {{ uncovered_reason_actions|tojson }};
+        const actionPlaceholder = {{ _('results.uncovered_action_select')|tojson }};
+        const otherActionLabel = {{ _('results.action_other')|tojson }};
         const group = document.getElementById('uncovered_topics_group');
         const toggles = document.querySelectorAll('[data-topics-toggle]');
         function syncTopicsGroup() {
@@ -195,12 +244,38 @@
             if (group) {
                 group.style.display = select.value === 'Other' ? 'block' : 'none';
             }
+            syncSuggestedActions(select);
         }
         function syncActionOther(select) {
             const group = document.getElementById('uncovered_action_other_group_' + select.getAttribute('data-action-select'));
             if (group) {
                 group.style.display = select.value === 'Other' ? 'block' : 'none';
             }
+        }
+        function appendActionOption(select, value, label) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = label || value;
+            select.appendChild(option);
+        }
+        function syncSuggestedActions(reasonSelect) {
+            const index = reasonSelect.getAttribute('data-reason-select');
+            const actionGroup = document.getElementById('uncovered_action_group_' + index);
+            const actionSelect = document.querySelector('[data-action-select="' + index + '"]');
+            if (!actionGroup || !actionSelect) {
+                return;
+            }
+            actionSelect.innerHTML = '';
+            appendActionOption(actionSelect, '', actionPlaceholder);
+            const actions = uncoveredReasonActions[reasonSelect.value] || [];
+            actions.forEach(function(action) {
+                appendActionOption(actionSelect, action, action === 'Other' ? otherActionLabel : action);
+            });
+            if (reasonSelect.value && actions.indexOf('Other') === -1) {
+                appendActionOption(actionSelect, 'Other', otherActionLabel);
+            }
+            actionGroup.style.display = reasonSelect.value ? 'block' : 'none';
+            syncActionOther(actionSelect);
         }
         function syncImprovementActionOther(select) {
             const group = document.getElementById('course_improvement_action_other_group_' + select.getAttribute('data-improvement-action-select'));
@@ -212,6 +287,12 @@
             const group = document.getElementById('course_improvement_support_other_group_' + select.getAttribute('data-improvement-support-select'));
             if (group) {
                 group.style.display = select.value === 'Other' ? 'block' : 'none';
+            }
+        }
+        function syncImprovementOtherRecommendation(toggle) {
+            const group = document.getElementById('course_improvement_other_recommendation_group');
+            if (group) {
+                group.style.display = toggle.checked ? 'block' : 'none';
             }
         }
         toggles.forEach(function(toggle) {
@@ -246,6 +327,12 @@
                 syncImprovementSupportOther(select);
             });
             syncImprovementSupportOther(select);
+        });
+        document.querySelectorAll('[data-improvement-other-recommendation]').forEach(function(toggle) {
+            toggle.addEventListener('change', function() {
+                syncImprovementOtherRecommendation(toggle);
+            });
+            syncImprovementOtherRecommendation(toggle);
         });
         syncTopicsGroup();
     });

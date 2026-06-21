@@ -102,7 +102,9 @@ LOGIN_IP_FAILURE_LIMIT = 20
 LOGIN_DISTINCT_EMAIL_LIMIT = 10
 LOGIN_LOCK_MINUTES = 15
 LOGIN_ESCALATED_LOCK_MINUTES = 60
-COURSE_REPORT_TEMPLATE_PATH = os.path.join(APP_BASE_DIR, 'course_report_templates', 'TP-154 Course Report - Eng.docx')
+COURSE_REPORT_TEMPLATE_PATH_EN = os.path.join(APP_BASE_DIR, 'course_report_templates', 'Course Report Template EN.docx')
+COURSE_REPORT_TEMPLATE_PATH_AR = os.path.join(APP_BASE_DIR, 'course_report_templates', 'Course Report Template AR.docx')
+COURSE_REPORT_TEMPLATE_PATH = COURSE_REPORT_TEMPLATE_PATH_EN
 COURSE_IMPROVEMENT_RECOMMENDATIONS = [
     'Improve student performance in CLOs',
     'Enhance practical/laboratory activities',
@@ -117,6 +119,46 @@ COURSE_IMPROVEMENT_RECOMMENDATIONS = [
     'Improve alignment between CLOs and assessments',
     'Increase use of real-world case studies',
     'Reduce content overload',
+]
+COURSE_IMPROVEMENT_RECOMMENDATION_GROUPS = [
+    {
+        'heading': 'CLO Attainment and Assessment',
+        'items': [
+            'Improve student performance in CLOs',
+            'Improve assessment methods',
+            'Improve alignment between CLOs and assessments',
+        ],
+    },
+    {
+        'heading': 'Teaching and Learning Strategies',
+        'items': [
+            'Increase project-based learning',
+            'Increase use of real-world case studies',
+        ],
+    },
+    {
+        'heading': 'Practical and Applied Learning',
+        'items': [
+            'Enhance practical/laboratory activities',
+            'Strengthen industry alignment',
+        ],
+    },
+    {
+        'heading': 'Course Content and Prerequisites',
+        'items': [
+            'Update course content',
+            'Improve prerequisite knowledge',
+            'Reduce content overload',
+        ],
+    },
+    {
+        'heading': 'Learning Resources and Skills',
+        'items': [
+            'Improve course materials and resources',
+            'Enhance critical thinking skills',
+            'Enhance teamwork and communication skills',
+        ],
+    },
 ]
 COURSE_IMPROVEMENT_SUPPORT_OPTIONS = [
     'Curriculum committee approval',
@@ -137,6 +179,80 @@ COURSE_IMPROVEMENT_ACTION_OPTIONS = [
     'Monitor implementation in the next offering',
     'Other',
 ]
+UNCOVERED_TOPIC_REASON_ACTIONS = {
+    'Time constraints': [
+        'Provide supplementary learning materials.',
+        'Share recorded lectures or demonstrations.',
+        'Cover essential concepts through assignments or projects.',
+        'Schedule additional review/support sessions.',
+        'Revise topic sequencing in future offerings.',
+    ],
+    'Student absence / low attendance': [
+        'Share lecture recordings and learning resources.',
+        'Provide make-up activities or assignments.',
+        'Offer office hours or support sessions.',
+        'Implement attendance improvement measures in future offerings.',
+    ],
+    'Topic covered in another course': [
+        'Coordinate with the related course instructor.',
+        'Recommend redistribution of content across courses.',
+    ],
+    'Course content overload': [
+        'Prioritize content directly linked to CLOs.',
+        'Move lower-priority content to self-study activities.',
+        'Provide supplementary reading materials.',
+        'Recommend redistribution of content across courses.',
+    ],
+    'Equipment unavailability': [
+        'Use simulations or virtual laboratories.',
+        'Provide instructor demonstrations.',
+        'Use alternative equipment where available.',
+        'Share recorded practical sessions.',
+        'Schedule the activity when resources become available.',
+    ],
+    'Topic replaced with a more current topic': [
+        'Verify alignment with CLOs.',
+        'Update course materials and references.',
+        'Propose formal curriculum updates if the change is permanent.',
+    ],
+    'Official holidays/suspension of classes': [
+        'Provide asynchronous learning materials.',
+        'Share recorded lectures.',
+        'Conduct make-up sessions if feasible.',
+        'Assign guided self-study activities.',
+        'Adjust future course schedules to account for lost teaching time.',
+    ],
+    'Technical/laboratory limitations': [
+        'Use virtual labs or software simulations.',
+        'Replace practical work with equivalent activities.',
+        'Provide recorded demonstrations.',
+        'Address infrastructure issues before the next offering.',
+    ],
+    'Prerequisite knowledge gap': [
+        'Deliver remedial sessions.',
+        'Provide prerequisite learning resources.',
+        'Offer additional tutorials or workshops.',
+        'Increase formative assessments to monitor readiness.',
+        'Review prerequisite requirements and course sequencing.',
+    ],
+    'Other': [
+        'Other',
+    ],
+}
+
+def grouped_course_improvement_recommendations():
+    groups = []
+    for group in COURSE_IMPROVEMENT_RECOMMENDATION_GROUPS:
+        items = []
+        for recommendation in group['items']:
+            if recommendation in COURSE_IMPROVEMENT_RECOMMENDATIONS:
+                items.append({
+                    'text': recommendation,
+                    'index': COURSE_IMPROVEMENT_RECOMMENDATIONS.index(recommendation),
+                })
+        if items:
+            groups.append({'heading': group['heading'], 'items': items})
+    return groups
 UNIVERSITY_IDENTITY_PATH = os.path.join(APP_BASE_DIR, 'university_identity.json')
 UNIVERSITY_LOGO_FOLDER = os.path.join(APP_BASE_DIR, 'public', 'university_logos')
 ORG_LOGO_FOLDER = os.environ.get('ORG_LOGO_FOLDER') or os.path.join(UPLOAD_FOLDER, 'organization_logos')
@@ -489,7 +605,7 @@ EN_TRANSLATIONS = {
     'index.course': 'Course',
     'index.select_course': 'Select a course...',
     'index.course_not_found': 'Course not found?',
-    'index.course_not_found_my_courses': 'Course not found? Add it through My Courses.',
+    'index.course_not_found_my_courses': 'Course not found? Add it through Add Course service.',
     'index.course_spec_title': 'Upload course specification PDF',
     'index.inline_course_title': 'Add Course Information',
     'index.inline_course_help': 'If the course is not in the list, enter its name and upload a course specification PDF or paste the CLOs below.',
@@ -590,14 +706,19 @@ EN_TRANSLATIONS = {
     'results.reason_overload': 'Course content overload',
     'results.reason_equipment': 'Equipment unavailability',
     'results.reason_replaced': 'Topic replaced with a more current topic',
+    'results.reason_holidays': 'Official holidays/suspension of classes',
+    'results.reason_lab_limitations': 'Technical/laboratory limitations',
+    'results.reason_prerequisite_gap': 'Prerequisite knowledge gap',
     'results.reason_other': 'Other',
     'results.reason_other_explanation': 'Other explanation',
+    'results.please_explain': 'Please explain',
     'results.uncovered_impact': 'Extent of their Impact on Learning Outcomes',
     'results.impact_none': 'None',
     'results.impact_low': 'Low',
     'results.impact_medium': 'Medium',
     'results.impact_high': 'High',
     'results.uncovered_action': 'Compensating Action',
+    'results.uncovered_action_select': 'Select an action',
     'results.action_supplementary_resources': 'Supplementary learning resources provided',
     'results.action_none_required': 'No action required',
     'results.action_other': 'Other',
@@ -986,7 +1107,7 @@ TRANSLATIONS = {
         'index.course': 'المقرر',
         'index.select_course': 'اختر مقرراً...',
         'index.course_not_found': 'المقرر غير موجود؟',
-        'index.course_not_found_my_courses': 'المقرر غير موجود؟ أضفه من خلال مقرراتي.',
+        'index.course_not_found_my_courses': 'المقرر غير موجود؟ أضفه من خلال خدمة إضافة مقرر.',
         'index.course_spec_title': 'رفع توصيف المقرر PDF',
         'index.inline_course_title': 'إضافة معلومات المقرر',
         'index.inline_course_help': 'إذا لم يكن المقرر موجوداً في القائمة، أدخل اسمه وارفع توصيف المقرر PDF أو الصق نواتج التعلم أدناه.',
@@ -1087,14 +1208,19 @@ TRANSLATIONS = {
         'results.reason_overload': '\u0643\u062b\u0627\u0641\u0629 \u0645\u062d\u062a\u0648\u0649 \u0627\u0644\u0645\u0642\u0631\u0631',
         'results.reason_equipment': '\u0639\u062f\u0645 \u062a\u0648\u0641\u0631 \u0627\u0644\u0623\u062c\u0647\u0632\u0629',
         'results.reason_replaced': '\u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u0627\u0644\u0645\u0648\u0636\u0648\u0639 \u0628\u0645\u0648\u0636\u0648\u0639 \u0623\u062d\u062f\u062b',
+        'results.reason_holidays': '\u0627\u0644\u0625\u062c\u0627\u0632\u0627\u062a \u0627\u0644\u0631\u0633\u0645\u064a\u0629 / \u062a\u0639\u0644\u064a\u0642 \u0627\u0644\u062f\u0631\u0627\u0633\u0629',
+        'results.reason_lab_limitations': '\u0642\u064a\u0648\u062f \u062a\u0642\u0646\u064a\u0629 \u0623\u0648 \u0645\u0639\u0645\u0644\u064a\u0629',
+        'results.reason_prerequisite_gap': '\u0641\u062c\u0648\u0629 \u0641\u064a \u0627\u0644\u0645\u0639\u0631\u0641\u0629 \u0627\u0644\u0633\u0627\u0628\u0642\u0629',
         'results.reason_other': '\u0623\u062e\u0631\u0649',
         'results.reason_other_explanation': '\u062a\u0648\u0636\u064a\u062d \u0623\u062e\u0631\u0649',
+        'results.please_explain': '\u064a\u0631\u062c\u0649 \u0627\u0644\u062a\u0648\u0636\u064a\u062d',
         'results.uncovered_impact': '\u0645\u062f\u0649 \u0627\u0644\u0623\u062b\u0631 \u0639\u0644\u0649 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645',
         'results.impact_none': '\u0644\u0627 \u064a\u0648\u062c\u062f',
         'results.impact_low': '\u0645\u0646\u062e\u0641\u0636',
         'results.impact_medium': '\u0645\u062a\u0648\u0633\u0637',
         'results.impact_high': '\u0639\u0627\u0644\u064a',
         'results.uncovered_action': '\u0627\u0644\u0625\u062c\u0631\u0627\u0621 \u0627\u0644\u062a\u0639\u0648\u064a\u0636\u064a',
+        'results.uncovered_action_select': '\u062d\u062f\u062f \u0627\u0644\u0625\u062c\u0631\u0627\u0621',
         'results.action_supplementary_resources': '\u062a\u0642\u062f\u064a\u0645 \u0645\u0635\u0627\u062f\u0631 \u062a\u0639\u0644\u0645 \u0625\u0636\u0627\u0641\u064a\u0629',
         'results.action_none_required': '\u0644\u0627 \u064a\u0648\u062c\u062f \u0625\u062c\u0631\u0627\u0621 \u0645\u0637\u0644\u0648\u0628',
         'results.action_other': '\u0623\u062e\u0631\u0649',
@@ -1873,7 +1999,8 @@ def inject_global_template_data():
         'language': language,
         'page_dir': 'rtl' if language == 'ar' else 'ltr',
         '_': translate,
-        'count_unit': count_unit
+        'count_unit': count_unit,
+        'display_student_id': display_student_id
     }
 
 def is_valid_hex_color(value):
@@ -8036,6 +8163,7 @@ def get_report_pdf_font_paths():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     regular_candidates = [
         os.environ.get('REPORT_PDF_FONT_REGULAR'),
+        os.path.join(base_dir, 'public', 'fonts', 'RB.ttf'),
         os.path.join(base_dir, 'fonts', 'NotoNaskhArabic-Regular.ttf'),
         os.path.join(base_dir, 'fonts', 'NotoSansArabic-Regular.ttf'),
         os.path.join(base_dir, 'fonts', 'DejaVuSans.ttf'),
@@ -8047,6 +8175,8 @@ def get_report_pdf_font_paths():
     ]
     bold_candidates = [
         os.environ.get('REPORT_PDF_FONT_BOLD'),
+        os.path.join(base_dir, 'public', 'fonts', 'RBTitle.ttf'),
+        os.path.join(base_dir, 'public', 'fonts', 'RB.ttf'),
         os.path.join(base_dir, 'fonts', 'NotoNaskhArabic-Bold.ttf'),
         os.path.join(base_dir, 'fonts', 'NotoSansArabic-Bold.ttf'),
         os.path.join(base_dir, 'fonts', 'DejaVuSans-Bold.ttf'),
@@ -8365,7 +8495,7 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
                 if cell:
                     status = labels.get('student_achieved_status', labels.get('achieved_status', labels['achieved'])) if cell.get('achieved') else labels.get('student_not_achieved_status', labels['not_achieved'])
                     status = str(status).replace(' ', '\u00a0')
-                    row.append(paragraph(f"{cell.get('score', 0):.2f}<br/>{status}", student_table_text))
+                    row.append(paragraph(f"{cell.get('score', 0):.2f}\n{status}", student_table_text))
                 else:
                     row.append(paragraph("-", student_table_text))
             student_rows.append(row)
@@ -8923,6 +9053,26 @@ def read_course_improvement_plan():
             'actions_needed': action,
             'support': support,
         })
+    if request.form.get('course_improvement_other_selected'):
+        recommendation = compact_text(request.form.get('course_improvement_other_recommendation') or '')
+        if recommendation:
+            action = compact_text(request.form.get('course_improvement_action_other_recommendation') or '')
+            if action not in allowed_action:
+                action = ''
+            other_action = compact_text(request.form.get('course_improvement_action_other_recommendation_text') or '')
+            if action == 'Other' and other_action:
+                action = f"Other: {other_action}"
+            support = compact_text(request.form.get('course_improvement_support_other_recommendation') or '')
+            if support not in allowed_support:
+                support = ''
+            other_support = compact_text(request.form.get('course_improvement_support_other_recommendation_text') or '')
+            if support == 'Other' and other_support:
+                support = f"Other: {other_support}"
+            items.append({
+                'recommendation': recommendation,
+                'actions_needed': action,
+                'support': support,
+            })
     return items
 
 WORD_W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
@@ -9285,15 +9435,22 @@ def find_body_child_index(body, needle, start=0):
 
 def replace_next_table_after_heading(body, heading_text, table_element):
     children = list(body)
-    heading_index = find_body_child_index(body, heading_text)
+    heading_options = list(heading_text) if isinstance(heading_text, (list, tuple)) else [heading_text]
+    heading_index = None
+    matched_heading = heading_options[0] if heading_options else ''
+    for heading_option in heading_options:
+        heading_index = find_body_child_index(body, heading_option)
+        if heading_index is not None:
+            matched_heading = heading_option
+            break
     if heading_index is None:
-        raise ValueError(f"Could not find '{heading_text}' in the Word template.")
+        raise ValueError(f"Could not find '{matched_heading}' in the Word template.")
     for index in range(heading_index + 1, len(children)):
         if children[index].tag.split('}')[-1] == 'tbl':
             body.remove(children[index])
             body.insert(index, table_element)
             return
-    raise ValueError(f"Could not find a table after '{heading_text}' in the Word template.")
+    raise ValueError(f"Could not find a table after '{matched_heading}' in the Word template.")
 
 def course_report_template_replacements(course_info=None, course_report_inputs=None, total_students=None):
     course_info = course_info or {}
@@ -9334,24 +9491,24 @@ def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, co
             grade_distribution = (course_report_inputs or {}).get('grade_distribution') or {}
             replace_next_table_after_heading(
                 body,
-                '1. Grade Distribution',
+                ['1. Grade Distribution', '1. توزيع التقديرات'],
                 build_template_grade_distribution_word_table(grade_distribution)
             )
             replace_next_table_after_heading(
                 body,
-                '1. Course Learning Outcomes Assessment Results',
+                ['1. Course Learning Outcomes Assessment Results', '1. قياس نواتج التعلم للمقرر'],
                 build_clo_assessment_word_table(stats, course_info)
             )
             uncovered_details = (course_report_inputs or {}).get('uncovered_topic_details') or []
             replace_next_table_after_heading(
                 body,
-                'C. Topics not covered.',
+                ['C. Topics not covered.', 'ج. الموضوعات التي لم يتم تغطيتها'],
                 build_uncovered_topics_word_table(uncovered_details)
             )
             improvement_items = (course_report_inputs or {}).get('course_improvement_plan') or []
             replace_next_table_after_heading(
                 body,
-                'D. Course Improvement Plan',
+                ['D. Course Improvement Plan', 'F. Course Improvement Plan', 'F. Course Improvement Plan (if any)', 'خطة تحسين المقرر', 'خطط التحسين'],
                 build_course_improvement_plan_word_table(improvement_items)
             )
             updated_document_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
@@ -9408,8 +9565,9 @@ def build_generated_course_report_docx(stats, course_report_inputs=None, course_
     return output.getvalue()
 
 def build_course_report_docx(stats, course_report_inputs=None, course_info=None, total_students=None):
-    if os.path.exists(COURSE_REPORT_TEMPLATE_PATH):
-        with open(COURSE_REPORT_TEMPLATE_PATH, 'rb') as template_file:
+    template_path = COURSE_REPORT_TEMPLATE_PATH_AR if get_export_report_language() == 'ar' else COURSE_REPORT_TEMPLATE_PATH_EN
+    if os.path.exists(template_path):
+        with open(template_path, 'rb') as template_file:
             return fill_course_report_docx(
                 template_file.read(),
                 stats,
@@ -11602,8 +11760,10 @@ def render_course_report_inputs(report_payloads, export_action, selected_course_
         course_info=course_info,
         course_topics=get_course_topics(raw_course_name),
         course_improvement_recommendations=COURSE_IMPROVEMENT_RECOMMENDATIONS,
+        course_improvement_recommendation_groups=grouped_course_improvement_recommendations(),
         course_improvement_action_options=COURSE_IMPROVEMENT_ACTION_OPTIONS,
         course_improvement_support_options=COURSE_IMPROVEMENT_SUPPORT_OPTIONS,
+        uncovered_reason_actions=UNCOVERED_TOPIC_REASON_ACTIONS,
         total_students=total_students,
         stats_items=sorted_clo_items(combined_stats)
     )
