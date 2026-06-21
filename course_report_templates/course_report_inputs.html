@@ -151,7 +151,7 @@
                                 <td style="border-top: 1px solid var(--border-color); background: #f3f4f6;"></td>
                                 <td style="border-top: 1px solid var(--border-color); background: #f3f4f6;"></td>
                             </tr>
-                            {% for recommendation_item in group.items %}
+                            {% for recommendation_item in group['items'] %}
                             {% set recommendation = recommendation_item.text %}
                             {% set recommendation_index = recommendation_item.index %}
                             <tr>
