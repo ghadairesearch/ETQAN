@@ -34,17 +34,17 @@
 
     .service-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-        padding: 1.25rem;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.85rem;
+        padding: 1rem;
     }
 
     .service-card {
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        padding: 1.4rem;
+        padding: 1rem;
         background: var(--bg-card);
-        min-height: 190px;
+        min-height: 132px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -84,12 +84,14 @@
         margin: 0 0 0.65rem;
         font-family: var(--brand-font);
         color: var(--accent);
-        font-size: 1.35rem;
+        font-size: 1.05rem;
     }
 
     .service-card p {
         color: var(--text-muted);
         margin: 0;
+        font-size: 0.92rem;
+        line-height: 1.45;
     }
 
     .service-card-note {

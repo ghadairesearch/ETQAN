@@ -556,6 +556,9 @@ EN_TRANSLATIONS = {
     'detected.suggestion_source': 'Suggestion source:',
     'detected.source_gemini': 'Gemini Flash',
     'detected.source_local': 'Local semantic matching',
+    'detected.mapping_used_gemini': 'Question-CLO mapping used Gemini Flash.',
+    'detected.mapping_used_local': 'Question-CLO mapping used local semantic matching.',
+    'detected.question_text': 'Question text',
     'results.title': 'CLO Attainment Report',
     'results.course': 'Course:',
     'results.total_students': 'Total Students Evaluated:',
@@ -1040,6 +1043,9 @@ TRANSLATIONS = {
         'detected.suggestion_source': 'مصدر الاقتراح:',
         'detected.source_gemini': 'Gemini Flash',
         'detected.source_local': 'المطابقة الدلالية المحلية',
+        'detected.mapping_used_gemini': 'تم ربط الأسئلة بالمخرجات باستخدام Gemini Flash.',
+        'detected.mapping_used_local': 'تم ربط الأسئلة بالمخرجات باستخدام المطابقة الدلالية المحلية.',
+        'detected.question_text': 'نص السؤال',
         'results.title': 'تقرير تحقق نواتج التعلم',
         'results.course': 'المقرر:',
         'results.total_students': 'إجمالي الطلاب:',
@@ -1299,10 +1305,12 @@ PDF_REPORT_LABELS = {
         'target': 'Target',
         'achieved': 'No of Students Achieved',
         'achieved_status': 'Achieved',
+        'student_achieved_status': 'Met',
         'achievement': 'Achievement',
         'student_achievement': 'Student CLO Achievement',
         'student_id': 'Student ID',
         'not_achieved': 'Not Achieved',
+        'student_not_achieved_status': 'Not met',
         'na': 'N/A',
     },
     'ar': {
@@ -1324,10 +1332,12 @@ PDF_REPORT_LABELS = {
         'target': 'المستوى المستهدف',
         'achieved': 'عدد الطلاب المحققين',
         'achieved_status': 'محقق',
+        'student_achieved_status': 'محقق',
         'achievement': 'نسبة التحقق',
         'student_achievement': 'تحقق نواتج التعلم لكل طالب',
         'student_id': 'معرّف الطالب',
         'not_achieved': 'غير محقق',
+        'student_not_achieved_status': 'غير محقق',
         'na': 'غير متوفر',
     }
 }
@@ -4895,8 +4905,7 @@ def parse_exam_paper_with_module(filepath):
             if q.get('marks', 1.0) != 1.0:
                 full_text += f"\nMarks: {q['marks']}"
                 
-            # Truncate for cookie size
-            question_texts[q_id] = full_text[:120] + ('...' if len(full_text) > 120 else '')
+            question_texts[q_id] = full_text[:900] + ('...' if len(full_text) > 900 else '')
             tags = detect_clo_tags_from_text(q['question_text'])
             if tags:
                 detected_clo_mappings[q_id] = tags
@@ -8291,7 +8300,7 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
             for clo in all_clos:
                 cell = student_achievement_matrix['cells'].get(student_id, {}).get(clo)
                 if cell:
-                    status = labels.get('achieved_status', labels['achieved']) if cell.get('achieved') else labels['not_achieved']
+                    status = labels.get('student_achieved_status', labels.get('achieved_status', labels['achieved'])) if cell.get('achieved') else labels.get('student_not_achieved_status', labels['not_achieved'])
                     status = str(status).replace(' ', '\u00a0')
                     row.append(paragraph(f"{cell.get('score', 0):.2f}<br/>{status}", student_table_text))
                 else:
@@ -9376,6 +9385,7 @@ def course_report_docx_response(docx_bytes):
 
 def build_results_pdf_legacy(stats, total_students, course_info, student_achievement_rows=None, branding=None):
     branding = apply_university_identity_colors(branding or get_report_branding())
+    labels = pdf_report_labels(get_export_report_language())
     logo_path = resolve_branding_logo_path(branding, report_ready=True, legacy_pdf=True)
     primary_color = branding.get('primary_color') or '#26365f'
     secondary_color = branding.get('secondary_color') or primary_color
@@ -9546,7 +9556,7 @@ def build_results_pdf_legacy(stats, total_students, course_info, student_achieve
                 for clo, width in zip(clo_chunk, col_widths[1:]):
                     cell = student_achievement_matrix['cells'].get(student_id, {}).get(clo)
                     if cell:
-                        status = labels.get('achieved_status', 'Achieved') if cell.get('achieved') else labels.get('not_achieved', 'Not Achieved')
+                        status = labels.get('student_achieved_status', labels.get('achieved_status', 'Achieved')) if cell.get('achieved') else labels.get('student_not_achieved_status', labels.get('not_achieved', 'Not Achieved'))
                         pdf_text(current_parts, cell_x + 5, row_y + 19, f"{cell.get('score', 0):.2f}", 7.5, "F1")
                         pdf_text(current_parts, cell_x + 5, row_y + 8, status, 6.8, "F1")
                     else:
@@ -11381,6 +11391,8 @@ def question_clo_mapping_service():
                 clos,
                 only_unmapped=metrics.get('question_clo_suggestion_source') == 'gemini'
             )
+            if not metrics.get('question_clo_suggestion_source'):
+                metrics['question_clo_suggestion_source'] = 'local'
         except Exception as e:
             flash(f"Error reading exam paper: {e}", "error")
             return redirect(request.url)

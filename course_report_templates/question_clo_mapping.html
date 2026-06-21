@@ -17,9 +17,8 @@
                         <option value="{{ course.name }}">{{ (course.display_label_ar if language == 'ar' else course.display_label_en) or course.display_label or course.name }}</option>
                     {% endfor %}
                 </select>
-                <a href="/account/courses" style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--accent); font-weight: 700; text-decoration: none; padding: 0.7rem 0;">
+                <a href="/account/courses" title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 2.45rem; height: 2.45rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; text-decoration: none; font-size: 1.2rem; align-self: center; flex-shrink: 0;">
                     <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; border: 1px solid currentColor; font-size: 0.85rem;">i</span>
-                    <span>{{ _('index.course_not_found_my_courses') }}</span>
                 </a>
             </div>
         </div>

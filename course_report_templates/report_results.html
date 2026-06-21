@@ -77,6 +77,60 @@
         background: #f3f4f6;
         color: var(--accent);
     }
+
+    .student-achievement-scroll {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+    }
+
+    .student-achievement-table {
+        min-width: max-content;
+        width: max-content;
+        margin: 0;
+    }
+
+    .student-achievement-table th,
+    .student-achievement-table td {
+        min-width: 118px;
+        max-width: 132px;
+        text-align: center;
+        white-space: nowrap;
+        padding: 0.75rem 0.55rem;
+    }
+
+    .student-achievement-table th:first-child,
+    .student-achievement-table td:first-child {
+        min-width: 145px;
+        max-width: 165px;
+        text-align: start;
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: var(--bg-card);
+    }
+
+    [dir="rtl"] .student-achievement-table th:first-child,
+    [dir="rtl"] .student-achievement-table td:first-child {
+        left: auto;
+        right: 0;
+    }
+
+    .student-achievement-table thead th:first-child {
+        background: #f3f4f6;
+        z-index: 3;
+    }
+
+    .student-achievement-table .badge {
+        display: inline-block;
+        max-width: 100%;
+        white-space: nowrap;
+        font-size: 0.8rem;
+        padding: 0.22rem 0.55rem;
+    }
 </style>
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -215,38 +269,40 @@
 
     {% if student_achievement_matrix and student_achievement_matrix.students %}
     <h3 style="margin-top: 2rem;">{{ _('results.student_achievement') }}</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>{{ _('results.student_id') }}</th>
-                {% for clo in student_achievement_matrix.clos %}
-                    <th>{{ clo_number(clo) }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for student_id in student_achievement_matrix.students %}
-            <tr>
-                <td>{{ display_student_id(student_id) }}</td>
-                {% for clo in student_achievement_matrix.clos %}
-                    {% set cell = student_achievement_matrix.cells.get(student_id, {}).get(clo) %}
-                    <td>
-                    {% if cell %}
-                        <div>{{ "%.2f"|format(cell.score) }}</div>
-                        {% if cell.achieved %}
-                            <span class="badge" style="background-color: rgba(16, 185, 129, 0.2); color: #34d399;">{{ _('results.achieved') }}</span>
+    <div class="student-achievement-scroll">
+        <table class="student-achievement-table">
+            <thead>
+                <tr>
+                    <th>{{ _('results.student_id') }}</th>
+                    {% for clo in student_achievement_matrix.clos %}
+                        <th>{{ clo_number(clo) }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for student_id in student_achievement_matrix.students %}
+                <tr>
+                    <td>{{ display_student_id(student_id) }}</td>
+                    {% for clo in student_achievement_matrix.clos %}
+                        {% set cell = student_achievement_matrix.cells.get(student_id, {}).get(clo) %}
+                        <td>
+                        {% if cell %}
+                            <div>{{ "%.2f"|format(cell.score) }}</div>
+                            {% if cell.achieved %}
+                                <span class="badge" style="background-color: rgba(16, 185, 129, 0.2); color: #34d399;">{% if language == 'ar' %}{{ _('results.achieved') }}{% else %}Met{% endif %}</span>
+                            {% else %}
+                                <span class="badge" style="background-color: rgba(239, 68, 68, 0.2); color: #f87171;">{% if language == 'ar' %}{{ _('results.not_achieved') }}{% else %}Not met{% endif %}</span>
+                            {% endif %}
                         {% else %}
-                            <span class="badge" style="background-color: rgba(239, 68, 68, 0.2); color: #f87171;">{{ _('results.not_achieved') }}</span>
+                            <span style="color: var(--text-muted);">-</span>
                         {% endif %}
-                    {% else %}
-                        <span style="color: var(--text-muted);">-</span>
-                    {% endif %}
-                    </td>
+                        </td>
+                    {% endfor %}
+                </tr>
                 {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
     {% endif %}
 
     {% if saved_report_view %}
