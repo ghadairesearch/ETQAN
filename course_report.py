@@ -307,6 +307,16 @@ EN_TRANSLATIONS = {
     'home.requires_course': 'Requires at least one course.',
     'home.question_mapping_title': 'Question CLO Mapping',
     'home.question_mapping_description': 'Upload an exam paper and map each question to the related CLOs before using the mapping in reports.',
+    'home.question_mapping_extract': 'Extract Questions',
+    'question_mapping.review_title': 'Review Extracted Questions',
+    'question_mapping.review_description': 'Edit the extracted questions, add missing questions if needed, then map them to CLOs.',
+    'question_mapping.add_question': 'Add Question',
+    'question_mapping.map_to_clos': 'Map to CLOs',
+    'question_mapping.question_text': 'Question text',
+    'question_mapping.link_title': 'Map Questions to CLOs',
+    'question_mapping.link_description': 'Review each question number and the related CLO suggested by ETQAN.',
+    'question_mapping.related_clo': 'Related CLO',
+    'question_mapping.no_questions': 'No questions were extracted. Add at least one question before mapping.',
     'home.assessment_balance_title': 'Assessment Balance Check',
     'home.assessment_balance_description': 'Review assessment coverage, score distribution, and balance across learning outcomes before reporting.',
     'home.plo_title': 'PLO Attainment Analysis',
@@ -793,7 +803,17 @@ TRANSLATIONS = {
         'home.add_course_description': 'أضف مقرراً لتتمكن من إنشاء التقارير.',
         'home.requires_course': 'يتطلب إضافة مقرر واحد على الأقل.',
         'home.question_mapping_title': 'ربط أسئلة الاختبار بالمخرجات',
-        'home.question_mapping_description': 'ارفع ورقة الاختبار واربط كل سؤال بنواتج تعلم المقرر قبل استخدام الربط في التقارير.',
+        'home.question_mapping_description': 'ارفع ورقة الاختبار لربط الأسئلة بنواتج تعلم المقرر.',
+        'home.question_mapping_extract': 'استخراج الأسئلة',
+        'question_mapping.review_title': 'مراجعة الأسئلة المستخرجة',
+        'question_mapping.review_description': 'عدّل الأسئلة المستخرجة، وأضف أي سؤال ناقص عند الحاجة، ثم اربطها بنواتج التعلم.',
+        'question_mapping.add_question': 'إضافة سؤال',
+        'question_mapping.map_to_clos': 'ربط بالمخرجات',
+        'question_mapping.question_text': 'نص السؤال',
+        'question_mapping.link_title': 'ربط الأسئلة بالمخرجات',
+        'question_mapping.link_description': 'راجع رقم كل سؤال وناتج التعلم المرتبط الذي يقترحه إتقان.',
+        'question_mapping.related_clo': 'المخرج المرتبط',
+        'question_mapping.no_questions': 'لم يتم استخراج أي أسئلة. أضف سؤالًا واحدًا على الأقل قبل الربط.',
         'home.assessment_balance_title': 'فحص توازن التقييم',
         'home.assessment_balance_description': 'راجع تغطية التقييم وتوزيع الدرجات وتوازنها عبر نواتج التعلم قبل إعداد التقرير.',
         'home.plo_title': 'تحليل تحقق مخرجات تعلم البرنامج',
@@ -1283,7 +1303,7 @@ def get_export_report_language(user=None):
         setting = str(user['report_language'] or '').strip()
     if setting in {'en', 'ar'}:
         return setting
-    return get_language() if has_request_context() else 'en'
+    return 'en'
 
 PDF_REPORT_LABELS = {
     'en': {
@@ -4928,6 +4948,49 @@ def infer_exam_paper_metrics(text):
     # Deprecated fallback
     return {'questions': [], 'total_questions': 0, 'confidence': 'Low', 'question_texts': {}, 'detected_clo_mappings': {}}
 
+def question_mapping_draft_path(draft_id):
+    safe_id = re.sub(r'[^A-Za-z0-9_-]', '', str(draft_id or ''))
+    if not safe_id:
+        raise ValueError("Invalid question mapping draft.")
+    return get_upload_path(f"question_mapping_{safe_id}.json")
+
+def save_question_mapping_draft(payload):
+    draft_id = str(uuid.uuid4())
+    with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
+        json.dump(payload, f, ensure_ascii=False)
+    return draft_id
+
+def load_question_mapping_draft(draft_id):
+    path = question_mapping_draft_path(draft_id)
+    if not os.path.exists(path):
+        raise FileNotFoundError("Question mapping draft was not found.")
+    with open(path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def build_question_mapping_metrics_from_texts(question_texts):
+    questions = []
+    normalized_texts = {}
+    detected_clo_mappings = {}
+    for index, text in enumerate(question_texts, start=1):
+        cleaned = re.sub(r'\s+', ' ', str(text or '')).strip()
+        if not cleaned:
+            continue
+        question_id = f"Q{len(questions) + 1}"
+        questions.append(question_id)
+        normalized_texts[question_id] = cleaned
+        tags = detect_clo_tags_from_text(cleaned)
+        if tags:
+            detected_clo_mappings[question_id] = tags
+    return {
+        'questions': questions,
+        'total_questions': len(questions),
+        'total_students': 0,
+        'confidence': 'Edited',
+        'text_sample': '',
+        'question_texts': normalized_texts,
+        'detected_clo_mappings': detected_clo_mappings
+    }
+
 def apply_exam_paper_mappings(report_metrics, exam_metrics):
     if not exam_metrics:
         return report_metrics
@@ -7760,16 +7823,16 @@ def format_question_label(question):
         return f"{question_word} {match.group(1)}"
     return question
 
-def localized_question_list_label(count):
-    language = get_language() if has_request_context() else 'en'
+def localized_question_list_label(count, language=None):
+    language = language or (get_language() if has_request_context() else 'en')
     if language == 'ar':
         return '\u0627\u0644\u0633\u0624\u0627\u0644' if count == 1 else '\u0627\u0644\u0623\u0633\u0626\u0644\u0629'
     return 'Question' if count == 1 else 'Questions'
 
 
-def format_assessment_label(label):
+def format_assessment_label(label, language=None):
     label_text = str(label or '').strip()
-    language = get_language() if has_request_context() else 'en'
+    language = language or (get_language() if has_request_context() else 'en')
     if language != 'ar':
         return label_text
     match = re.match(r'^(Final|Midterm|Quiz|Project|Assignment|Other)(?:\s+(\d+))?$', label_text, flags=re.I)
@@ -7777,13 +7840,13 @@ def format_assessment_label(label):
         return label_text
     key = match.group(1).lower()
     number = match.group(2)
-    translated = translate(f'assessment.{key}')
+    translated = TRANSLATIONS.get('ar', {}).get(f'assessment.{key}', label_text)
     return f"{translated} {number}" if number else translated
 
 
-def format_question_label(question):
+def format_question_label(question, language=None):
     question = str(question)
-    language = get_language() if has_request_context() else 'en'
+    language = language or (get_language() if has_request_context() else 'en')
     question_word = '\u0633\u0624\u0627\u0644' if language == 'ar' else 'Question'
     match = re.match(r'^(.+?)\s+Q(\d+)$', question)
     if match:
@@ -7843,12 +7906,12 @@ def build_mapping_groups(columns, assessment_files):
 
     return groups
 
-def compact_question_list(question_keys):
+def compact_question_list(question_keys, language=None):
     numbers = []
     for question in question_keys:
         match = re.match(r'^Q(\d+)$', str(question))
         if not match:
-            return ', '.join(format_question_label(question) for question in question_keys)
+            return ', '.join(format_question_label(question, language=language) for question in question_keys)
         numbers.append(int(match.group(1)))
 
     if not numbers:
@@ -7867,10 +7930,10 @@ def compact_question_list(question_keys):
     ranges.append((start, previous))
 
     range_text = ', '.join(str(start) if start == end else f"{start}-{end}" for start, end in ranges)
-    label = localized_question_list_label(len(numbers))
+    label = localized_question_list_label(len(numbers), language=language)
     return f"{label} {range_text}"
 
-def format_missing_mapping_questions(missing_columns, assessment_files):
+def format_missing_mapping_questions(missing_columns, assessment_files, language=None):
     missing_columns = [str(column) for column in missing_columns or []]
     if not missing_columns:
         return ''
@@ -7884,15 +7947,15 @@ def format_missing_mapping_questions(missing_columns, assessment_files):
         local_questions = [column[len(prefix):] for column in group_columns]
         if local_questions:
             handled.update(group_columns)
-            parts.append(f"{format_assessment_label(label)}: {compact_question_list(local_questions)}")
+            parts.append(f"{format_assessment_label(label, language=language)}: {compact_question_list(local_questions, language=language)}")
 
     remaining = [column for column in missing_columns if column not in handled]
     if remaining:
-        parts.append(compact_question_list(remaining))
+        parts.append(compact_question_list(remaining, language=language))
 
     return '; '.join(parts)
 
-def format_mapped_questions_for_report(questions, assessment_files=None):
+def format_mapped_questions_for_report(questions, assessment_files=None, language=None):
     question_keys = [str(question) for question in questions or []]
     if not question_keys:
         return ''
@@ -7907,12 +7970,12 @@ def format_mapped_questions_for_report(questions, assessment_files=None):
         group_questions = [question for question in question_keys if question.startswith(prefix)]
         local_questions = [question[len(prefix):] for question in group_questions]
         if local_questions:
-            parts.append(f"{format_assessment_label(label)}: {compact_question_list(local_questions)}")
+            parts.append(f"{format_assessment_label(label, language=language)}: {compact_question_list(local_questions, language=language)}")
             handled.update(group_questions)
 
     remaining = [question for question in question_keys if question not in handled]
     if remaining:
-        parts.append(compact_question_list(remaining))
+        parts.append(compact_question_list(remaining, language=language))
 
     return '; '.join(parts)
 
@@ -8001,7 +8064,7 @@ def get_report_pdf_font_paths():
 def build_results_pdf_reportlab(stats, total_students, course_info, student_achievement_rows=None, branding=None):
     from xml.sax.saxutils import escape
     from reportlab.lib import colors
-    from reportlab.lib.enums import TA_LEFT, TA_RIGHT
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
     from reportlab.lib.pagesizes import landscape, letter
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.lib.units import inch
@@ -8268,7 +8331,7 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
     for clo, data in sorted_clo_items(stats):
         rows.append([
             paragraph(clo_number(clo), table_text),
-            table_paragraph(format_mapped_questions_for_report(data['questions'])),
+            table_paragraph(format_mapped_questions_for_report(data['questions'], language=report_language)),
             paragraph(f"{data['total_possible_score']:.2f}", table_text),
             paragraph(f"{data['target_score']:.2f}", table_text),
             paragraph(str(data['students_achieved']), table_text),
@@ -8343,10 +8406,29 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
     return buffer.getvalue()
 
 def build_results_pdf(stats, total_students, course_info, student_achievement_rows=None, branding=None):
+    def payload_contains_arabic():
+        candidates = [
+            course_info.get('course_name') if isinstance(course_info, dict) else '',
+            course_info.get('course_id') if isinstance(course_info, dict) else '',
+        ]
+        for data in (stats or {}).values():
+            candidates.extend(data.get('questions') or [])
+            candidates.append(data.get('clo') or '')
+        branding_data = branding or get_report_branding()
+        candidates.extend([
+            branding_data.get('organization_name') or '',
+            branding_data.get('college') or '',
+            branding_data.get('department') or '',
+        ])
+        return any(contains_arabic(value) for value in candidates)
+
     try:
         return build_results_pdf_reportlab(stats, total_students, course_info, student_achievement_rows, branding)
     except Exception as exc:
         app.logger.warning("Falling back to legacy PDF renderer: %s", exc)
+        if payload_contains_arabic():
+            app.logger.exception("Unicode PDF rendering failed for Arabic content; legacy PDF renderer cannot preserve Arabic text.")
+            raise
         return build_results_pdf_legacy(stats, total_students, course_info, student_achievement_rows, branding)
 
 GRADE_ORDER = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F']
@@ -9472,7 +9554,7 @@ def build_results_pdf_legacy(stats, total_students, course_info, student_achieve
     y = table_y
     current_parts = content_parts
     for clo, data in sorted_clo_items(stats):
-        question_text = format_mapped_questions_for_report(data['questions'])
+        question_text = format_mapped_questions_for_report(data['questions'], language=get_export_report_language())
         clo_lines = wrap_pdf_text(clo_number(clo), 48)
         question_lines = wrap_pdf_text(question_text, 42)
         line_count = max(len(clo_lines), len(question_lines), 2)
@@ -11385,29 +11467,70 @@ def question_clo_mapping_service():
         paper_file.save(filepath)
         try:
             metrics = parse_exam_paper_with_module(filepath)
-            metrics = build_gemini_question_clo_suggestions(metrics, clos)
-            metrics = build_smart_clo_suggestions(
-                metrics,
-                clos,
-                only_unmapped=metrics.get('question_clo_suggestion_source') == 'gemini'
-            )
-            if not metrics.get('question_clo_suggestion_source'):
-                metrics['question_clo_suggestion_source'] = 'local'
+            draft_id = save_question_mapping_draft({
+                'course_name': course_name,
+                'filename': paper_file.filename,
+                'metrics': metrics,
+            })
         except Exception as e:
             flash(f"Error reading exam paper: {e}", "error")
             return redirect(request.url)
 
         return render_template(
-            'report_detected.html',
+            'question_clo_review.html',
             course_name=course_name,
-            clos=clos,
             metrics=metrics,
-            filename=paper_file.filename
+            filename=paper_file.filename,
+            draft_id=draft_id
         )
 
     return render_template(
         'question_clo_mapping.html',
         courses=courses
+    )
+
+@app.route('/question-clo-mapping/map', methods=['POST'])
+def question_clo_mapping_map():
+    draft_id = (request.form.get('draft_id') or '').strip()
+    try:
+        draft = load_question_mapping_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    course_name = (draft.get('course_name') or '').strip()
+    clos = get_course_clos(course_name)
+    if not clos:
+        flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    question_texts = request.form.getlist('question_text')
+    metrics = build_question_mapping_metrics_from_texts(question_texts)
+    if not metrics.get('questions'):
+        flash(translate('question_mapping.no_questions'), "error")
+        return render_template(
+            'question_clo_review.html',
+            course_name=course_name,
+            metrics=draft.get('metrics') or {},
+            filename=draft.get('filename') or '',
+            draft_id=draft_id
+        )
+
+    metrics = build_gemini_question_clo_suggestions(metrics, clos)
+    metrics = build_smart_clo_suggestions(
+        metrics,
+        clos,
+        only_unmapped=metrics.get('question_clo_suggestion_source') == 'gemini'
+    )
+    if not metrics.get('question_clo_suggestion_source'):
+        metrics['question_clo_suggestion_source'] = 'local'
+
+    return render_template(
+        'question_clo_link.html',
+        course_name=course_name,
+        clos=clos,
+        metrics=metrics,
+        filename=draft.get('filename') or ''
     )
 
 @app.route('/course-report-service', methods=['GET', 'POST'])

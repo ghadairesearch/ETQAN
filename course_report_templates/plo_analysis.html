@@ -79,9 +79,9 @@
                     </option>
                     {% endfor %}
                 </select>
-                <a href="/account/courses" title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 2.45rem; height: 2.45rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; text-decoration: none; font-size: 1.2rem; align-self: center; flex-shrink: 0;">
+                <span title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 2.45rem; height: 2.45rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; text-decoration: none; font-size: 1.2rem; align-self: center; flex-shrink: 0; cursor: help;">
                     i
-                </a>
+                </span>
                 <button type="button" id="addCourseBtn" class="btn" onclick="addCourse()" disabled style="background: var(--text-color); color: #fff; padding-left: 1.5rem; padding-right: 1.5rem; white-space: nowrap;">Add Course</button>
             </div>
             

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">{{ _('question_mapping.link_title') }}</h2>
+    <p style="color: var(--text-muted); margin-top: -0.5rem;">
+        {{ _('question_mapping.link_description') }}
+    </p>
+    <p style="color: var(--text-muted);">
+        {{ _('mapping.course') }} <strong>{{ course_name }}</strong><br>
+        {{ _('detected.source') }} <strong>{{ filename }}</strong>
+    </p>
+
+    {% if metrics.question_clo_suggestion_source %}
+        <div class="alert" style="margin-bottom: 1.5rem;">
+            {% if metrics.question_clo_suggestion_source == 'gemini' %}
+                {{ _('detected.mapping_used_gemini') }}
+            {% else %}
+                {{ _('detected.mapping_used_local') }}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <form method="POST" action="/save-question-clos">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 140px;">{{ _('mapping.question') }}</th>
+                    <th>{{ _('question_mapping.question_text') }}</th>
+                    <th style="width: 300px;">{{ _('question_mapping.related_clo') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in metrics.questions %}
+                    {% set suggestions = metrics.smart_clo_suggestions.get(question, []) if metrics.smart_clo_suggestions else [] %}
+                    {% set selected_clo = suggestions[0].clo if suggestions else '' %}
+                    <tr>
+                        <td><strong>{{ _('mapping.question') }} {{ loop.index }}</strong></td>
+                        <td style="white-space: pre-wrap;">{{ metrics.question_texts.get(question, '') }}</td>
+                        <td>
+                            <select name="question_clo_{{ question }}" class="form-control" multiple size="5">
+                                {% for clo in clos %}
+                                    <option value="{{ clo }}" {% if clo == selected_clo or (metrics.detected_clo_mappings and clo in metrics.detected_clo_mappings.get(question, [])) %}selected{% endif %}>{{ clo }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if suggestions %}
+                                <div style="margin-top: 0.45rem; color: var(--text-muted); font-size: 0.82rem;">
+                                    {{ _('detected.suggestion_source') }}
+                                    {% for suggestion in suggestions[:3] %}
+                                        <span style="display: inline-block; margin-inline-end: 0.35rem;">{{ suggestion.clo.split(' ')[0] }} ({{ suggestion.score }}%)</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</div>
+{% endblock %}

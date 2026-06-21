@@ -17,9 +17,9 @@
                         <option value="{{ course.name }}">{{ (course.display_label_ar if language == 'ar' else course.display_label_en) or course.display_label or course.name }}</option>
                     {% endfor %}
                 </select>
-                <a href="/account/courses" title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 2.45rem; height: 2.45rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; text-decoration: none; font-size: 1.2rem; align-self: center; flex-shrink: 0;">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; border: 1px solid currentColor; font-size: 0.85rem;">i</span>
-                </a>
+                <span title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 2.45rem; height: 2.45rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; text-decoration: none; font-size: 1.2rem; align-self: center; flex-shrink: 0; cursor: help;">
+                    i
+                </span>
             </div>
         </div>
 
@@ -28,8 +28,7 @@
             <input type="file" name="exam_paper" class="form-control" accept=".pdf,.docx,.txt" required style="padding: 0.5rem;">
         </div>
 
-        <button type="submit" class="btn">{{ _('spec.extract') }}</button>
-        <a href="/" class="btn" style="background: #6b7280; margin-left: 0.5rem;">{{ _('service.back_home') }}</a>
+        <button type="submit" class="btn">{{ _('home.question_mapping_extract') }}</button>
     </form>
 </div>
 {% endblock %}
