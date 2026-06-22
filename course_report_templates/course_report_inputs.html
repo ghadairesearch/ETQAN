@@ -47,6 +47,50 @@
         {% for report_id in selected_report_ids %}
             <input type="hidden" name="report_ids" value="{{ report_id }}">
         {% endfor %}
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+            <button type="submit" name="course_report_action" value="export_docx" class="btn">{{ _('results.export_word') }}</button>
+        </div>
+
+        <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff; margin-bottom: 1.25rem;">
+            <h3 style="margin: 0 0 0.85rem;">{{ _('results.course_report_optional_details') }}</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">{{ _('results.course_instructor') }}</label>
+                    <input type="text" name="course_instructor" class="form-control">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">{{ _('results.course_coordinator') }}</label>
+                    <input type="text" name="course_coordinator" class="form-control">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">{{ _('results.course_location') }}</label>
+                    <div style="display: grid; gap: 0.35rem;">
+                        <label style="display: flex; align-items: center; gap: 0.45rem;">
+                            <input type="radio" name="course_location" value="main">
+                            <span>{{ _('results.main_campus') }}</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.45rem;">
+                            <input type="radio" name="course_location" value="branch">
+                            <span>{{ _('results.branch') }}</span>
+                        </label>
+                        <input type="text" name="branch_name" class="form-control" placeholder="{{ _('results.branch_name') }}">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">{{ _('results.number_of_sections') }}</label>
+                    <input type="number" min="0" step="1" name="sections_count" class="form-control">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">{{ _('results.students_started') }}</label>
+                    <input type="number" min="0" step="1" name="students_started" class="form-control">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">{{ _('results.students_completed') }}</label>
+                    <input type="number" min="0" step="1" name="students_completed" class="form-control">
+                </div>
+            </div>
+        </section>
+
         <div class="form-group">
             <label class="form-label">{{ _('results.topics_covered') }}</label>
             <div style="display: grid; gap: 0.45rem;">
@@ -146,7 +190,7 @@
                         {% for group in course_improvement_recommendation_groups %}
                             <tr>
                                 <td style="vertical-align: top; padding: 0.6rem 0.65rem; border-top: 1px solid var(--border-color); background: #f3f4f6; font-weight: 700; color: var(--accent);">
-                                    {{ group.heading }}
+                                    {{ course_report_label(group.heading) }}
                                 </td>
                                 <td style="border-top: 1px solid var(--border-color); background: #f3f4f6;"></td>
                                 <td style="border-top: 1px solid var(--border-color); background: #f3f4f6;"></td>
@@ -158,13 +202,13 @@
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
                                     <label style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; align-items: start;">
                                         <input type="checkbox" name="course_improvement_recommendations" value="{{ recommendation }}" style="margin-top: 0.2rem;">
-                                        <span>{{ recommendation }}</span>
+                                        <span>{{ course_report_label(recommendation) }}</span>
                                     </label>
                                 </td>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
                                     <select name="course_improvement_action_{{ recommendation_index }}" class="form-control" data-improvement-action-select="{{ recommendation_index }}">
                                         {% for action_option in course_improvement_action_options %}
-                                            <option value="{{ action_option }}">{{ action_option }}</option>
+                                            <option value="{{ action_option }}">{{ course_report_label(action_option) }}</option>
                                         {% endfor %}
                                     </select>
                                     <div id="course_improvement_action_other_group_{{ recommendation_index }}" style="display: none; margin-top: 0.5rem;">
@@ -175,7 +219,7 @@
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
                                     <select name="course_improvement_support_{{ recommendation_index }}" class="form-control" data-improvement-support-select="{{ recommendation_index }}">
                                         {% for support_option in course_improvement_support_options %}
-                                            <option value="{{ support_option }}">{{ support_option }}</option>
+                                            <option value="{{ support_option }}">{{ course_report_label(support_option) }}</option>
                                         {% endfor %}
                                     </select>
                                     <div id="course_improvement_support_other_group_{{ recommendation_index }}" style="display: none; margin-top: 0.5rem;">
@@ -200,7 +244,7 @@
                             <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
                                 <select name="course_improvement_action_other_recommendation" class="form-control" data-improvement-action-select="other_recommendation">
                                     {% for action_option in course_improvement_action_options %}
-                                        <option value="{{ action_option }}">{{ action_option }}</option>
+                                        <option value="{{ action_option }}">{{ course_report_label(action_option) }}</option>
                                     {% endfor %}
                                 </select>
                                 <div id="course_improvement_action_other_group_other_recommendation" style="display: none; margin-top: 0.5rem;">
@@ -211,7 +255,7 @@
                             <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
                                 <select name="course_improvement_support_other_recommendation" class="form-control" data-improvement-support-select="other_recommendation">
                                     {% for support_option in course_improvement_support_options %}
-                                        <option value="{{ support_option }}">{{ support_option }}</option>
+                                        <option value="{{ support_option }}">{{ course_report_label(support_option) }}</option>
                                     {% endfor %}
                                 </select>
                                 <div id="course_improvement_support_other_group_other_recommendation" style="display: none; margin-top: 0.5rem;">
@@ -225,7 +269,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn">{{ _('results.export_course_report') }}</button>
+        <button type="submit" name="course_report_action" value="save" class="btn">{{ _('results.save_course_report') }}</button>
     </form>
 </div>
 <script>
@@ -266,6 +310,15 @@
             option.textContent = label || value;
             select.appendChild(option);
         }
+        function actionValue(action) {
+            return action && typeof action === 'object' ? action.value : action;
+        }
+        function actionLabel(action) {
+            if (action && typeof action === 'object') {
+                return action.label || action.value;
+            }
+            return action === 'Other' ? otherActionLabel : action;
+        }
         function syncSuggestedActions(reasonSelect) {
             const index = reasonSelect.getAttribute('data-reason-select');
             const actionGroup = document.getElementById('uncovered_action_group_' + index);
@@ -277,9 +330,12 @@
             appendActionOption(actionSelect, '', actionPlaceholder);
             const actions = uncoveredReasonActions[reasonSelect.value] || [];
             actions.forEach(function(action) {
-                appendActionOption(actionSelect, action, action === 'Other' ? otherActionLabel : action);
+                appendActionOption(actionSelect, actionValue(action), actionLabel(action));
             });
-            if (reasonSelect.value && actions.indexOf('Other') === -1) {
+            const hasOther = actions.some(function(action) {
+                return actionValue(action) === 'Other';
+            });
+            if (reasonSelect.value && !hasOther) {
                 appendActionOption(actionSelect, 'Other', otherActionLabel);
             }
             actionGroup.style.display = reasonSelect.value ? 'block' : 'none';

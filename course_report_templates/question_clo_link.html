@@ -1,6 +1,50 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .clo-card-grid {
+        display: grid;
+        gap: 0.6rem;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    }
+
+    .clo-card-option {
+        display: block;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #f9fafb;
+        padding: 0.65rem 0.75rem;
+        cursor: pointer;
+    }
+
+    .clo-card-option input {
+        margin-inline-end: 0.4rem;
+    }
+
+    .clo-card-option.is-suggested {
+        border-color: var(--accent-primary);
+        background: color-mix(in srgb, var(--accent-primary) 10%, white);
+    }
+
+    .clo-card-option:has(input:checked) {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    }
+
+    .clo-card-code {
+        font-weight: 800;
+        color: var(--accent-primary);
+        margin-inline-end: 0.25rem;
+    }
+
+    .clo-card-hint {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        margin-top: 0.25rem;
+    }
+</style>
+
 <div class="card">
     <h2 style="margin-top: 0;">{{ _('question_mapping.link_title') }}</h2>
     <p style="color: var(--text-muted); margin-top: -0.5rem;">
@@ -38,6 +82,7 @@
             <tbody>
                 {% for question in metrics.questions %}
                     {% set suggestions = metrics.smart_clo_suggestions.get(question, []) if metrics.smart_clo_suggestions else [] %}
+                    {% set suggested_clos = suggestions|map(attribute='clo')|list if suggestions else [] %}
                     {% set detected_clos = resolve_detected_clos_to_course_list(metrics.detected_clo_mappings.get(question, []) if metrics.detected_clo_mappings else [], clos) %}
                     {% set selected_clos = detected_clos if detected_clos else ([suggestions[0].clo] if suggestions else []) %}
                     {% set question_text = metrics.question_texts.get(question, '') %}
@@ -52,19 +97,23 @@
                         <td>{{ question_type or '-' }}</td>
                         <td dir="{{ text_direction(question_text) }}" style="white-space: pre-wrap; text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</td>
                         <td>
-                            <select name="question_clo_{{ question }}" class="form-control" multiple size="5">
+                            <div class="clo-card-grid">
                                 {% for clo in clos %}
-                                    <option value="{{ clo }}" {% if clo in selected_clos %}selected{% endif %}>{{ clo }}</option>
+                                    <label class="clo-card-option {% if clo in suggested_clos and not detected_clos %}is-suggested{% endif %}">
+                                        <input type="checkbox" name="question_clo_{{ question }}" value="{{ clo }}" {% if clo in selected_clos %}checked{% endif %}>
+                                        <span class="clo-card-code">{{ clo.split(' ')[0] }}</span>
+                                        <span>{{ clo }}</span>
+                                        {% if clo in suggested_clos and not detected_clos %}
+                                            <span class="clo-card-hint">
+                                                {{ _('question_mapping.suggested_clo') }}
+                                                {% for suggestion in suggestions if suggestion.clo == clo %}
+                                                    {% if suggestion.score %} - {{ suggestion.score }}%{% endif %}
+                                                {% endfor %}
+                                            </span>
+                                        {% endif %}
+                                    </label>
                                 {% endfor %}
-                            </select>
-                            {% if suggestions and not detected_clos %}
-                                <div style="margin-top: 0.45rem; color: var(--text-muted); font-size: 0.82rem;">
-                                    {{ _('detected.suggestion_source') }}
-                                    {% for suggestion in suggestions[:3] %}
-                                        <span style="display: inline-block; margin-inline-end: 0.35rem;">{{ suggestion.clo.split(' ')[0] }} ({{ suggestion.score }}%)</span>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}

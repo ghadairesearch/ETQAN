@@ -129,8 +129,12 @@
                                     </svg>
                                 </button>
                                 <div class="report-action-panel">
-                                    <a href="/reports/{{ report.id }}/export/csv">{{ _('results.export_csv') }}</a>
-                                    <a href="/reports/{{ report.id }}/export/pdf">{{ _('results.export_pdf') }}</a>
+                                    {% if report.report_type == 'course_report' %}
+                                        <a href="/reports/{{ report.id }}/export/docx">{{ _('results.export_word') }}</a>
+                                    {% else %}
+                                        <a href="/reports/{{ report.id }}/export/csv">{{ _('results.export_csv') }}</a>
+                                        <a href="/reports/{{ report.id }}/export/pdf">{{ _('results.export_pdf') }}</a>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="report-action-menu">

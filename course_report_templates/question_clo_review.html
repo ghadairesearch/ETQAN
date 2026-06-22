@@ -6,7 +6,7 @@
         border: 1px solid var(--border-color);
         border-radius: 8px;
         background: #f9fafb;
-        overflow: hidden;
+        overflow-x: auto;
     }
 
     .question-review-header {
@@ -20,38 +20,10 @@
         flex-wrap: wrap;
     }
 
-    .question-review-counts,
-    .question-summary-grid {
+    .question-review-counts {
         display: flex;
         gap: 0.75rem;
         flex-wrap: wrap;
-    }
-
-    .question-summary-grid {
-        margin: 1rem 0 1.25rem;
-    }
-
-    .question-summary-card {
-        flex: 1 1 190px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background: var(--bg-card);
-        padding: 0.9rem 1rem;
-    }
-
-    .question-summary-card span {
-        display: block;
-        color: var(--text-muted);
-        font-size: 0.85rem;
-        font-weight: 700;
-    }
-
-    .question-summary-card strong {
-        display: block;
-        margin-top: 0.25rem;
-        color: var(--text-main);
-        font-size: 1.75rem;
-        line-height: 1;
     }
 
     .question-review-detected {
@@ -73,6 +45,8 @@
     .question-review-table {
         margin: 0;
         background: var(--bg-card);
+        table-layout: fixed;
+        width: 100%;
     }
 
     .question-review-table textarea {
@@ -113,11 +87,7 @@
         margin: 1rem 0 0;
     }
 
-    @media (max-width: 760px) {
-        .question-review-box {
-            overflow-x: auto;
-        }
-    }
+    @media (max-width: 760px) {}
 </style>
 
 <div class="card" style="max-width: 1180px; margin: 0 auto;">
@@ -132,20 +102,6 @@
 
     {% set question_items = metrics.questions if metrics and metrics.questions else ['Q1'] %}
     {% set summary = review_summary or {'total': question_items|length, 'auto_mapped': 0, 'needs_ai': question_items|length, 'all_mapped': false, 'explicit_by_question': {}} %}
-    <div class="question-summary-grid">
-        <div class="question-summary-card">
-            <span>{{ _('question_mapping.total_questions') }}</span>
-            <strong id="totalQuestionsCount">{{ summary.total }}</strong>
-        </div>
-        <div class="question-summary-card">
-            <span>{{ _('question_mapping.auto_mapped_questions') }}</span>
-            <strong id="autoMappedCount">{{ summary.auto_mapped }}</strong>
-        </div>
-        <div class="question-summary-card">
-            <span>{{ _('question_mapping.ai_required_questions') }}</span>
-            <strong id="aiRequiredCount">{{ summary.needs_ai }}</strong>
-        </div>
-    </div>
 
     {% if summary.all_mapped %}
         <div class="alert" style="margin-bottom: 1rem;">{{ _('question_mapping.all_mapped_success') }}</div>
@@ -158,22 +114,23 @@
                 <div>
                     <strong>{{ filename }}</strong>
                 </div>
-                <div class="question-review-counts">
-                    <span class="question-review-detected">{{ _('mapping.detected') }}</span>
-                    <span class="question-review-count" id="questionCount">{{ question_items|length }} {{ count_unit('question', question_items|length) }}</span>
-                </div>
+                    <div class="question-review-counts">
+                        <span class="question-review-detected">{{ _('mapping.detected') }}</span>
+                        <span class="question-review-count" id="questionCount">{{ question_items|length }} {{ count_unit('question', question_items|length) }}</span>
+                        <span class="question-review-count"><span id="autoMappedCount">{{ summary.auto_mapped }}</span> {{ _('question_mapping.auto_mapped_questions') }}</span>
+                        <span class="question-review-count"><span id="aiRequiredCount">{{ summary.needs_ai }}</span> {{ _('question_mapping.ai_required_questions') }}</span>
+                    </div>
             </div>
-            <table id="questionTable" class="question-review-table">
+            <table id="questionTable" class="question-review-table" style="min-width: 1080px;">
                 <thead>
                     <tr>
                         <th style="width: 140px;">{{ _('question_mapping.question_number') }}</th>
-                        <th>{{ _('question_mapping.question_text') }}</th>
-                        <th style="width: 170px;">{{ _('question_mapping.question_type') }}</th>
-                        <th style="width: 260px;">
+                        <th style="width: 52%;">{{ _('question_mapping.question_text') }}</th>
+                        <th style="width: 145px;">{{ _('question_mapping.question_type') }}</th>
+                        <th style="width: 150px;">
                             {{ _('question_mapping.explicit_clo') }}
-                            <small style="display: block; margin-top: 0.25rem; color: rgba(255,255,255,0.86); font-weight: 500;">{{ _('question_mapping.paper_clo_help') }}</small>
                         </th>
-                        <th style="width: 190px;">{{ _('question_mapping.status') }}</th>
+                        <th style="width: 165px;">{{ _('question_mapping.status') }}</th>
                         <th style="width: 70px;"></th>
                     </tr>
                 </thead>
@@ -254,7 +211,6 @@
         const template = document.getElementById('questionTemplate');
         const addButton = document.getElementById('addQuestionBtn');
         const questionCount = document.getElementById('questionCount');
-        const totalQuestionsCount = document.getElementById('totalQuestionsCount');
         const autoMappedCount = document.getElementById('autoMappedCount');
         const aiRequiredCount = document.getElementById('aiRequiredCount');
         const questionWord = {{ _('mapping.question')|tojson }};
@@ -295,7 +251,6 @@
                 const unit = count === 1 ? unitOne : (count === 2 ? unitTwo : (count <= 10 ? unitMany : unitLarge));
                 questionCount.textContent = count + ' ' + unit;
             }
-            if (totalQuestionsCount) totalQuestionsCount.textContent = rows.length;
             if (autoMappedCount) autoMappedCount.textContent = autoMapped;
             if (aiRequiredCount) aiRequiredCount.textContent = needsAi;
         }

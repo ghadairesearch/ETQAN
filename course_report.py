@@ -163,6 +163,84 @@ COURSE_IMPROVEMENT_RECOMMENDATION_GROUPS = [
         ],
     },
 ]
+COURSE_REPORT_AR_LABELS = {
+    'CLO Attainment and Assessment': 'تحقق مخرجات التعلم والتقييم',
+    'Teaching and Learning Strategies': 'استراتيجيات التعليم والتعلم',
+    'Curriculum and Course Content': 'المنهج ومحتوى المقرر',
+    'Learning Resources and Skills': 'مصادر التعلم والمهارات',
+    'Improve student performance in CLOs': 'تحسين أداء الطلاب في مخرجات التعلم',
+    'Enhance practical/laboratory activities': 'تعزيز الأنشطة العملية أو المعملية',
+    'Update course content': 'تحديث محتوى المقرر',
+    'Improve assessment methods': 'تحسين أساليب التقييم',
+    'Strengthen industry alignment': 'تعزيز مواءمة المقرر مع سوق العمل',
+    'Improve prerequisite knowledge': 'تحسين المعرفة السابقة المطلوبة',
+    'Increase project-based learning': 'زيادة التعلم القائم على المشاريع',
+    'Improve course materials and resources': 'تحسين مواد ومصادر المقرر',
+    'Enhance critical thinking skills': 'تعزيز مهارات التفكير الناقد',
+    'Enhance teamwork and communication skills': 'تعزيز مهارات العمل الجماعي والتواصل',
+    'Improve alignment between CLOs and assessments': 'تحسين مواءمة مخرجات التعلم مع التقييمات',
+    'Increase use of real-world case studies': 'زيادة استخدام دراسات حالة واقعية',
+    'Reduce content overload': 'تقليل كثافة محتوى المقرر',
+    'Curriculum committee approval': 'موافقة لجنة المناهج',
+    'No additional support required': 'لا يتطلب دعمًا إضافيًا',
+    'Department approval': 'موافقة القسم',
+    'Technical support': 'دعم فني',
+    'Revise teaching strategies': 'مراجعة استراتيجيات التدريس',
+    'Provide supplementary learning resources': 'توفير مصادر تعلم إضافية',
+    'Conduct remedial/support sessions': 'تنفيذ جلسات علاجية أو داعمة',
+    'Revise assessment methods': 'مراجعة أساليب التقييم',
+    'Update course materials': 'تحديث مواد المقرر',
+    'Review CLO-assessment alignment': 'مراجعة مواءمة مخرجات التعلم مع التقييم',
+    'Increase practical/application activities': 'زيادة الأنشطة العملية أو التطبيقية',
+    'Coordinate with the department/course team': 'التنسيق مع القسم أو فريق المقرر',
+    'Monitor implementation in the next offering': 'متابعة التنفيذ في الطرح القادم',
+    'Time constraints': 'ضيق الوقت',
+    'Student absence / low attendance': 'غياب الطلاب أو انخفاض الحضور',
+    'Topic covered in another course': 'الموضوع مغطى في مقرر آخر',
+    'Course content overload': 'كثافة محتوى المقرر',
+    'Equipment unavailability': 'عدم توفر التجهيزات',
+    'Topic replaced with a more current topic': 'استبدال الموضوع بموضوع أحدث',
+    'Official holidays/suspension of classes': 'إجازات رسمية أو تعليق الدراسة',
+    'Technical/laboratory limitations': 'قيود تقنية أو معملية',
+    'Prerequisite knowledge gap': 'فجوة في المعرفة السابقة',
+    'Provide supplementary learning materials.': 'توفير مواد تعلم إضافية.',
+    'Share recorded lectures or demonstrations.': 'مشاركة محاضرات أو عروض مسجلة.',
+    'Cover essential concepts through assignments or projects.': 'تغطية المفاهيم الأساسية من خلال تكليفات أو مشاريع.',
+    'Schedule additional review/support sessions.': 'جدولة جلسات مراجعة أو دعم إضافية.',
+    'Revise topic sequencing in future offerings.': 'مراجعة ترتيب الموضوعات في الطروحات القادمة.',
+    'Share lecture recordings and learning resources.': 'مشاركة تسجيلات المحاضرات ومصادر التعلم.',
+    'Provide make-up activities or assignments.': 'توفير أنشطة أو تكليفات بديلة.',
+    'Offer office hours or support sessions.': 'تقديم ساعات مكتبية أو جلسات دعم.',
+    'Implement attendance improvement measures in future offerings.': 'تطبيق إجراءات لتحسين الحضور في الطروحات القادمة.',
+    'Coordinate with the related course instructor.': 'التنسيق مع أستاذ المقرر المرتبط.',
+    'Recommend redistribution of content across courses.': 'اقتراح إعادة توزيع المحتوى بين المقررات.',
+    'Prioritize content directly linked to CLOs.': 'إعطاء الأولوية للمحتوى المرتبط مباشرة بمخرجات التعلم.',
+    'Move lower-priority content to self-study activities.': 'نقل المحتوى الأقل أولوية إلى أنشطة تعلم ذاتي.',
+    'Provide supplementary reading materials.': 'توفير قراءات إضافية.',
+    'Use simulations or virtual laboratories.': 'استخدام المحاكاة أو المعامل الافتراضية.',
+    'Provide instructor demonstrations.': 'تقديم عروض توضيحية من أستاذ المقرر.',
+    'Use alternative equipment where available.': 'استخدام تجهيزات بديلة عند توفرها.',
+    'Share recorded practical sessions.': 'مشاركة جلسات عملية مسجلة.',
+    'Schedule the activity when resources become available.': 'جدولة النشاط عند توفر الموارد.',
+    'Verify alignment with CLOs.': 'التحقق من المواءمة مع مخرجات التعلم.',
+    'Update course materials and references.': 'تحديث مواد ومراجع المقرر.',
+    'Propose formal curriculum updates if the change is permanent.': 'اقتراح تحديث رسمي للمنهج إذا كان التغيير دائمًا.',
+    'Provide asynchronous learning materials.': 'توفير مواد تعلم غير متزامنة.',
+    'Share recorded lectures.': 'مشاركة محاضرات مسجلة.',
+    'Conduct make-up sessions if feasible.': 'تنفيذ جلسات تعويضية إذا أمكن.',
+    'Assign guided self-study activities.': 'تكليف الطلاب بأنشطة تعلم ذاتي موجهة.',
+    'Adjust future course schedules to account for lost teaching time.': 'تعديل جداول الطروحات القادمة لتعويض وقت التدريس المفقود.',
+    'Use virtual labs or software simulations.': 'استخدام معامل افتراضية أو محاكاة برمجية.',
+    'Replace practical work with equivalent activities.': 'استبدال العمل العملي بأنشطة مكافئة.',
+    'Provide recorded demonstrations.': 'توفير عروض توضيحية مسجلة.',
+    'Address infrastructure issues before the next offering.': 'معالجة مشكلات البنية التحتية قبل الطرح القادم.',
+    'Deliver remedial sessions.': 'تنفيذ جلسات علاجية.',
+    'Provide prerequisite learning resources.': 'توفير مصادر للمعرفة السابقة المطلوبة.',
+    'Offer additional tutorials or workshops.': 'تقديم دروس أو ورش إضافية.',
+    'Increase formative assessments to monitor readiness.': 'زيادة التقييمات التكوينية لمتابعة الجاهزية.',
+    'Review prerequisite requirements and course sequencing.': 'مراجعة المتطلبات السابقة وتسلسل المقررات.',
+    'Other': 'أخرى',
+}
 COURSE_IMPROVEMENT_SUPPORT_OPTIONS = [
     'Curriculum committee approval',
     'No additional support required',
@@ -256,6 +334,28 @@ def grouped_course_improvement_recommendations():
         if items:
             groups.append({'heading': group['heading'], 'items': items})
     return groups
+
+def course_report_label(value):
+    value = str(value or '')
+    if has_request_context() and get_language() == 'ar':
+        return COURSE_REPORT_AR_LABELS.get(value, value)
+    return value
+
+def course_report_label_for_language(value, language=None):
+    value = str(value or '')
+    language = language or (get_export_report_language() if has_request_context() else 'en')
+    if language == 'ar':
+        return COURSE_REPORT_AR_LABELS.get(value, value)
+    return value
+
+def localized_uncovered_reason_actions():
+    localized = {}
+    for reason, actions in UNCOVERED_TOPIC_REASON_ACTIONS.items():
+        localized[reason] = [
+            {'value': action, 'label': course_report_label(action)}
+            for action in actions
+        ]
+    return localized
 UNIVERSITY_IDENTITY_PATH = os.path.join(APP_BASE_DIR, 'university_identity.json')
 UNIVERSITY_LOGO_FOLDER = os.path.join(APP_BASE_DIR, 'public', 'university_logos')
 ORG_LOGO_FOLDER = os.environ.get('ORG_LOGO_FOLDER') or os.path.join(UPLOAD_FOLDER, 'organization_logos')
@@ -436,17 +536,17 @@ EN_TRANSLATIONS = {
     'question_mapping.question_text': 'Question text',
     'question_mapping.question_type': 'Question type',
     'question_mapping.paper_clo': 'CLO from exam paper',
-    'question_mapping.paper_clo_help': 'Only learning outcomes explicitly mentioned in the exam paper are shown here.',
+    'question_mapping.paper_clo_help': '',
     'question_mapping.step2_title': 'Step 2: Question Extraction and Explicit Mapping',
     'question_mapping.step2_description': 'Review extracted questions, detected question types, and any CLOs explicitly mentioned in the exam paper.',
     'question_mapping.total_questions': 'Total Questions',
-    'question_mapping.auto_mapped_questions': 'Automatically Mapped Questions',
-    'question_mapping.ai_required_questions': 'Questions Requiring AI Mapping',
+    'question_mapping.auto_mapped_questions': 'Mapped Questions',
+    'question_mapping.ai_required_questions': 'Requires Mapping',
     'question_mapping.question_number': 'Question Number',
-    'question_mapping.explicit_clo': 'Explicit CLO',
+    'question_mapping.explicit_clo': 'CLO',
     'question_mapping.status': 'Status',
     'question_mapping.mapped_automatically': 'Mapped Automatically',
-    'question_mapping.requires_ai_mapping': 'Requires AI Mapping',
+    'question_mapping.requires_ai_mapping': 'Requires Mapping',
     'question_mapping.all_mapped_success': 'All questions were mapped successfully.',
     'question_mapping.final_review': 'Final Review',
     'question_mapping.continue_ai_mapping': 'Continue to AI Mapping',
@@ -731,7 +831,19 @@ EN_TRANSLATIONS = {
     'results.export_csv': 'Export CSV',
     'results.export_pdf': 'Export PDF',
     'results.export_course_report': 'Export Course Report DOCX',
+    'results.save_course_report': 'Save Course Report',
+    'results.export_word': 'Export Word',
     'results.course_report_inputs': 'Course Report Inputs',
+    'results.course_report_optional_details': 'Optional Course Report Details',
+    'results.course_instructor': 'Course Instructor',
+    'results.course_coordinator': 'Course Coordinator',
+    'results.course_location': 'Course Location',
+    'results.main_campus': 'Main campus',
+    'results.branch': 'Branch',
+    'results.branch_name': 'Branch name',
+    'results.number_of_sections': 'Number of Sections',
+    'results.students_started': 'Students who started the course',
+    'results.students_completed': 'Students who completed the course',
     'results.topics_covered': 'Have you covered all course topics?',
     'results.topics_covered_yes': 'Yes, all topics were covered',
     'results.topics_covered_no': 'No, some topics were not covered',
@@ -974,7 +1086,7 @@ TRANSLATIONS = {
         'question_mapping.map_to_clos': 'ربط بالمخرجات',
         'question_mapping.question_text': 'نص السؤال',
         'question_mapping.paper_clo': 'مخرج التعلم من الورقة',
-        'question_mapping.paper_clo_help': 'تظهر هنا فقط المخرجات المكتشفة من ورقة الاختبار.',
+        'question_mapping.paper_clo_help': '',
         'question_mapping.link_title': 'ربط الأسئلة بالمخرجات',
         'question_mapping.link_description': 'راجع رقم كل سؤال وناتج التعلم المرتبط الذي يقترحه إتقان.',
         'question_mapping.related_clo': 'المخرج المرتبط',
@@ -1239,7 +1351,19 @@ TRANSLATIONS = {
         'results.export_csv': 'تصدير CSV',
         'results.export_pdf': 'تصدير PDF',
         'results.export_course_report': 'تصدير تقرير المقرر DOCX',
+        'results.save_course_report': 'حفظ تقرير المقرر',
+        'results.export_word': 'تصدير Word',
         'results.course_report_inputs': '\u0645\u062f\u062e\u0644\u0627\u062a \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631',
+        'results.course_report_optional_details': 'بيانات تقرير المقرر الاختيارية',
+        'results.course_instructor': 'أستاذ المقرر',
+        'results.course_coordinator': 'منسق المقرر',
+        'results.course_location': 'مكان تقديم المقرر',
+        'results.main_campus': 'المقر الرئيس',
+        'results.branch': 'فرع',
+        'results.branch_name': 'اسم الفرع',
+        'results.number_of_sections': 'عدد الشعب',
+        'results.students_started': 'عدد الطلاب الذين بدأوا المقرر',
+        'results.students_completed': 'عدد الطلاب الذين أنهوا المقرر',
         'results.topics_covered': '\u0647\u0644 \u062a\u0645\u062a \u062a\u063a\u0637\u064a\u0629 \u062c\u0645\u064a\u0639 \u0645\u0648\u0636\u0648\u0639\u0627\u062a \u0627\u0644\u0645\u0642\u0631\u0631\u061f',
         'results.topics_covered_yes': '\u0646\u0639\u0645\u060c \u062a\u0645\u062a \u062a\u063a\u0637\u064a\u0629 \u062c\u0645\u064a\u0639 \u0627\u0644\u0645\u0648\u0636\u0648\u0639\u0627\u062a',
         'results.topics_covered_no': '\u0644\u0627\u060c \u0644\u0645 \u062a\u062a\u0645 \u062a\u063a\u0637\u064a\u0629 \u0628\u0639\u0636 \u0627\u0644\u0645\u0648\u0636\u0648\u0639\u0627\u062a',
@@ -1442,17 +1566,17 @@ TRANSLATIONS = {
 TRANSLATIONS['ar'].update({
     'nav.my_exams': '\u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a\u064a',
     'question_mapping.question_type': '\u0646\u0648\u0639 \u0627\u0644\u0633\u0624\u0627\u0644',
-    'question_mapping.paper_clo_help': '\u062a\u064f\u0639\u0631\u0636 \u0647\u0646\u0627 \u0641\u0642\u0637 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0630\u0643\u0648\u0631\u0629 \u0628\u0634\u0643\u0644 \u0635\u0631\u064a\u062d \u0641\u064a \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631.',
+        'question_mapping.paper_clo_help': '',
     'question_mapping.step2_title': '\u0627\u0644\u062e\u0637\u0648\u0629 2: \u0627\u0633\u062a\u062e\u0631\u0627\u062c \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0648\u0627\u0644\u0631\u0628\u0637 \u0627\u0644\u0635\u0631\u064a\u062d',
     'question_mapping.step2_description': '\u0631\u0627\u062c\u0639 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u0645\u0633\u062a\u062e\u0631\u062c\u0629\u060c \u0648\u0623\u0646\u0648\u0627\u0639\u0647\u0627\u060c \u0648\u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0630\u0643\u0648\u0631\u0629 \u0635\u0631\u0627\u062d\u0629 \u0641\u064a \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631.',
     'question_mapping.total_questions': '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0623\u0633\u0626\u0644\u0629',
-    'question_mapping.auto_mapped_questions': '\u0623\u0633\u0626\u0644\u0629 \u0631\u064f\u0628\u0637\u062a \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b',
-    'question_mapping.ai_required_questions': '\u0623\u0633\u0626\u0644\u0629 \u062a\u062d\u062a\u0627\u062c \u0631\u0628\u0637\u0627\u064b \u0628\u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
+    'question_mapping.auto_mapped_questions': '\u0623\u0633\u0626\u0644\u0629 \u0645\u0631\u0628\u0648\u0637\u0629',
+    'question_mapping.ai_required_questions': '\u062a\u062d\u062a\u0627\u062c \u0631\u0628\u0637',
     'question_mapping.question_number': '\u0631\u0642\u0645 \u0627\u0644\u0633\u0624\u0627\u0644',
-    'question_mapping.explicit_clo': '\u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0635\u0631\u064a\u062d',
+    'question_mapping.explicit_clo': 'CLO',
     'question_mapping.status': '\u0627\u0644\u062d\u0627\u0644\u0629',
     'question_mapping.mapped_automatically': '\u0631\u064f\u0628\u0637 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b',
-    'question_mapping.requires_ai_mapping': '\u064a\u062d\u062a\u0627\u062c \u0631\u0628\u0637\u0627\u064b \u0628\u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
+    'question_mapping.requires_ai_mapping': '\u064a\u062d\u062a\u0627\u062c \u0631\u0628\u0637',
     'question_mapping.all_mapped_success': '\u062a\u0645 \u0631\u0628\u0637 \u062c\u0645\u064a\u0639 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0628\u0646\u062c\u0627\u062d.',
     'question_mapping.final_review': '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0646\u0647\u0627\u0626\u064a\u0629',
     'question_mapping.continue_ai_mapping': '\u0645\u062a\u0627\u0628\u0639\u0629 \u0627\u0644\u0631\u0628\u0637 \u0628\u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
@@ -2133,7 +2257,8 @@ def inject_global_template_data():
         'count_unit': count_unit,
         'resolve_detected_clos_to_course_list': resolve_detected_clos_to_course_list,
         'display_student_id': display_student_id,
-        'text_direction': text_direction
+        'text_direction': text_direction,
+        'course_report_label': course_report_label,
     }
 
 def is_valid_hex_color(value):
@@ -2787,7 +2912,7 @@ def course_report_template_context_defaults(export_action, selected_course_name=
         'course_improvement_action_options': COURSE_IMPROVEMENT_ACTION_OPTIONS,
         'course_improvement_support_options': COURSE_IMPROVEMENT_SUPPORT_OPTIONS,
         'uncovered_reason_actions': UNCOVERED_TOPIC_REASON_ACTIONS,
-        'uncovered_reason_actions_json': json.dumps(UNCOVERED_TOPIC_REASON_ACTIONS, ensure_ascii=False),
+        'uncovered_reason_actions_json': json.dumps(localized_uncovered_reason_actions(), ensure_ascii=False),
         'total_students': 0,
         'stats_items': [],
         'course_report_warnings': [],
@@ -4943,6 +5068,57 @@ def call_groq_json(system_prompt, user_payload, timeout=90):
     return parse_gemini_json_response(content)
 
 
+def call_gemini_json(system_prompt, user_payload, timeout=90):
+    if not GEMINI_API_KEY:
+        return None
+    try:
+        payload = {
+            'contents': [
+                {
+                    'role': 'user',
+                    'parts': [
+                        {'text': f"{system_prompt}\n\n{user_payload}"},
+                    ],
+                }
+            ],
+            'generationConfig': {
+                'temperature': 0.2,
+                'responseMimeType': 'application/json',
+            },
+        }
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            + urllib.parse.quote(GEMINI_MODEL, safe='')
+            + ":generateContent?key="
+            + urllib.parse.quote(GEMINI_API_KEY, safe='')
+        )
+        gemini_request = urllib.request.Request(
+            url,
+            data=json.dumps(payload, ensure_ascii=False).encode('utf-8'),
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'ETQAN-CourseReportAI/1.0',
+            },
+            method='POST',
+        )
+        with urllib.request.urlopen(gemini_request, timeout=timeout) as response:
+            gemini_payload = json.loads(response.read().decode('utf-8'))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode('utf-8', errors='replace')
+        app.logger.warning("Gemini course report insight request failed with HTTP %s: %s", exc.code, body[:800])
+        return None
+    except Exception as exc:
+        app.logger.warning("Gemini course report insight request failed: %s", exc)
+        return None
+
+    response_text = ''
+    for candidate in gemini_payload.get('candidates') or []:
+        content = candidate.get('content') or {}
+        for part in content.get('parts') or []:
+            response_text += part.get('text') or ''
+    return parse_gemini_json_response(response_text)
+
+
 def normalize_gemini_clos(raw_clos):
     if isinstance(raw_clos, dict):
         raw_clos = [
@@ -5425,6 +5601,93 @@ def build_smart_clo_suggestions(metrics, clos, only_unmapped=False):
     return metrics
 
 
+def gemini_exam_question_extraction_prompt():
+    return (
+        "Extract exam questions from the provided exam paper text. "
+        "The exam may be Arabic or English. Preserve each question text as completely as possible, "
+        "including sub-parts and options when they belong to the same question. "
+        "Detect the question type, such as MCQ, True/False, Essay, Short Answer, Problem Solving, or Other. "
+        "Detect only CLOs explicitly written in the exam paper near or inside each question, such as CLO1, CLO 1, "
+        "CLO1.1, 1.1, مخرج 1.1, or ناتج 1.1. Do not infer CLOs by meaning. "
+        "Return JSON only with this exact schema: "
+        '{"questions":[{"number":"Q1","text":"full question text","type":"MCQ","explicit_clos":["1.1"]}]}'
+    )
+
+def normalize_gemini_exam_metrics(payload):
+    if not isinstance(payload, dict):
+        return {}
+    raw_questions = payload.get('questions') or payload.get('items') or []
+    if not isinstance(raw_questions, list):
+        return {}
+    questions = []
+    question_texts = {}
+    question_types = {}
+    detected_clo_mappings = {}
+    for index, item in enumerate(raw_questions, start=1):
+        if not isinstance(item, dict):
+            continue
+        raw_number = compact_text(item.get('number') or item.get('id') or item.get('question') or '')
+        number = question_number_from_label(raw_number) or index
+        question_id = f"Q{number}"
+        if question_id in questions:
+            question_id = f"Q{len(questions) + 1}"
+        text = compact_text(item.get('text') or item.get('question_text') or item.get('body') or '')
+        if not text:
+            continue
+        questions.append(question_id)
+        question_texts[question_id] = text[:4000]
+        question_types[question_id] = compact_text(item.get('type') or item.get('question_type') or '')
+        explicit = item.get('explicit_clos') or item.get('clos') or item.get('clo') or []
+        if isinstance(explicit, str):
+            explicit = [explicit]
+        tags = detect_clo_tags_from_text(' '.join(str(value or '') for value in explicit))
+        if not tags:
+            tags = detect_clo_tags_from_text(text)
+        if tags:
+            detected_clo_mappings[question_id] = tags
+    if not questions:
+        return {}
+    return {
+        'questions': questions,
+        'total_questions': len(questions),
+        'total_students': 0,
+        'confidence': 'Gemini',
+        'text_sample': '',
+        'question_texts': question_texts,
+        'question_types': question_types,
+        'detected_clo_mappings': detected_clo_mappings,
+        'question_extraction_source': 'gemini',
+    }
+
+def extract_exam_text_for_ai(filepath):
+    try:
+        from exam_parser import ExamParser
+        parser = ExamParser(filepath)
+        parser.extract_text()
+        return parser.raw_text or ''
+    except Exception as exc:
+        app.logger.warning("Could not extract exam text for Gemini: %s", exc)
+        return ''
+
+def parse_exam_paper_with_gemini(filepath):
+    if not GEMINI_API_KEY:
+        return {}
+    text = extract_exam_text_for_ai(filepath)
+    if not compact_text(text):
+        return {}
+    payload = {
+        'exam_text': text[:60000],
+    }
+    parsed = call_gemini_json(
+        gemini_exam_question_extraction_prompt(),
+        json.dumps(payload, ensure_ascii=False),
+        timeout=120
+    )
+    metrics = normalize_gemini_exam_metrics(parsed)
+    if metrics:
+        return metrics
+    return {}
+
 def gemini_question_clo_prompt():
     return (
         "Map exam questions to Course Learning Outcomes. "
@@ -5643,6 +5906,12 @@ def parse_exam_paper_with_module(filepath):
         import traceback
         traceback.print_exc()
         raise e
+
+def parse_exam_paper_metrics(filepath):
+    gemini_metrics = parse_exam_paper_with_gemini(filepath)
+    if gemini_metrics:
+        return gemini_metrics
+    return parse_exam_paper_with_module(filepath)
 
 def infer_exam_paper_metrics(text):
     # Deprecated fallback
@@ -9271,6 +9540,18 @@ IDENTITY_HEADER_HINTS = (
 )
 GRADE_SOURCE_PRIORITY_HINTS = ('final', 'total', 'grade', 'garde', 'result', 'نهائي', 'النهائي', 'المجموع', 'تقدير')
 
+GRADE_HEADER_HINTS = GRADE_HEADER_HINTS + (
+    'تقدير', 'التقدير', 'درجة', 'درجات', 'نتيجة', 'النتيجة', 'المجموع', 'مجموع',
+    'الدرجة رمزاً', 'الدرجة رمزا', 'نهائي', 'النهائي', 'الدرجة النهائية', 'علامة', 'علامات',
+)
+IDENTITY_HEADER_HINTS = IDENTITY_HEADER_HINTS + (
+    'اسم', 'الاسم', 'اسم الطالب', 'الطالب', 'الرقم الجامعي', 'رقم جامعي', 'رقم الطالب',
+    'السجل', 'القيد', 'حالة الطالب',
+)
+GRADE_SOURCE_PRIORITY_HINTS = GRADE_SOURCE_PRIORITY_HINTS + (
+    'نهائي', 'النهائي', 'المجموع', 'الدرجة رمزاً', 'الدرجة رمزا', 'تقدير',
+)
+
 def empty_grade_counts():
     return {grade: 0 for grade in GRADE_ORDER}
 
@@ -9350,6 +9631,16 @@ def parse_numeric_score_value(value):
         if 0 <= score <= 100:
             return score
     return None
+
+def parse_grade_count_value(value):
+    score = parse_numeric_score_value(value)
+    if score is None:
+        return None
+    rounded = round(score)
+    if abs(score - rounded) > 1e-9:
+        return None
+    count = int(rounded)
+    return count if 0 <= count <= 1000 else None
 
 def numeric_score_to_letter_grade(value):
     try:
@@ -9432,6 +9723,9 @@ def dataframe_structured_grade_distribution(frame, source='Structured grade tabl
     identity_mask = pd.Series(False, index=frame.index)
     for column in identity_columns:
         identity_mask = identity_mask | nonempty_series_mask(frame[column])
+    if not bool(identity_mask.any()):
+        for column in grade_columns:
+            identity_mask = identity_mask | nonempty_series_mask(frame[column])
 
     candidates = []
     for column in grade_columns:
@@ -9458,6 +9752,42 @@ def dataframe_structured_grade_distribution(frame, source='Structured grade tabl
         return finalize_grade_distribution(grade_distribution_from_letters(values), f"{source}: letter grades column: {header}")
     return finalize_grade_distribution(grade_distribution_from_scores(values), f"{source}: numeric scores column: {header}")
 
+def grade_distribution_from_summary_frame(raw_frame, source='Grade summary table'):
+    if raw_frame is None or raw_frame.empty:
+        return finalize_grade_distribution(empty_grade_counts())
+
+    counts = empty_grade_counts()
+    found_pairs = 0
+    row_count, column_count = raw_frame.shape
+    for row_index in range(row_count):
+        for column_index in range(column_count):
+            grade = normalize_letter_grade(raw_frame.iat[row_index, column_index])
+            if not grade:
+                continue
+
+            # Student rows often put a letter grade immediately after a numeric total.
+            # A summary table normally puts the grade label first, then the count nearby.
+            if column_index > 0 and parse_numeric_score_value(raw_frame.iat[row_index, column_index - 1]) is not None:
+                continue
+            if column_index > 1 and parse_numeric_score_value(raw_frame.iat[row_index, column_index - 2]) is not None:
+                continue
+
+            for offset in range(1, 5):
+                next_column = column_index + offset
+                if next_column >= column_count:
+                    break
+                count = parse_grade_count_value(raw_frame.iat[row_index, next_column])
+                if count is None:
+                    continue
+                counts[grade] += count
+                found_pairs += 1
+                break
+
+    total = grade_distribution_total(counts)
+    if total >= 3 and found_pairs >= 2:
+        return finalize_grade_distribution(counts, source)
+    return finalize_grade_distribution(empty_grade_counts())
+
 def unique_headers(headers):
     seen = {}
     result = []
@@ -9471,7 +9801,7 @@ def unique_headers(headers):
 def grade_distribution_from_headerless_frame(raw_frame, source='Detected grade table'):
     if raw_frame is None or raw_frame.empty:
         return finalize_grade_distribution(empty_grade_counts())
-    best = finalize_grade_distribution(empty_grade_counts())
+    best = grade_distribution_from_summary_frame(raw_frame, f"{source}: grade summary")
     max_header_rows = min(12, len(raw_frame.index))
     for header_row in range(max_header_rows):
         headers = raw_frame.iloc[header_row].tolist()
@@ -9656,6 +9986,7 @@ def parse_excel_sheet_grade_distribution(filepath, sheet_name):
         pass
     try:
         raw = pd.read_excel(filepath, sheet_name=sheet_name, header=None)
+        distributions.append(grade_distribution_from_summary_frame(raw, f"Excel sheet {sheet_name}: grade summary"))
         distributions.append(grade_distribution_from_headerless_frame(raw, f"Excel sheet {sheet_name}"))
     except Exception:
         pass
@@ -9771,6 +10102,21 @@ def read_course_improvement_plan():
             })
     return items
 
+def read_course_report_optional_details():
+    location = compact_text(request.form.get('course_location') or '')
+    if location not in {'main', 'branch'}:
+        location = ''
+    return {
+        'course_instructor': compact_text(request.form.get('course_instructor') or ''),
+        'course_coordinator': compact_text(request.form.get('course_coordinator') or ''),
+        'location': location,
+        'branch_name': compact_text(request.form.get('branch_name') or ''),
+        'sections_count': compact_text(request.form.get('sections_count') or ''),
+        'students_started': compact_text(request.form.get('students_started') or ''),
+        'students_completed': compact_text(request.form.get('students_completed') or ''),
+        'report_date': datetime.now().strftime('%Y-%m-%d'),
+    }
+
 WORD_W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 WORD_XML_NS = 'http://www.w3.org/XML/1998/namespace'
 
@@ -9840,7 +10186,7 @@ def resolve_clo_plo_code(clo, clo_plos):
             return format_plo_value(normalized_lookup[lookup_key])
     return ''
 
-def build_clo_course_report_rows(stats, course_info=None):
+def build_clo_course_report_rows(stats, course_info=None, language=None):
     rows = []
     clo_plos = (course_info or {}).get('clo_plos') or {}
     for clo, data in sorted_clo_items(stats):
@@ -9848,7 +10194,8 @@ def build_clo_course_report_rows(stats, course_info=None):
         wording = clo_wording(clo)
         target = f"{float(data.get('target_pct', 0)):.2f}%"
         actual = f"{float(data.get('achievement_percentage', 0)):.2f}%"
-        comment = "Target achieved" if float(data.get('achievement_percentage', 0)) >= float(data.get('target_pct', 0)) else "Below target"
+        achieved = float(data.get('achievement_percentage', 0)) >= float(data.get('target_pct', 0))
+        comment = ('تم تحقق المستوى المستهدف' if achieved else 'أقل من المستوى المستهدف') if language == 'ar' else ('Target achieved' if achieved else 'Below target')
         rows.append([
             f"{number} {wording}".strip(),
             resolve_clo_plo_code(clo, clo_plos),
@@ -9859,7 +10206,8 @@ def build_clo_course_report_rows(stats, course_info=None):
         ])
     return rows
 
-def build_clo_assessment_word_table(stats, course_info=None):
+def build_clo_assessment_word_table(stats, course_info=None, language=None):
+    language = language or (get_export_report_language() if has_request_context() else 'en')
     table = word_element('tbl')
     table_properties = word_element('tblPr')
     table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
@@ -9874,19 +10222,18 @@ def build_clo_assessment_word_table(stats, course_info=None):
     table_properties.append(borders)
     table.append(table_properties)
 
-    table.append(word_row([
-        'Course Learning Outcomes (CLOs)',
-        'Related PLOs Code',
-        'Assessment Methods',
-        'Targeted Level',
-        'Actual Level',
-        'Comment on Assessment Results',
-    ], header=True))
-    for row in build_clo_course_report_rows(stats, course_info):
+    headers = (
+        ['مخرجات تعلم المقرر', 'مخرجات البرنامج المرتبطة', 'طرق التقييم', 'المستوى المستهدف', 'المستوى الفعلي', 'التعليق على نتائج القياس']
+        if language == 'ar'
+        else ['Course Learning Outcomes (CLOs)', 'Related PLOs Code', 'Assessment Methods', 'Targeted Level', 'Actual Level', 'Comment on Assessment Results']
+    )
+    table.append(word_row(headers, header=True))
+    for row in build_clo_course_report_rows(stats, course_info, language):
         table.append(word_row(row))
     return table
 
-def build_grade_distribution_word_table(distribution):
+def build_grade_distribution_word_table(distribution, language=None):
+    language = language or (get_export_report_language() if has_request_context() else 'en')
     table = word_element('tbl')
     table_properties = word_element('tblPr')
     table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
@@ -9900,7 +10247,7 @@ def build_grade_distribution_word_table(distribution):
         }))
     table_properties.append(borders)
     table.append(table_properties)
-    table.append(word_row(['Grade', 'Count', 'Percentage'], header=True))
+    table.append(word_row(['التقدير', 'العدد', 'النسبة'] if language == 'ar' else ['Grade', 'Count', 'Percentage'], header=True))
     for row in distribution.get('rows') or []:
         table.append(word_row([
             row.get('grade', ''),
@@ -9909,16 +10256,16 @@ def build_grade_distribution_word_table(distribution):
         ]))
     status_summary = grade_distribution_pass_fail_summary(distribution)
     table.append(word_row([
-        'Pass',
+        'ناجح' if language == 'ar' else 'Pass',
         status_summary['Pass']['count'],
         f"{status_summary['Pass']['percentage']:.2f}%",
     ]))
     table.append(word_row([
-        'Fail',
+        'راسب' if language == 'ar' else 'Fail',
         status_summary['Fail']['count'],
         f"{status_summary['Fail']['percentage']:.2f}%",
     ]))
-    table.append(word_row(['Total', distribution.get('total', 0), '100.00%' if distribution.get('total') else '0.00%'], header=True))
+    table.append(word_row(['الإجمالي' if language == 'ar' else 'Total', distribution.get('total', 0), '100.00%' if distribution.get('total') else '0.00%'], header=True))
     return table
 
 def grade_distribution_pass_fail_summary(distribution):
@@ -9941,7 +10288,8 @@ def grade_distribution_pass_fail_summary(distribution):
         },
     }
 
-def build_student_grade_comment(distribution):
+def build_student_grade_comment(distribution, language=None):
+    language = language or (get_export_report_language() if has_request_context() else 'en')
     distribution = distribution or {}
     total = int(distribution.get('total') or 0)
     if not total:
@@ -9960,6 +10308,23 @@ def build_student_grade_comment(distribution):
     high_pct = round((high_count / total * 100), 2) if total else 0
     at_risk_count = counts.get('D+', 0) + counts.get('D', 0) + counts.get('F', 0)
     at_risk_pct = round((at_risk_count / total * 100), 2) if total else 0
+
+    if language == 'ar':
+        if pass_pct >= 90:
+            overall = 'كان أداء الطلاب العام قويًا.'
+        elif pass_pct >= 75:
+            overall = 'كان أداء الطلاب العام مرضيًا.'
+        elif pass_pct >= 60:
+            overall = 'كان أداء الطلاب العام مقبولًا مع وجود حاجة لتحسينات موجهة.'
+        else:
+            overall = 'كان أداء الطلاب العام دون المستوى المتوقع ويتطلب إجراءات تحسين.'
+        return (
+            f"من أصل {total} طالبًا، نجح {pass_count} طالبًا ({pass_pct:.2f}%) "
+            f"ولم ينجح {fail_count} طالبًا ({fail_pct:.2f}%). {overall} كان التقدير الأكثر تكرارًا "
+            f"{top_grade} ({top_count} طالبًا، {top_pct:.2f}%). مثّلت تقديرات الإنجاز المرتفع "
+            f"(A+ و A) عدد {high_count} طالبًا ({high_pct:.2f}%)، بينما مثّلت التقديرات التي تحتاج متابعة "
+            f"(D+ و D و F) عدد {at_risk_count} طالبًا ({at_risk_pct:.2f}%)."
+        )
 
     if pass_pct >= 90:
         overall = 'overall student performance was strong.'
@@ -10018,7 +10383,146 @@ def build_template_grade_distribution_word_table(distribution):
     table.append(word_row(['Percentage'] + [grade_percentage_value(grade) for grade in grades_and_statuses]))
     return table
 
-def build_uncovered_topics_word_table(uncovered_details):
+def course_report_stats_summary_for_ai(stats):
+    rows = []
+    for clo, data in sorted_clo_items(stats or {}):
+        rows.append({
+            'clo': clo_number(clo),
+            'wording': clo_wording(clo),
+            'target_percentage': round(float(data.get('target_pct', 0) or 0), 2),
+            'achievement_percentage': round(float(data.get('achievement_percentage', 0) or 0), 2),
+            'students_achieved': int(data.get('students_achieved', 0) or 0),
+            'total_possible_score': round(float(data.get('total_possible_score', 0) or 0), 2),
+        })
+    return rows
+
+def course_report_grade_summary_for_ai(distribution):
+    distribution = distribution or {}
+    return {
+        'total_students': int(distribution.get('total') or 0),
+        'grade_counts': distribution.get('counts') or {},
+        'grade_percentages': {
+            row.get('grade'): row.get('percentage', 0)
+            for row in distribution.get('rows') or []
+        },
+        'pass_fail': grade_distribution_pass_fail_summary(distribution),
+    }
+
+def course_report_ai_system_prompt(language):
+    if language == 'ar':
+        return (
+            "أنت مساعد أكاديمي يكتب نصوصًا مختصرة لتقرير مقرر. "
+            "اكتب بالعربية الأكاديمية الواضحة. أعد JSON فقط دون Markdown. "
+            "لا تخترع أرقامًا غير موجودة. اجعل التعليق على نتائج الطلاب فقرة واحدة، "
+            "واجعل التوصيات عملية ومبنية على تحقق نواتج التعلم."
+        )
+    return (
+        "You are an academic reporting assistant. Write concise, formal course report text. "
+        "Return JSON only with no Markdown. Do not invent numbers. Provide one paragraph for "
+        "student results and practical recommendations based on CLO attainment."
+    )
+
+def generate_course_report_ai_insights(stats, grade_distribution, course_info=None, language=None):
+    language = language or (get_export_report_language() if has_request_context() else 'en')
+    payload = {
+        'language': 'Arabic' if language == 'ar' else 'English',
+        'course': {
+            'name': (course_info or {}).get('course_name') or (course_info or {}).get('raw_name') or '',
+            'code': (course_info or {}).get('course_id') or '',
+        },
+        'grade_distribution': course_report_grade_summary_for_ai(grade_distribution),
+        'clo_attainment': course_report_stats_summary_for_ai(stats),
+        'required_json_schema': {
+            'student_results_comment': 'one formal paragraph',
+            'recommendations': [
+                {
+                    'recommendation': 'short recommendation',
+                    'actions_needed': 'short action',
+                    'support': 'short support or No additional support required',
+                }
+            ],
+        },
+    }
+    user_payload = json.dumps(payload, ensure_ascii=False)
+    parsed = call_gemini_json(course_report_ai_system_prompt(language), user_payload)
+    if not parsed:
+        parsed = call_groq_json(course_report_ai_system_prompt(language), user_payload)
+    if not isinstance(parsed, dict):
+        return {}
+
+    comment = compact_text(parsed.get('student_results_comment') or parsed.get('student_comment') or '')
+    recommendations = []
+    for item in parsed.get('recommendations') or []:
+        if not isinstance(item, dict):
+            continue
+        recommendation = compact_text(item.get('recommendation') or item.get('text') or '')
+        if not recommendation:
+            continue
+        recommendations.append({
+            'recommendation': recommendation,
+            'actions_needed': compact_text(item.get('actions_needed') or item.get('action') or ''),
+            'support': compact_text(item.get('support') or item.get('needed_support') or ''),
+        })
+    return {
+        'student_results_comment': comment,
+        'recommendations': recommendations[:5],
+        'source': 'gemini' if GEMINI_API_KEY else 'groq',
+    }
+
+def fallback_course_report_recommendations(stats, language=None):
+    language = language or (get_export_report_language() if has_request_context() else 'en')
+    stats_items = sorted_clo_items(stats or {})
+    below_target = [
+        clo_number(clo)
+        for clo, data in stats_items
+        if float(data.get('achievement_percentage', 0) or 0) < float(data.get('target_pct', 0) or 0)
+    ]
+    if language == 'ar':
+        if below_target:
+            return [{
+                'recommendation': f"تحسين أداء الطلاب في نواتج التعلم التي لم تحقق المستوى المستهدف ({', '.join(below_target)}).",
+                'actions_needed': 'مراجعة استراتيجيات التدريس وتوفير أنشطة دعم وتدريب إضافية.',
+                'support': 'متابعة من القسم أو لجنة البرنامج.',
+            }]
+        return [{
+            'recommendation': 'المحافظة على مستوى تحقق نواتج التعلم وتعزيز الممارسات التعليمية الفاعلة.',
+            'actions_needed': 'توظيف أنشطة إثرائية ومتابعة مؤشرات الأداء في الطرح القادم.',
+            'support': 'لا يتطلب دعمًا إضافيًا.',
+        }]
+    if below_target:
+        return [{
+            'recommendation': f"Improve student performance in CLOs below the target level ({', '.join(below_target)}).",
+            'actions_needed': 'Revise teaching strategies and provide additional support activities.',
+            'support': 'Department or program committee follow-up.',
+        }]
+    return [{
+        'recommendation': 'Maintain CLO attainment performance and reinforce effective teaching practices.',
+        'actions_needed': 'Use enrichment activities and monitor performance indicators in the next offering.',
+        'support': 'No additional support required.',
+    }]
+
+def merge_course_report_recommendations(selected_items, generated_items):
+    merged = []
+    seen = set()
+    for item in list(selected_items or []) + list(generated_items or []):
+        if not isinstance(item, dict):
+            continue
+        recommendation = compact_text(item.get('recommendation') or '')
+        if not recommendation:
+            continue
+        key = re.sub(r'\s+', ' ', recommendation).strip().lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append({
+            'recommendation': recommendation,
+            'actions_needed': compact_text(item.get('actions_needed') or ''),
+            'support': compact_text(item.get('support') or ''),
+        })
+    return merged
+
+def build_uncovered_topics_word_table(uncovered_details, language=None):
+    language = language or (get_export_report_language() if has_request_context() else 'en')
     table = word_element('tbl')
     table_properties = word_element('tblPr')
     table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
@@ -10032,22 +10536,23 @@ def build_uncovered_topics_word_table(uncovered_details):
         }))
     table_properties.append(borders)
     table.append(table_properties)
-    table.append(word_row([
-        'Topic',
-        'Reason for Not Covering/discrepancies',
-        'Extent of their Impact on Learning Outcomes',
-        'Compensating Action',
-    ], header=True))
+    table.append(word_row(
+        ['الموضوع', 'سبب عدم التغطية أو الاختلاف', 'مدى التأثير على نواتج التعلم', 'الإجراء التعويضي']
+        if language == 'ar'
+        else ['Topic', 'Reason for Not Covering/discrepancies', 'Extent of their Impact on Learning Outcomes', 'Compensating Action'],
+        header=True
+    ))
     for item in uncovered_details or []:
         table.append(word_row([
             item.get('topic', ''),
-            item.get('reason', ''),
+            course_report_label_for_language(item.get('reason', ''), language),
             item.get('impact', ''),
-            item.get('action', ''),
+            course_report_label_for_language(item.get('action', ''), language),
         ]))
     return table
 
-def build_course_improvement_plan_word_table(improvement_items):
+def build_course_improvement_plan_word_table(improvement_items, language=None):
+    language = language or (get_export_report_language() if has_request_context() else 'en')
     table = word_element('tbl')
     table_properties = word_element('tblPr')
     table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
@@ -10061,12 +10566,15 @@ def build_course_improvement_plan_word_table(improvement_items):
         }))
     table_properties.append(borders)
     table.append(table_properties)
-    table.append(word_row(['Recommendations', 'Actions Needed', 'Support'], header=True))
+    table.append(word_row(
+        ['التوصيات', 'الإجراءات المطلوبة', 'الدعم المطلوب'] if language == 'ar' else ['Recommendations', 'Actions Needed', 'Support'],
+        header=True
+    ))
     for item in improvement_items or []:
         table.append(word_row([
-            item.get('recommendation', ''),
-            item.get('actions_needed', ''),
-            item.get('support', ''),
+            course_report_label_for_language(item.get('recommendation', ''), language),
+            course_report_label_for_language(item.get('actions_needed', ''), language),
+            course_report_label_for_language(item.get('support', ''), language),
         ]))
     return table
 
@@ -10074,6 +10582,7 @@ def build_course_report_input_blocks(course_report_inputs):
     if not course_report_inputs:
         return []
 
+    language = get_export_report_language() if has_request_context() else 'en'
     blocks = []
     topics_value = course_report_inputs.get('topics_covered')
     topics_label = 'Yes' if topics_value == 'yes' else 'No' if topics_value == 'no' else 'Not specified'
@@ -10082,19 +10591,19 @@ def build_course_report_input_blocks(course_report_inputs):
     blocks.append(word_paragraph(f"Have all course topics been covered? {topics_label}"))
     if topics_value == 'no' and uncovered_details:
         blocks.append(word_paragraph('Topics not covered:'))
-        blocks.append(build_uncovered_topics_word_table(uncovered_details))
+        blocks.append(build_uncovered_topics_word_table(uncovered_details, language))
     grade_distribution = course_report_inputs.get('grade_distribution') or {}
     if grade_distribution:
         blocks.append(word_paragraph('Final Grade Distribution', bold=True))
-        blocks.append(build_grade_distribution_word_table(grade_distribution))
-        student_grade_comment = build_student_grade_comment(grade_distribution)
+        blocks.append(build_grade_distribution_word_table(grade_distribution, language))
+        student_grade_comment = course_report_inputs.get('student_results_comment') or build_student_grade_comment(grade_distribution, language)
         if student_grade_comment:
             blocks.append(word_paragraph('Comment on Student Grades', bold=True))
             blocks.append(word_paragraph(student_grade_comment))
     improvement_items = course_report_inputs.get('course_improvement_plan') or []
     if improvement_items:
         blocks.append(word_paragraph('Course Improvement Plan', bold=True))
-        blocks.append(build_course_improvement_plan_word_table(improvement_items))
+        blocks.append(build_course_improvement_plan_word_table(improvement_items, language))
     return blocks
 
 def replace_word_text(root, replacements):
@@ -10150,13 +10659,23 @@ def replace_next_table_after_heading(body, heading_text, table_element):
 
 def course_report_template_replacements(course_info=None, course_report_inputs=None, total_students=None):
     course_info = course_info or {}
+    course_report_inputs = course_report_inputs or {}
     grade_distribution = (course_report_inputs or {}).get('grade_distribution') or {}
     completed_students = grade_distribution.get('total') or total_students or ''
-    student_grade_comment = build_student_grade_comment(grade_distribution)
+    report_details = course_report_inputs.get('report_details') or {}
+    student_grade_comment = course_report_inputs.get('student_results_comment') or build_student_grade_comment(grade_distribution)
     branding = get_report_branding() if has_request_context() else {}
     user = current_user() if has_request_context() else None
     institution = (user['university_name'] if user else '') or branding.get('organization_name') or ''
     department = course_info.get('department') or branding.get('department') or ''
+    location = report_details.get('location') or ''
+    branch_name = report_details.get('branch_name') or ''
+    if get_export_report_language() == 'ar':
+        location_text = 'مكان تقديم المقرر: ☒ المقر الرئيس ☐       فرع ...' if location == 'main' else f"مكان تقديم المقرر: ☐ المقر الرئيس ☒       فرع {branch_name}".rstrip()
+    else:
+        location_text = 'Location:   Main campus ☒             branch ☐' if location == 'main' else f"Location:   Main campus ☐             branch ☒ {branch_name}".rstrip()
+    started_students = report_details.get('students_started') or completed_students
+    completed_students = report_details.get('students_completed') or completed_students
     return {
         'Enter Course Title.': course_info.get('course_name') or course_info.get('raw_name') or '',
         'Enter Course Code.': course_info.get('course_id') or '',
@@ -10165,11 +10684,24 @@ def course_report_template_replacements(course_info=None, course_report_inputs=N
         'Enter College Name.': course_info.get('college') or '',
         'Enter Institution Name.': institution,
         'Enter Academic Year.': course_info.get('academic_year') or str(datetime.now().year),
-        'Enter Course Instructor Name.': course_info.get('instructor') or '',
-        'Enter Number of Students Starting the Course.': completed_students,
+        'Enter Course Instructor Name.': report_details.get('course_instructor') or course_info.get('instructor') or '',
+        'Course Coordinator:': f"Course Coordinator: {report_details.get('course_coordinator') or ''}",
+        'Location:   Main campus ☐             branch ☐': location_text,
+        'Number of Section(s):': f"Number of Section(s): {report_details.get('sections_count') or ''}",
+        'Enter Number of Students Starting the Course.': started_students,
         'Enter Number of Students Completed the Course.': completed_students,
         'Pick Report Date.': datetime.now().strftime('%Y-%m-%d'),
         'Including particular factors (if any) affecting the results': student_grade_comment,
+        'اسم المقرر:   اكتب هنا': f"اسم المقرر:   {course_info.get('course_name') or course_info.get('raw_name') or ''}",
+        'رمز المقرر:  اكتب هنا': f"رمز المقرر:  {course_info.get('course_id') or ''}",
+        'أستاذ المقرر:  اكتب هنا': f"أستاذ المقرر:  {report_details.get('course_instructor') or course_info.get('instructor') or ''}",
+        'منسق المقرر:  اكتب هنا': f"منسق المقرر:  {report_details.get('course_coordinator') or ''}",
+        'مكان تقديم المقرر: ☐ المقر الرئيس ☐       فرع ...': location_text,
+        'عدد الشعب:  اكتب هنا': f"عدد الشعب:  {report_details.get('sections_count') or ''}",
+        'عدد الطلاب (الذين بدأوا المقرر):  اكتب هنا': f"عدد الطلاب (الذين بدأوا المقرر):  {started_students}",
+        'عدد الطلاب (الذين أنهوا المقرر):  اكتب هنا': f"عدد الطلاب (الذين أنهوا المقرر):  {completed_students}",
+        'تاريخ إعداد التقرير:  اكتب هنا': f"تاريخ إعداد التقرير:  {datetime.now().strftime('%Y-%m-%d')}",
+        'متضمنًا العوامل التي أثرت على النتائج - إن وجدت-.': student_grade_comment,
     }
 
 def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, course_info=None, total_students=None):
@@ -10184,6 +10716,7 @@ def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, co
                 raise ValueError("The Word template does not contain a document body.")
 
             replace_word_text(root, course_report_template_replacements(course_info, course_report_inputs, total_students))
+            report_language = get_export_report_language()
             grade_distribution = (course_report_inputs or {}).get('grade_distribution') or {}
             replace_next_table_after_heading(
                 body,
@@ -10193,19 +10726,24 @@ def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, co
             replace_next_table_after_heading(
                 body,
                 ['1. Course Learning Outcomes Assessment Results', '1. قياس نواتج التعلم للمقرر'],
-                build_clo_assessment_word_table(stats, course_info)
+                build_clo_assessment_word_table(stats, course_info, report_language)
             )
             uncovered_details = (course_report_inputs or {}).get('uncovered_topic_details') or []
             replace_next_table_after_heading(
                 body,
                 ['C. Topics not covered.', 'ج. الموضوعات التي لم يتم تغطيتها'],
-                build_uncovered_topics_word_table(uncovered_details)
+                build_uncovered_topics_word_table(uncovered_details, report_language)
             )
             improvement_items = (course_report_inputs or {}).get('course_improvement_plan') or []
             replace_next_table_after_heading(
                 body,
+                ['2. Recommendations', '2. التوصيات:'],
+                build_course_improvement_plan_word_table(improvement_items, report_language)
+            )
+            replace_next_table_after_heading(
+                body,
                 ['D. Course Improvement Plan', 'F. Course Improvement Plan', 'F. Course Improvement Plan (if any)', 'خطة تحسين المقرر', 'خطط التحسين'],
-                build_course_improvement_plan_word_table(improvement_items)
+                build_course_improvement_plan_word_table(improvement_items, report_language)
             )
             updated_document_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
 
@@ -10236,7 +10774,7 @@ def build_generated_course_report_docx(stats, course_report_inputs=None, course_
         body.append(word_paragraph(f"Course Code: {course_id}"))
 
     body.append(word_paragraph('Course Learning Outcomes Assessment Results', bold=True))
-    body.append(build_clo_assessment_word_table(stats, course_info))
+    body.append(build_clo_assessment_word_table(stats, course_info, get_export_report_language() if has_request_context() else 'en'))
     for block in build_course_report_input_blocks(course_report_inputs):
         body.append(block)
 
@@ -10273,7 +10811,7 @@ def build_course_report_docx(stats, course_report_inputs=None, course_info=None,
             )
     return build_generated_course_report_docx(stats, course_report_inputs, course_info)
 
-def read_course_report_export_inputs(redirect_url):
+def read_course_report_export_inputs(redirect_url, stats=None, course_info=None, total_students=None):
     final_grades_file = request.files.get('final_grades_file')
     if not final_grades_file or not final_grades_file.filename:
         flash("Please upload the final grades file as CSV, Excel, or PDF.", "error")
@@ -10304,12 +10842,28 @@ def read_course_report_export_inputs(redirect_url):
     if not grade_distribution.get('total'):
         grade_distribution = {}
 
-    return {
+    course_report_inputs = {
         'topics_covered': topics_covered,
         'uncovered_topic_details': read_uncovered_topic_details(),
         'grade_distribution': grade_distribution,
+        'report_details': read_course_report_optional_details(),
         'course_improvement_plan': read_course_improvement_plan(),
-    }, None
+    }
+
+    language = get_export_report_language() if has_request_context() else 'en'
+    ai_insights = generate_course_report_ai_insights(stats or {}, grade_distribution, course_info or {}, language)
+    student_comment = compact_text(ai_insights.get('student_results_comment') or '')
+    if not student_comment:
+        student_comment = build_student_grade_comment(grade_distribution, language)
+    generated_recommendations = ai_insights.get('recommendations') or fallback_course_report_recommendations(stats or {}, language)
+    course_report_inputs['student_results_comment'] = student_comment
+    course_report_inputs['ai_recommendations'] = generated_recommendations
+    course_report_inputs['course_improvement_plan'] = merge_course_report_recommendations(
+        course_report_inputs.get('course_improvement_plan') or [],
+        generated_recommendations
+    )
+    course_report_inputs['ai_source'] = ai_insights.get('source') or 'fallback'
+    return course_report_inputs, None
 
 def course_report_docx_response(docx_bytes):
     response = Response(
@@ -10318,6 +10872,65 @@ def course_report_docx_response(docx_bytes):
     )
     response.headers["Content-Disposition"] = 'attachment; filename="course_report_filled.docx"'
     return response
+
+def save_course_report_snapshot(stats, course_report_inputs, course_info, total_students=None, source_report_ids=None):
+    user = current_user()
+    if not user:
+        return {'allowed': False, 'saved': False, 'reason': 'anonymous', 'id': None}
+
+    created_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+    course_name = course_info.get('raw_name') or course_info.get('course_name') or ''
+    payload = {
+        'report_type': 'course_report',
+        'stats': json_safe(stats or {}),
+        'course_report_inputs': json_safe(course_report_inputs or {}),
+        'total_students': total_students or 0,
+        'course_info': json_safe(course_info or {}),
+        'source_report_ids': source_report_ids or [],
+        'branding': get_display_branding_payload(),
+        'created_at': created_at,
+    }
+    payload_json = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+    report_hash = hashlib.sha256(
+        json.dumps({'payload': payload, 'nonce': str(uuid.uuid4())}, ensure_ascii=False, sort_keys=True).encode('utf-8')
+    ).hexdigest()
+    with get_db() as conn:
+        saved_count = conn.execute(
+            "SELECT COUNT(*) FROM saved_reports WHERE user_id = ?",
+            (user['id'],)
+        ).fetchone()[0]
+        entitlement = report_creation_entitlement(user, saved_count)
+        if not entitlement:
+            return {'allowed': False, 'saved': False, 'reason': 'billing_required', 'id': None}
+
+        title = unique_saved_report_title(
+            conn,
+            user['id'],
+            course_name,
+            f"Course Report - {course_name}".strip(' -') or 'Course Report'
+        )
+        row = conn.execute(
+            """
+            INSERT INTO saved_reports
+                (user_id, title, course_name, payload_json, report_hash, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            RETURNING id
+            """,
+            (
+                user['id'],
+                title,
+                course_name,
+                payload_json,
+                report_hash,
+                created_at
+            )
+        ).fetchone()
+        if entitlement == 'credit':
+            conn.execute(
+                "UPDATE users SET report_credits = CASE WHEN report_credits > 0 THEN report_credits - 1 ELSE 0 END WHERE id = ?",
+                (user['id'],)
+            )
+        return {'allowed': True, 'saved': True, 'reason': entitlement, 'id': row['id'] if row else None}
 
 def build_results_pdf_legacy(stats, total_students, course_info, student_achievement_rows=None, branding=None):
     branding = apply_university_identity_colors(branding or get_report_branding())
@@ -11553,7 +12166,7 @@ def reports():
         return redirect(url_for('login'))
     with get_db() as conn:
         rows = conn.execute(
-            "SELECT id, title, course_name, created_at FROM saved_reports WHERE user_id = ? ORDER BY id DESC",
+            "SELECT id, title, course_name, created_at, payload_json FROM saved_reports WHERE user_id = ? ORDER BY id DESC",
             (user['id'],)
         ).fetchall()
     reports = [
@@ -11562,7 +12175,8 @@ def reports():
             'title': row['title'],
             'display_title': display_saved_report_title(row),
             'course_name': row['course_name'],
-            'created_at': row['created_at']
+            'created_at': row['created_at'],
+            'report_type': (safe_json_loads(row_get(row, 'payload_json'), {}) or {}).get('report_type') or 'clo_attainment',
         }
         for row in rows
     ]
@@ -11578,6 +12192,18 @@ def report_detail(report_id):
     if not row:
         flash("Report not found.", "error")
         return redirect(url_for('reports'))
+    if payload.get('report_type') == 'course_report':
+        try:
+            docx_bytes = build_course_report_docx(
+                payload.get('stats') or {},
+                payload.get('course_report_inputs') or {},
+                payload.get('course_info') or {},
+                payload.get('total_students') or None
+            )
+        except ValueError as e:
+            flash(str(e), "error")
+            return redirect(url_for('reports'))
+        return course_report_docx_response(docx_bytes)
     branding = merge_with_current_branding(payload.get('branding') or {})
     return render_template(
         'report_results.html',
@@ -11642,6 +12268,31 @@ def export_saved_report_pdf(report_id):
     response = Response(pdf_bytes, mimetype="application/pdf")
     response.headers["Content-Disposition"] = 'attachment; filename="clo_achievement_report.pdf"'
     return response
+
+@app.route('/reports/<int:report_id>/export/docx')
+def export_saved_course_report_word(report_id):
+    user = current_user()
+    if not user:
+        flash("Please login to view saved reports.", "error")
+        return redirect(url_for('login'))
+    row, payload = load_saved_report_payload(report_id, user['id'])
+    if not row:
+        flash("Report not found.", "error")
+        return redirect(url_for('reports'))
+    if payload.get('report_type') != 'course_report':
+        flash("This report is not a course report.", "error")
+        return redirect(url_for('reports'))
+    try:
+        docx_bytes = build_course_report_docx(
+            payload.get('stats') or {},
+            payload.get('course_report_inputs') or {},
+            payload.get('course_info') or {},
+            payload.get('total_students') or None
+        )
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for('reports'))
+    return course_report_docx_response(docx_bytes)
 
 @app.route('/reports/<int:report_id>/rename', methods=['POST'])
 def rename_saved_report(report_id):
@@ -12210,7 +12861,7 @@ def assessment_balance_check_service():
         
         try:
             if file_ext in {'.pdf', '.docx', '.txt'}:
-                metrics = parse_exam_paper_with_module(filepath)
+                metrics = parse_exam_paper_metrics(filepath)
             else:
                 metrics = infer_spreadsheet_metrics(filepath, file_ext)
         except Exception as e:
@@ -12406,7 +13057,7 @@ def question_clo_mapping_service():
         filepath = get_upload_path(stored_name)
         paper_file.save(filepath)
         try:
-            metrics = parse_exam_paper_with_module(filepath)
+            metrics = parse_exam_paper_metrics(filepath)
             draft_id = save_question_mapping_draft({
                 'course_name': course_name,
                 'filename': paper_file.filename,
@@ -12692,15 +13343,34 @@ def export_saved_course_report_docx(report_id):
         flash("CLO attainment report not found.", "error")
         return redirect(url_for('course_report_service'))
 
-    course_report_inputs, error_response = read_course_report_export_inputs(redirect_url)
+    enriched_course_info = enrich_course_info_from_course(payload.get('course_info') or {}, row['course_name'])
+    course_report_inputs, error_response = read_course_report_export_inputs(
+        redirect_url,
+        payload.get('stats') or {},
+        enriched_course_info,
+        payload.get('total_students') or None
+    )
     if error_response:
         return error_response
+
+    if request.form.get('course_report_action') == 'save':
+        save_result = save_course_report_snapshot(
+            payload.get('stats') or {},
+            course_report_inputs,
+            enriched_course_info,
+            payload.get('total_students') or None,
+            [report_id]
+        )
+        if not save_result.get('allowed'):
+            flash("Please upgrade or add report credits to save more reports.", "error")
+            return redirect(redirect_url)
+        return redirect(url_for('reports'))
 
     try:
         docx_bytes = build_course_report_docx(
             payload.get('stats') or {},
             course_report_inputs,
-            enrich_course_info_from_course(payload.get('course_info') or {}, row['course_name']),
+            enriched_course_info,
             payload.get('total_students') or None
         )
     except ValueError as e:
@@ -12721,14 +13391,32 @@ def export_selected_course_report_docx():
         flash(translate('course_report.select_one_report'), "error")
         return redirect(redirect_url)
 
-    course_report_inputs, error_response = read_course_report_export_inputs(redirect_url)
-    if error_response:
-        return error_response
-
     combined_stats, course_info, total_students, selected_reports = aggregate_course_report_payloads(
         report_payloads,
         request.form.get('course_name') or ''
     )
+    course_report_inputs, error_response = read_course_report_export_inputs(
+        redirect_url,
+        combined_stats,
+        course_info,
+        total_students
+    )
+    if error_response:
+        return error_response
+
+    if request.form.get('course_report_action') == 'save':
+        source_report_ids = []
+        for value in request.form.getlist('report_ids'):
+            try:
+                source_report_ids.append(int(value))
+            except (TypeError, ValueError):
+                pass
+        save_result = save_course_report_snapshot(combined_stats, course_report_inputs, course_info, total_students, source_report_ids)
+        if not save_result.get('allowed'):
+            flash("Please upgrade or add report credits to save more reports.", "error")
+            return redirect(redirect_url)
+        return redirect(url_for('reports'))
+
     try:
         docx_bytes = build_course_report_docx(combined_stats, course_report_inputs, course_info, total_students)
     except ValueError as e:
@@ -13061,10 +13749,6 @@ def export_course_report_docx():
     if not require_export_profile():
         return redirect(redirect_url)
 
-    course_report_inputs, error_response = read_course_report_export_inputs(redirect_url)
-    if error_response:
-        return error_response
-
     try:
         stats, total_students, student_achievement_rows, error = calculate_clo_results()
     except Exception as e:
@@ -13075,8 +13759,18 @@ def export_course_report_docx():
         flash(error)
         return redirect(url_for('clo_attainment'))
 
+    course_info_for_report = get_course_report_info()
+    course_report_inputs, error_response = read_course_report_export_inputs(
+        redirect_url,
+        stats,
+        course_info_for_report,
+        total_students
+    )
+    if error_response:
+        return error_response
+
     try:
-        docx_bytes = build_course_report_docx(stats, course_report_inputs, get_course_report_info(), total_students)
+        docx_bytes = build_course_report_docx(stats, course_report_inputs, course_info_for_report, total_students)
     except ValueError as e:
         flash(str(e), "error")
         return redirect(redirect_url)

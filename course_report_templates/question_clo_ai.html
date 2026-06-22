@@ -41,17 +41,48 @@
         color: var(--accent-primary);
     }
 
-    .clo-reference {
-        margin-top: 0.75rem;
-        border-top: 1px solid var(--border-color);
-        padding-top: 0.75rem;
-        color: var(--text-muted);
-        font-size: 0.88rem;
+    .clo-card-grid {
+        display: grid;
+        gap: 0.65rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        margin-top: 0.6rem;
     }
 
-    .clo-reference ul {
-        margin: 0.45rem 0 0;
-        padding-inline-start: 1.25rem;
+    .clo-card-option {
+        display: block;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #f9fafb;
+        padding: 0.7rem 0.8rem;
+        cursor: pointer;
+        min-height: 100%;
+    }
+
+    .clo-card-option input {
+        margin-inline-end: 0.45rem;
+    }
+
+    .clo-card-option.is-suggested {
+        border-color: var(--accent-primary);
+        background: color-mix(in srgb, var(--accent-primary) 10%, white);
+    }
+
+    .clo-card-option:has(input:checked) {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    }
+
+    .clo-card-code {
+        font-weight: 800;
+        color: var(--accent-primary);
+        margin-inline-end: 0.25rem;
+    }
+
+    .clo-card-hint {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        margin-top: 0.25rem;
     }
 </style>
 
@@ -94,6 +125,7 @@
             {% for question in review_summary.needs_ai_questions %}
                 {% set suggestions = metrics.smart_clo_suggestions.get(question, []) if metrics.smart_clo_suggestions else [] %}
                 {% set suggested = suggestions[0] if suggestions else None %}
+                {% set suggested_clos = suggestions|map(attribute='clo')|list if suggestions else [] %}
                 {% set question_text = metrics.question_texts.get(question, '') %}
                 <section class="ai-map-card">
                     <h3>{{ _('mapping.question') }} {{ loop.index }}</h3>
@@ -106,20 +138,23 @@
                             <strong>{{ (suggested.score ~ '%') if suggested else '-' }}</strong>
                         </span>
                     </div>
-                    <label for="question_clo_{{ question }}">{{ _('question_mapping.select_clo') }}</label>
-                    <select id="question_clo_{{ question }}" name="question_clo_{{ question }}" class="form-control" required>
-                        <option value="">{{ _('question_mapping.choose_clo') }}</option>
+                    <strong>{{ _('question_mapping.select_clo') }}</strong>
+                    <div class="clo-card-grid">
                         {% for clo in clos %}
-                            <option value="{{ clo }}" {% if suggested and clo == suggested.clo %}selected{% endif %}>{{ clo }}</option>
+                            <label class="clo-card-option {% if clo in suggested_clos %}is-suggested{% endif %}">
+                                <input type="checkbox" name="question_clo_{{ question }}" value="{{ clo }}" {% if suggested and clo == suggested.clo %}checked{% endif %}>
+                                <span class="clo-card-code">{{ clo.split(' ')[0] }}</span>
+                                <span>{{ clo }}</span>
+                                {% if clo in suggested_clos %}
+                                    <span class="clo-card-hint">
+                                        {{ _('question_mapping.suggested_clo') }}
+                                        {% for suggestion in suggestions if suggestion.clo == clo %}
+                                            {% if suggestion.score %} - {{ suggestion.score }}%{% endif %}
+                                        {% endfor %}
+                                    </span>
+                                {% endif %}
+                            </label>
                         {% endfor %}
-                    </select>
-                    <div class="clo-reference">
-                        <strong>{{ _('question_mapping.all_course_clos') }}</strong>
-                        <ul>
-                            {% for clo in clos %}
-                                <li>{{ clo }}</li>
-                            {% endfor %}
-                        </ul>
                     </div>
                 </section>
             {% endfor %}
