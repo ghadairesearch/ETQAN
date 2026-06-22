@@ -527,7 +527,7 @@ EN_TRANSLATIONS = {
     'home.add_course_description': 'Create a course to generate reports.',
     'home.requires_course': 'Requires at least one course.',
     'home.question_mapping_title': 'Question CLO Mapping',
-    'home.question_mapping_description': 'Upload an exam paper and map each question to the related CLOs before using the mapping in reports.',
+    'home.question_mapping_description': 'Upload an exam paper to map each question to the related CLOs.',
     'home.question_mapping_extract': 'Extract Questions',
     'question_mapping.review_title': 'Review Extracted Questions',
     'question_mapping.review_description': 'Edit the extracted questions, add missing questions if needed, then map them to CLOs.',
@@ -1375,7 +1375,7 @@ TRANSLATIONS = {
         'results.save_course_report': 'حفظ تقرير المقرر',
         'results.export_word': 'تصدير Word',
         'results.course_report_inputs': '\u0645\u062f\u062e\u0644\u0627\u062a \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631',
-        'results.course_report_optional_details': 'بيانات تقرير المقرر الاختيارية',
+        'results.course_report_optional_details': 'البيانات الأساسية',
         'results.course_instructor': 'أستاذ المقرر',
         'results.course_coordinator': 'منسق المقرر',
         'results.course_location': 'مكان تقديم المقرر',
@@ -13314,13 +13314,22 @@ def course_report_service():
         associated_reports=None
     )
 
-@app.route('/course-report-service/reports', methods=['POST'])
+@app.route('/course-report-service/reports', methods=['GET', 'POST'])
 def course_report_service_inputs_multi():
     user = current_user()
     if not user:
         flash("Please login to create a course report.", "error")
         return redirect(url_for('login'))
-    report_ids = request.form.getlist('report_ids')
+    
+    if request.method == 'POST':
+        report_ids = request.form.getlist('report_ids')
+        course_name = request.form.get('course_name')
+        session['last_report_ids'] = report_ids
+        session['last_course_name'] = course_name
+    else:
+        report_ids = session.get('last_report_ids', [])
+        course_name = session.get('last_course_name', '')
+        
     if not report_ids:
         flash(translate('course_report.select_one_report'), "error")
         return redirect(url_for('course_report_service'))
@@ -13332,16 +13341,16 @@ def course_report_service_inputs_multi():
         return render_course_report_inputs_from_records(
             records,
             url_for('export_selected_course_report_docx'),
-            request.form.get('course_name') or ''
+            course_name or ''
         )
     except Exception as exc:
         app.logger.exception(
             "Failed to open course report inputs for user_id=%s report_ids=%s course=%s",
             user['id'],
             report_ids,
-            request.form.get('course_name') or ''
+            course_name or ''
         )
-        flash(course_report_input_error_message(exc, report_ids, request.form.get('course_name') or ''), "error")
+        flash(course_report_input_error_message(exc, report_ids, course_name or ''), "error")
         return redirect(url_for('course_report_service'))
 
 @app.route('/course-report-service/report/<int:report_id>')

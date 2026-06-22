@@ -415,6 +415,46 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const savedState = sessionStorage.getItem('savedFormState');
+            if (savedState) {
+                try {
+                    const formData = JSON.parse(savedState);
+                    document.querySelectorAll('input, select, textarea').forEach(el => {
+                        if (el.name && !el.matches('[type="hidden"], [type="file"]')) {
+                            if (el.type === 'checkbox' || el.type === 'radio') {
+                                const key = el.name + '_' + el.value;
+                                if (formData[key] !== undefined) {
+                                    el.checked = formData[key];
+                                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                                }
+                            } else {
+                                if (formData[el.name] !== undefined) {
+                                    el.value = formData[el.name];
+                                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                                }
+                            }
+                        }
+                    });
+                } catch (err) {}
+                sessionStorage.removeItem('savedFormState');
+            }
+
+            document.querySelectorAll('.language-menu-panel a').forEach(a => {
+                a.addEventListener('click', function() {
+                    const formData = {};
+                    document.querySelectorAll('input, select, textarea').forEach(el => {
+                        if (el.name && !el.matches('[type="hidden"], [type="file"]')) {
+                            if (el.type === 'checkbox' || el.type === 'radio') {
+                                formData[el.name + '_' + el.value] = el.checked;
+                            } else {
+                                formData[el.name] = el.value;
+                            }
+                        }
+                    });
+                    sessionStorage.setItem('savedFormState', JSON.stringify(formData));
+                });
+            });
+
             const menuPairs = [
                 [document.getElementById('account_menu'), document.getElementById('account_menu_button')],
                 [document.getElementById('language_menu'), document.getElementById('language_menu_button')]

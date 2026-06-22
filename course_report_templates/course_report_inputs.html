@@ -6,7 +6,6 @@
         <div>
             <h2 style="margin-top: 0;">{{ _('home.course_report_title') }}</h2>
         </div>
-        <a href="/course-report-service" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('mapping.back') }}</a>
     </div>
 
     <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb; margin-bottom: 1.25rem;">
@@ -268,7 +267,10 @@
             </div>
         </div>
 
-        <button type="submit" name="course_report_action" value="preview" class="btn">{{ _('course_report.next') }}</button>
+        <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1.5rem;">
+            <a href="/course-report-service" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('mapping.back') }}</a>
+            <button type="submit" name="course_report_action" value="preview" class="btn">{{ _('course_report.next') }}</button>
+        </div>
     </form>
 </div>
 <script>
