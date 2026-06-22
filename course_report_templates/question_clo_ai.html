@@ -2,12 +2,16 @@
 
 {% block content %}
 <style>
-    .wizard-slide { display: none; }
-    .wizard-slide.active { display: block; animation: fadeIn 0.3s ease; }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(5px); }
-        to { opacity: 1; transform: translateY(0); }
+    .wizard-slide {
+        display: block;
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px dashed var(--border-color);
+    }
+    .wizard-slide:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
     
     .question-box {
@@ -219,14 +223,6 @@
 <div class="card" style="max-width: 800px; margin: 0 auto;">
     <h2 style="margin-top: 0;">{{ _('question_mapping.step3_title') }}</h2>
     
-    <div style="margin-bottom: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <span style="color: var(--text-muted); font-weight: 600;" id="wizard-progress-text"></span>
-            <div style="flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; margin: 0 1rem; overflow: hidden;">
-                <div id="wizard-progress-bar" style="height: 100%; background: var(--accent-primary); width: 0%; transition: width 0.3s;"></div>
-            </div>
-        </div>
-    </div>
 
     <form method="POST" action="{{ url_for('question_clo_mapping_final') }}" id="mapping-form">
         <input type="hidden" name="draft_id" value="{{ draft_id }}">
@@ -308,9 +304,8 @@
             {% endfor %}
         </div>
         
-        <div class="wizard-footer">
-            <button type="button" class="btn" id="btn-prev" style="background-color: var(--border-color); color: var(--text-main);">Previous Question</button>
-            <button type="button" class="btn" id="btn-next">Save and Next</button>
+        <div class="wizard-footer" style="justify-content: flex-end;">
+            <button type="submit" class="btn">{{ _('question_mapping.save_mapping') }}</button>
         </div>
     </form>
 </div>
@@ -346,7 +341,6 @@
     
     const selectedClos = {};
     const slides = document.querySelectorAll('.wizard-slide');
-    let currentIndex = 0;
     let targetQuestionForModal = null;
     
     function init() {
@@ -358,48 +352,7 @@
             }
             renderChips(q);
         });
-        updateWizard();
     }
-    
-    function updateWizard() {
-        slides.forEach((slide, idx) => {
-            slide.classList.toggle('active', idx === currentIndex);
-        });
-        
-        document.getElementById('btn-prev').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
-        
-        const btnNext = document.getElementById('btn-next');
-        if (currentIndex === slides.length - 1) {
-            btnNext.textContent = "{{ _('question_mapping.save_mapping') }}";
-        } else {
-            btnNext.textContent = "Save and Next";
-        }
-        
-        // Progress bar
-        const total = slides.length;
-        if (total > 0) {
-            document.getElementById('wizard-progress-text').textContent = `${currentIndex + 1} / ${total}`;
-            document.getElementById('wizard-progress-bar').style.width = `${((currentIndex + 1) / total) * 100}%`;
-        }
-    }
-    
-    document.getElementById('btn-prev').addEventListener('click', () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            updateWizard();
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-    });
-    
-    document.getElementById('btn-next').addEventListener('click', () => {
-        if (currentIndex < slides.length - 1) {
-            currentIndex++;
-            updateWizard();
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        } else {
-            document.getElementById('mapping-form').submit();
-        }
-    });
     
     function renderChips(question) {
         const container = document.getElementById(`chip-container-${question}`);
