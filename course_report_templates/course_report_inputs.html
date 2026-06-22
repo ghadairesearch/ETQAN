@@ -90,7 +90,7 @@
         </section>
 
         <div class="form-group">
-            <label class="form-label">{{ _('results.topics_covered') }}</label>
+            <label class="form-label">{{ _('results.topics_covered') }} <span style="color: var(--danger);">*</span></label>
             <div style="display: grid; gap: 0.45rem;">
                 <label style="display: flex; align-items: center; gap: 0.5rem;">
                     <input type="radio" name="topics_covered" value="yes" required data-topics-toggle>
@@ -166,7 +166,7 @@
 
         <div class="form-group">
             <label class="form-label" style="display: inline-flex; align-items: center; gap: 0.35rem;">
-                <span>{{ _('results.final_grades_file') }}</span>
+                <span>{{ _('results.final_grades_file') }} <span style="color: var(--danger);">*</span></span>
                 <span title="{{ _('results.final_grades_help') }}" aria-label="{{ _('results.final_grades_help') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: help;">i</span>
             </label>
             <input type="file" name="final_grades_file" class="form-control" accept=".csv,.xlsx,.xls,.pdf" required style="padding: 0.5rem;">

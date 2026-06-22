@@ -31,6 +31,47 @@
         text-align: left;
         vertical-align: top;
     }
+    .clo-card-grid {
+        display: grid;
+        gap: 0.6rem;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    }
+
+    .clo-card-option {
+        display: block;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #f9fafb;
+        padding: 0.65rem 0.75rem;
+        cursor: pointer;
+    }
+
+    .clo-card-option input {
+        margin-inline-end: 0.4rem;
+    }
+
+    .clo-card-option.is-suggested {
+        border-color: var(--accent-primary);
+        background: color-mix(in srgb, var(--accent-primary) 10%, white);
+    }
+
+    .clo-card-option:has(input:checked) {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    }
+
+    .clo-card-code {
+        font-weight: 800;
+        color: var(--accent-primary);
+        margin-inline-end: 0.25rem;
+    }
+
+    .clo-card-hint {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        margin-top: 0.25rem;
+    }
 </style>
 
 <div class="card">
@@ -71,23 +112,25 @@
                                 </td>
                                 <td>
                                     {% set suggestions = metrics.smart_clo_suggestions.get(col, []) if metrics and metrics.smart_clo_suggestions else [] %}
-                                    {% if suggestions %}
-                                        <div style="margin-bottom: 0.5rem;">
-                                        {% for suggestion in suggestions %}
-                                            <div style="border: 1px solid var(--border-color); border-radius: 4px; padding: 0.25rem 0.5rem; margin-bottom: 0.25rem; background: #fff; display: inline-block;">
-                                                <strong>{{ suggestion.clo.split(' ')[0] }}</strong>
-                                                <span style="color: var(--text-muted); font-size: 0.75rem;">{{ suggestion.score }}%</span>
-                                            </div>
-                                        {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    
-                                    <select name="clo_{{ col }}" class="form-control" multiple size="4" style="padding: 0.5rem; background: var(--bg-base); width: 100%;">
+                                    {% set suggested_clos = suggestions|map(attribute='clo')|list if suggestions else [] %}
+                                    {% set mapped_clos = existing_mapping.get(col).get('clos', []) if existing_mapping.get(col) else [] %}
+                                    <div class="clo-card-grid">
                                         {% for clo in clos %}
-                                            <option value="{{ clo }}" {% if existing_mapping.get(col) and clo in existing_mapping.get(col).get('clos', []) %}selected{% endif %}>{{ clo }}</option>
+                                            <label class="clo-card-option {% if clo in suggested_clos and not mapped_clos %}is-suggested{% endif %}">
+                                                <input type="checkbox" name="clo_{{ col }}" value="{{ clo }}" {% if clo in mapped_clos %}checked{% endif %}>
+                                                <span class="clo-card-code">{{ clo.split(' ')[0] }}</span>
+                                                <span>{{ clo }}</span>
+                                                {% if clo in suggested_clos and not mapped_clos %}
+                                                    <span class="clo-card-hint">
+                                                        Suggested
+                                                        {% for suggestion in suggestions if suggestion.clo == clo %}
+                                                            {% if suggestion.score %} - {{ suggestion.score }}%{% endif %}
+                                                        {% endfor %}
+                                                    </span>
+                                                {% endif %}
+                                            </label>
                                         {% endfor %}
-                                    </select>
-                                    <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">Hold Ctrl to select multiple.</small>
+                                    </div>
                             </tr>
                         {% endfor %}
                     {% else %}
@@ -104,21 +147,25 @@
                                 </td>
                                 <td>
                                     {% set suggestions = metrics.smart_clo_suggestions.get(col, []) if metrics and metrics.smart_clo_suggestions else [] %}
-                                    {% if suggestions %}
-                                        <div style="margin-bottom: 0.5rem;">
-                                        {% for suggestion in suggestions %}
-                                            <div style="border: 1px solid var(--border-color); border-radius: 4px; padding: 0.25rem 0.5rem; margin-bottom: 0.25rem; background: #fff; display: inline-block;">
-                                                <strong>{{ suggestion.clo.split(' ')[0] }}</strong>
-                                                <span style="color: var(--text-muted); font-size: 0.75rem;">{{ suggestion.score }}%</span>
-                                            </div>
-                                        {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    <select name="clo_{{ col }}" class="form-control" multiple size="4" style="padding: 0.5rem; background: var(--bg-base); width: 100%;">
+                                    {% set suggested_clos = suggestions|map(attribute='clo')|list if suggestions else [] %}
+                                    {% set mapped_clos = existing_mapping.get(col).get('clos', []) if existing_mapping.get(col) else [] %}
+                                    <div class="clo-card-grid">
                                         {% for clo in clos %}
-                                            <option value="{{ clo }}" {% if existing_mapping.get(col) and clo in existing_mapping.get(col).get('clos', []) %}selected{% endif %}>{{ clo }}</option>
+                                            <label class="clo-card-option {% if clo in suggested_clos and not mapped_clos %}is-suggested{% endif %}">
+                                                <input type="checkbox" name="clo_{{ col }}" value="{{ clo }}" {% if clo in mapped_clos %}checked{% endif %}>
+                                                <span class="clo-card-code">{{ clo.split(' ')[0] }}</span>
+                                                <span>{{ clo }}</span>
+                                                {% if clo in suggested_clos and not mapped_clos %}
+                                                    <span class="clo-card-hint">
+                                                        Suggested
+                                                        {% for suggestion in suggestions if suggestion.clo == clo %}
+                                                            {% if suggestion.score %} - {{ suggestion.score }}%{% endif %}
+                                                        {% endfor %}
+                                                    </span>
+                                                {% endif %}
+                                            </label>
                                         {% endfor %}
-                                    </select>
+                                    </div>
                             </tr>
                         {% else %}
                             <tr>
