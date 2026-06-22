@@ -155,12 +155,14 @@
         {% if can_export %}
             {% if current_user and current_user.university_name %}
             <div style="display: flex; gap: 0.45rem; justify-content: flex-end; align-items: center;">
+                {% if not saved_report_view %}
                     <form method="POST" action="/save-report" style="margin: 0;">
                         <button type="submit" class="btn" style="padding: 0.45rem 0.85rem; display: flex; align-items: center; gap: 0.35rem; background-color: var(--accent); color: white;">
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                             {{ _('question_mapping.save_mapping') }}
                         </button>
                     </form>
+                {% endif %}
                 <div style="display: flex; align-items: center;">
                     <div class="result-export-menu" id="result_export_menu">
                         <button type="button" class="result-export-button" id="result_export_button" aria-label="Export" aria-haspopup="true" aria-expanded="false" {% if not is_saved %}disabled style="opacity: 0.5; cursor: not-allowed;" title="يجب حفظ التقرير قبل التصدير"{% endif %}>

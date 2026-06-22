@@ -12320,6 +12320,7 @@ def report_detail(report_id):
         display_branding=branding,
         show_exports=True,
         saved_report_view=True,
+        is_saved=True,
         show_course_report_export=False,
         export_csv_url=url_for('export_saved_report_csv', report_id=report_id),
         export_pdf_url=url_for('export_saved_report_pdf', report_id=report_id),
