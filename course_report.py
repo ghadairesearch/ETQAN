@@ -12718,6 +12718,45 @@ def my_exams():
         })
     return render_template('exam_history.html', exams=exams)
 
+@app.route('/account/exams/<int:exam_id>')
+def exam_view(exam_id):
+    user = current_user()
+    if not user:
+        flash(translate('courses.login_required'), "error")
+        return redirect(url_for('login'))
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT id, title, course_name, filename, payload_json, created_at FROM saved_exams WHERE id = ? AND user_id = ?",
+            (exam_id, user['id'])
+        ).fetchone()
+    if not row:
+        flash("Exam not found.", "error")
+        return redirect(url_for('my_exams'))
+    
+    exam = {
+        'id': row_get(row, 'id'),
+        'title': row_get(row, 'title'),
+        'course_name': row_get(row, 'course_name'),
+        'filename': row_get(row, 'filename'),
+        'created_at': row_get(row, 'created_at'),
+    }
+    payload = safe_json_loads(row_get(row, 'payload_json'), {}) or {}
+    return render_template('exam_view.html', exam=exam, payload=payload)
+
+@app.route('/account/exams/<int:exam_id>/delete', methods=['POST'])
+def exam_delete(exam_id):
+    user = current_user()
+    if not user:
+        flash(translate('courses.login_required'), "error")
+        return redirect(url_for('login'))
+    with get_db() as conn:
+        conn.execute(
+            "DELETE FROM saved_exams WHERE id = ? AND user_id = ?",
+            (exam_id, user['id'])
+        )
+    flash("Exam deleted successfully.")
+    return redirect(url_for('my_exams'))
+
 @app.route('/')
 def index():
     user = current_user()

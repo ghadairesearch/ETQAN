@@ -1,6 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .exam-delete-button {
+        width: 2.45rem;
+        height: 2.45rem;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--danger);
+        color: #fff;
+        border: 0;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .exam-delete-button svg {
+        width: 1.05rem;
+        height: 1.05rem;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+    }
+</style>
 <div class="card">
     <h2 style="margin-top: 0;">{{ _('exams.title') }}</h2>
     <table>
@@ -10,6 +33,7 @@
                 <th>{{ _('exams.course') }}</th>
                 <th>{{ _('exams.questions') }}</th>
                 <th>{{ _('exams.created') }}</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -17,7 +41,7 @@
                 {% for exam in exams %}
                     <tr>
                         <td>
-                            <strong>{{ exam.title }}</strong>
+                            <a href="/account/exams/{{ exam.id }}" style="color: var(--accent); font-weight: 700; text-decoration: underline;">{{ exam.title }}</a>
                             {% if exam.filename %}
                                 <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">{{ exam.filename }}</div>
                             {% endif %}
@@ -25,11 +49,26 @@
                         <td>{{ exam.course_name }}</td>
                         <td>{{ exam.question_count }}</td>
                         <td>{{ exam.created_at }}</td>
+                        <td>
+                            <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
+                                <form method="POST" action="/account/exams/{{ exam.id }}/delete" onsubmit="return confirm('{{ _('history.delete_confirm') }}');" style="margin: 0;">
+                                    <button type="submit" class="exam-delete-button" aria-label="{{ _('history.delete') }}">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M3 6h18"></path>
+                                            <path d="M8 6V4h8v2"></path>
+                                            <path d="M19 6l-1 16H6L5 6"></path>
+                                            <path d="M10 11v6"></path>
+                                            <path d="M14 11v6"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td colspan="4" style="color: var(--text-muted); text-align: center; padding: 1.25rem;">
+                    <td colspan="5" style="color: var(--text-muted); text-align: center; padding: 1.25rem;">
                         {{ _('exams.empty') }}
                     </td>
                 </tr>
