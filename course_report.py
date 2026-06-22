@@ -570,6 +570,9 @@ EN_TRANSLATIONS = {
     'question_mapping.low_conf': 'Low',
     'question_mapping.alt_suggestions': 'Alternative Suggestions:',
     'question_mapping.no_ai_suggestions': 'No AI suggestions available.',
+    'question_mapping.ai_diagnostics_title': 'AI Mapping Diagnostics',
+    'question_mapping.ai_diagnostics_help': 'This shows whether Gemini, Qwen, or local matching produced the mapping suggestions.',
+    'question_mapping.no_suggestion_reason': 'No suggestion was produced for this question. See the diagnostics above for the provider status.',
     'question_mapping.final_selection': 'Final CLO Selection',
     'question_mapping.add_clo': 'Add CLO',
     'question_mapping.confidence_score': 'Confidence Score',
@@ -1639,12 +1642,12 @@ TRANSLATIONS['ar'].update({
     'question_mapping.question_type': '\u0646\u0648\u0639 \u0627\u0644\u0633\u0624\u0627\u0644',
         'question_mapping.paper_clo_help': '',
     'question_mapping.step2_title': '\u0627\u0644\u062e\u0637\u0648\u0629 2: \u0627\u0633\u062a\u062e\u0631\u0627\u062c \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0648\u0627\u0644\u0631\u0628\u0637 \u0627\u0644\u0635\u0631\u064a\u062d',
-    'question_mapping.step2_description': '\u0631\u0627\u062c\u0639 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u0645\u0633\u062a\u062e\u0631\u062c\u0629\u060c \u0648\u0623\u0646\u0648\u0627\u0639\u0647\u0627\u060c \u0648\u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0630\u0643\u0648\u0631\u0629 \u0635\u0631\u0627\u062d\u0629 \u0641\u064a \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631.',
+    'question_mapping.step2_description': '\u0631\u0627\u062c\u0639 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u0645\u0633\u062a\u062e\u0631\u062c\u0629\u060c \u0648\u0623\u0646\u0648\u0627\u0639\u0647\u0627\u060c \u0648\u0646\u0648\u0627\u062a\u062d \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0630\u0643\u0648\u0631\u0629 \u0635\u0631\u0627\u062d\u0629 \u0641\u064a \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631.',
     'question_mapping.total_questions': '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0623\u0633\u0626\u0644\u0629',
     'question_mapping.auto_mapped_questions': '\u0623\u0633\u0626\u0644\u0629 \u0645\u0631\u0628\u0648\u0637\u0629',
     'question_mapping.ai_required_questions': '\u062a\u062d\u062a\u0627\u062c \u0631\u0628\u0637',
     'question_mapping.question_number': '\u0631\u0642\u0645 \u0627\u0644\u0633\u0624\u0627\u0644',
-    'question_mapping.explicit_clo': '\u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
+    'question_mapping.explicit_clo': '\u0646\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
     'question_mapping.status': '\u0627\u0644\u062d\u0627\u0644\u0629',
     'question_mapping.mapped_automatically': '\u0631\u064f\u0628\u0637 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b',
     'question_mapping.requires_ai_mapping': '\u064a\u062d\u062a\u0627\u062c \u0631\u0628\u0637',
@@ -1660,6 +1663,9 @@ TRANSLATIONS['ar'].update({
     'question_mapping.low_conf': 'منخفض',
     'question_mapping.alt_suggestions': 'اقتراحات بديلة:',
     'question_mapping.no_ai_suggestions': 'لا توجد اقتراحات متاحة.',
+    'question_mapping.ai_diagnostics_title': '\u062a\u0634\u062e\u064a\u0635 \u0627\u0642\u062a\u0631\u0627\u062d\u0627\u062a \u0627\u0644\u0631\u0628\u0637',
+    'question_mapping.ai_diagnostics_help': '\u064a\u0648\u0636\u062d \u0647\u0630\u0627 \u0647\u0644 \u0623\u0646\u062a\u062c Gemini \u0623\u0648 Qwen \u0623\u0648 \u0627\u0644\u0631\u0628\u0637 \u0627\u0644\u0645\u062d\u0644\u064a \u0627\u0644\u0627\u0642\u062a\u0631\u0627\u062d\u0627\u062a.',
+    'question_mapping.no_suggestion_reason': '\u0644\u0645 \u064a\u0646\u062a\u062c \u0627\u0642\u062a\u0631\u0627\u062d \u0644\u0647\u0630\u0627 \u0627\u0644\u0633\u0624\u0627\u0644. \u0631\u0627\u062c\u0639 \u062a\u0634\u062e\u064a\u0635 \u0627\u0644\u0645\u0632\u0648\u062f\u0627\u062a \u0623\u0639\u0644\u0627\u0647.',
     'question_mapping.final_selection': 'النواتج المختارة',
     'question_mapping.add_clo': 'إضافة ناتج تعلم',
     'question_mapping.confidence_score': '\u062f\u0631\u062c\u0629 \u0627\u0644\u062b\u0642\u0629',
@@ -5137,9 +5143,9 @@ def parse_gemini_json_response(text):
     return None
 
 
-def call_groq_json(system_prompt, user_payload, timeout=90):
+def call_groq_json_with_error(system_prompt, user_payload, timeout=90):
     if not GROQ_KEY:
-        return None
+        return None, "GROQ_KEY is not configured."
     try:
         payload = {
             'model': GROQ_MODEL,
@@ -5165,16 +5171,24 @@ def call_groq_json(system_prompt, user_payload, timeout=90):
     except urllib.error.HTTPError as exc:
         body = exc.read().decode('utf-8', errors='replace')
         app.logger.warning("Groq/Qwen request failed with HTTP %s: %s", exc.code, body[:800])
-        return None
+        return None, f"HTTP {exc.code}: {body[:500]}"
     except Exception as exc:
         app.logger.warning("Groq/Qwen request failed: %s", exc)
-        return None
+        return None, str(exc)
 
     content = ''
     for choice in groq_payload.get('choices') or []:
         message = choice.get('message') or {}
         content += message.get('content') or ''
-    return parse_gemini_json_response(content)
+    parsed = parse_gemini_json_response(content)
+    if parsed is None:
+        return None, "Qwen/Groq returned a response, but it was not valid JSON."
+    return parsed, ''
+
+
+def call_groq_json(system_prompt, user_payload, timeout=90):
+    parsed, _error = call_groq_json_with_error(system_prompt, user_payload, timeout)
+    return parsed
 
 
 def call_gemini_json(system_prompt, user_payload, timeout=90):
@@ -5912,6 +5926,20 @@ def score_question_clo_match(question_text, clo, explicit=False):
 
     return {'score': round(min(score, 100), 2), 'reasons': reasons[:4]}
 
+def add_question_clo_diagnostic(metrics, provider, status, message):
+    metrics = dict(metrics or {})
+    diagnostics = list(metrics.get('question_clo_diagnostics') or [])
+    message = re.sub(r'\s+', ' ', str(message or '')).strip()
+    entry = {
+        'provider': str(provider or '').strip(),
+        'status': str(status or '').strip(),
+        'message': message[:700],
+    }
+    if entry['provider'] and entry['status'] and entry not in diagnostics:
+        diagnostics.append(entry)
+    metrics['question_clo_diagnostics'] = diagnostics
+    return metrics
+
 def build_smart_clo_suggestions(metrics, clos, only_unmapped=False):
     metrics = metrics or {}
     clos = list(clos or [])
@@ -5919,10 +5947,12 @@ def build_smart_clo_suggestions(metrics, clos, only_unmapped=False):
     explicit_mappings = metrics.get('detected_clo_mappings') or {}
     suggestions = {}
     detected = dict(explicit_mappings)
+    attempted = 0
 
     for question in metrics.get('questions') or []:
         if only_unmapped and detected.get(question):
             continue
+        attempted += 1
         question_text = question_texts.get(question) or question
         explicit_clos = set(resolve_detected_clos_to_course_list(explicit_mappings.get(question, []), clos))
         ranked = []
@@ -5950,6 +5980,21 @@ def build_smart_clo_suggestions(metrics, clos, only_unmapped=False):
     metrics['detected_clo_mappings'] = detected
     if suggestions and not metrics.get('question_clo_suggestion_source'):
         metrics['question_clo_suggestion_source'] = 'local'
+    if attempted:
+        if suggestions:
+            metrics = add_question_clo_diagnostic(
+                metrics,
+                'Local',
+                'success',
+                f"Local semantic matching produced suggestions for {len(suggestions)} question(s)."
+            )
+        else:
+            metrics = add_question_clo_diagnostic(
+                metrics,
+                'Local',
+                'failed',
+                "Local semantic matching could not find enough overlap between the question text and the available CLOs."
+            )
     return metrics
 
 
@@ -6124,12 +6169,15 @@ def question_clo_llm_payload(metrics, clos):
 
 
 def build_qwen_question_clo_suggestions(metrics, clos):
+    metrics = dict(metrics or {})
     if not GROQ_KEY:
+        metrics = add_question_clo_diagnostic(metrics, 'Qwen', 'skipped', 'GROQ_KEY is not configured.')
         return metrics
     question_items, clo_items = question_clo_llm_payload(metrics, clos)
     if not question_items or not clo_items:
+        metrics = add_question_clo_diagnostic(metrics, 'Qwen', 'skipped', 'No question text or valid CLO codes were available for Qwen.')
         return metrics
-    parsed = call_groq_json(
+    parsed, error = call_groq_json_with_error(
         "You map exam questions to Course Learning Outcomes. Return valid JSON only.",
         gemini_question_clo_prompt()
         + "\n\nInput JSON:\n"
@@ -6141,20 +6189,29 @@ def build_qwen_question_clo_suggestions(metrics, clos):
             ensure_ascii=False
         )
     )
-    return apply_llm_question_clo_mappings(metrics, clos, parsed, 'qwen', 'Qwen via Groq')
+    if error:
+        return add_question_clo_diagnostic(metrics, 'Qwen', 'failed', error)
+    mapped_metrics = apply_llm_question_clo_mappings(metrics, clos, parsed, 'qwen', 'Qwen via Groq')
+    if mapped_metrics.get('question_clo_suggestion_source') == 'qwen':
+        mapped_count = len(mapped_metrics.get('smart_clo_suggestions') or {})
+        return add_question_clo_diagnostic(mapped_metrics, 'Qwen', 'success', f"Qwen produced valid CLO suggestions for {mapped_count} question(s).")
+    return add_question_clo_diagnostic(metrics, 'Qwen', 'failed', 'Qwen returned JSON, but no mappings matched the available course CLOs.')
 
 
 def build_gemini_question_clo_suggestions(metrics, clos):
-    if not GEMINI_API_KEY:
-        return build_qwen_question_clo_suggestions(metrics, clos)
     metrics = dict(metrics or {})
+    if not GEMINI_API_KEY:
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'skipped', 'GEMINI_API_KEY is not configured.')
+        return build_qwen_question_clo_suggestions(metrics, clos)
     questions = list(metrics.get('questions') or [])
     clos = list(clos or [])
     if not questions or not clos:
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'skipped', 'No questions or CLOs were available for Gemini mapping.')
         return metrics
 
     question_items, clo_items = question_clo_llm_payload(metrics, clos)
     if not question_items or not clo_items:
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'skipped', 'No question text or valid CLO codes were available for Gemini.')
         return metrics
 
     try:
@@ -6200,9 +6257,11 @@ def build_gemini_question_clo_suggestions(metrics, clos):
     except urllib.error.HTTPError as exc:
         body = exc.read().decode('utf-8', errors='replace')
         app.logger.warning("Gemini question-CLO mapping failed with HTTP %s: %s", exc.code, body[:800])
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', f"HTTP {exc.code}: {body[:500]}")
         return build_qwen_question_clo_suggestions(metrics, clos)
     except Exception as exc:
         app.logger.warning("Gemini question-CLO mapping failed: %s", exc)
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', str(exc))
         return build_qwen_question_clo_suggestions(metrics, clos)
 
     response_text = ''
@@ -6212,12 +6271,19 @@ def build_gemini_question_clo_suggestions(metrics, clos):
             response_text += part.get('text') or ''
 
     parsed = parse_gemini_json_response(response_text)
-    mappings = parsed.get('mappings') if isinstance(parsed, dict) else []
+    if not isinstance(parsed, dict):
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', 'Gemini returned a response, but it was not valid JSON.')
+        return build_qwen_question_clo_suggestions(metrics, clos)
+    mappings = parsed.get('mappings')
     if not isinstance(mappings, list):
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', 'Gemini returned a response, but it did not contain a valid mappings list.')
         return build_qwen_question_clo_suggestions(metrics, clos)
     mapped_metrics = apply_llm_question_clo_mappings(metrics, clos, parsed, 'gemini', 'Gemini Flash')
     if mapped_metrics.get('question_clo_suggestion_source') == 'gemini':
+        mapped_count = len(mapped_metrics.get('smart_clo_suggestions') or {})
+        mapped_metrics = add_question_clo_diagnostic(mapped_metrics, 'Gemini', 'success', f"Gemini produced valid CLO suggestions for {mapped_count} question(s).")
         return mapped_metrics
+    metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', 'Gemini returned JSON, but no mappings matched the available course CLOs.')
     return build_qwen_question_clo_suggestions(metrics, clos)
 
 def parse_exam_paper_with_module(filepath):
@@ -6426,6 +6492,7 @@ def build_ai_suggestions_for_unmapped(metrics, clos, review_summary):
 
     merged = dict(metrics)
     merged['smart_clo_suggestions'] = dict(ai_metrics.get('smart_clo_suggestions') or {})
+    merged['question_clo_diagnostics'] = list(ai_metrics.get('question_clo_diagnostics') or [])
     if ai_metrics.get('question_clo_suggestion_source'):
         merged['question_clo_suggestion_source'] = ai_metrics.get('question_clo_suggestion_source')
     elif merged['smart_clo_suggestions']:

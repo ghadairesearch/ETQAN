@@ -138,9 +138,38 @@
     .wizard-footer {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        direction: ltr;
         margin-top: 2rem;
         padding-top: 1.5rem;
         border-top: 1px solid var(--border-color);
+    }
+
+    .wizard-footer-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: auto;
+        flex-wrap: wrap;
+        direction: rtl;
+    }
+
+    .wizard-export-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: var(--border-color);
+        color: var(--text-main);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .wizard-save-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
     }
 
     /* Modal styling */
@@ -218,10 +247,70 @@
         border-color: var(--accent-primary);
         background: #f9fafb;
     }
+
+    .ai-diagnostics {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #f9fafb;
+        padding: 1rem;
+        margin: 1rem 0 1.25rem;
+    }
+
+    .ai-diagnostics h3 {
+        margin: 0 0 0.35rem;
+        font-size: 1rem;
+        color: var(--accent-primary);
+    }
+
+    .ai-diagnostics p {
+        margin: 0 0 0.75rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .ai-diagnostic-item {
+        border-top: 1px solid var(--border-color);
+        padding-top: 0.65rem;
+        margin-top: 0.65rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        overflow-wrap: anywhere;
+    }
+
+    .ai-diagnostic-item:first-of-type {
+        border-top: 0;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    .ai-diagnostic-status {
+        display: inline-flex;
+        border-radius: 999px;
+        padding: 0.12rem 0.45rem;
+        margin: 0 0.25rem;
+        background: var(--border-color);
+        color: var(--text-main);
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
 </style>
 
 <div class="card" style="max-width: 800px; margin: 0 auto;">
     <h2 style="margin-top: 0;">{{ _('question_mapping.step3_title') }}</h2>
+
+    {% if metrics.question_clo_diagnostics %}
+        <div class="ai-diagnostics">
+            <h3>{{ _('question_mapping.ai_diagnostics_title') }}</h3>
+            <p>{{ _('question_mapping.ai_diagnostics_help') }}</p>
+            {% for item in metrics.question_clo_diagnostics %}
+                <div class="ai-diagnostic-item">
+                    <strong>{{ item.provider }}</strong>
+                    <span class="ai-diagnostic-status">{{ item.status }}</span>
+                    {{ item.message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     
 
     <form method="POST" action="{{ url_for('question_clo_mapping_final') }}" id="mapping-form">
@@ -283,7 +372,10 @@
                             </div>
                             {% endif %}
                         {% else %}
-                            <div style="color: var(--text-muted);">{{ _('question_mapping.no_ai_suggestions') if _('question_mapping.no_ai_suggestions') != 'question_mapping.no_ai_suggestions' else 'No AI suggestions available.' }}</div>
+                            <div style="color: var(--text-muted);">
+                                {{ _('question_mapping.no_ai_suggestions') if _('question_mapping.no_ai_suggestions') != 'question_mapping.no_ai_suggestions' else 'No AI suggestions available.' }}
+                                <div style="font-size: 0.86rem; margin-top: 0.35rem;">{{ _('question_mapping.no_suggestion_reason') }}</div>
+                            </div>
                         {% endif %}
                     </div>
                     
@@ -304,8 +396,20 @@
             {% endfor %}
         </div>
         
-        <div class="wizard-footer" style="justify-content: flex-end;">
-            <button type="submit" class="btn">{{ _('question_mapping.save_mapping') }}</button>
+        <div class="wizard-footer">
+            <a href="{{ url_for('question_clo_mapping_review_get', draft_id=draft_id) }}" class="btn" style="background-color: var(--border-color); color: var(--text-main);">
+                {{ _('mapping.back') }}
+            </a>
+            <div class="wizard-footer-actions">
+                <button type="submit" class="btn wizard-save-button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    {{ _('question_mapping.save_mapping') }}
+                </button>
+                <button type="button" class="btn wizard-export-disabled" disabled title="{{ _('question_mapping.save_mapping') }}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15h6"></path><path d="M9 18h6"></path><path d="M9 12h1"></path></svg>
+                    {{ _('results.export_pdf') }}
+                </button>
+            </div>
         </div>
     </form>
 </div>
