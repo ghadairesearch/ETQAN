@@ -5373,13 +5373,254 @@ def extract_course_spec_with_groq_text(text):
     return None
 
 
+def clean_ncaaa_pdf_layout_text(value):
+    text = normalize_course_spec_text(value)
+    replacements = {
+        'أخصاEي': 'أخصائي',
+        'معPد': 'معهد',
+        'الاسUشارات': 'الاستشارات',
+        'الاسwشارات': 'الاستشارات',
+        'و^فسر': 'ويفسر',
+        'ويفسرمفاهيم': 'ويفسر مفاهيم',
+        'مفا`يم': 'مفاهيم',
+        '@عمل': 'بعمل',
+        'الداخjk': 'الداخلي',
+        'العمjk': 'العملي',
+        'الداخl†': 'الداخلي',
+        ' lk ': ' في ',
+        'واpqاص': 'والخاص',
+        'المtام': 'المهام',
+        '{عد': 'يعد',
+        'تقار^ر': 'تقارير',
+        'تقارcر': 'تقارير',
+        'مكتو|ة': 'مكتوبة',
+        'تقاريرمكتوبة': 'تقارير مكتوبة',
+        'و^وصل': 'ويوصل',
+        'اQqتلفة': 'المختلفة',
+        'اللƒ„': 'التي',
+        'المtنة': 'المهنة',
+        'أدأب': 'آداب',
+        'اZ[دود': 'الحدود',
+        'مفPوم': 'مفهوم',
+        'وأsداف': 'وأهداف',
+        'ا—^اطر': 'المخاطر',
+        'تحسŽن': 'تحسين',
+        'بTMئة': 'بيئة',
+        '›†': 'في',
+        'بŽن': 'بين',
+        'واZ^ار•†': 'والخارجي',
+        "ا'’موع": '',
+    }
+    for source, target in replacements.items():
+        text = text.replace(source, target)
+    text = text.replace('ويفسرمفاهيم', 'ويفسر مفاهيم')
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'\s+([:،,.؛])', r'\1', text)
+    return text.strip()
+
+
+def join_pdf_words_rtl(words, same_line_tolerance=4, word_gap=1.5):
+    rows = []
+    for word in sorted(words or [], key=lambda item: item[1]):
+        if not rows or abs(rows[-1][0] - word[1]) > same_line_tolerance:
+            rows.append([word[1], [word]])
+        else:
+            rows[-1][1].append(word)
+
+    lines = []
+    for _, row_words in rows:
+        parts = []
+        previous_x0 = None
+        for word in sorted(row_words, key=lambda item: item[0], reverse=True):
+            x0, _y0, x1, _y1, text = word[:5]
+            if previous_x0 is not None and previous_x0 - x1 > word_gap:
+                parts.append(' ')
+            parts.append(text)
+            previous_x0 = x0
+        lines.append(''.join(parts))
+
+    return clean_ncaaa_pdf_layout_text(' '.join(lines))
+
+
+def value_after_pdf_colon(line):
+    line = clean_ncaaa_pdf_layout_text(line)
+    if ':' in line:
+        return clean_ncaaa_pdf_layout_text(line.split(':', 1)[1])
+    if '؛' in line:
+        return clean_ncaaa_pdf_layout_text(line.split('؛', 1)[1])
+    return line
+
+
+def extract_ncaaa_pdf_cover_metadata(doc):
+    if not doc:
+        return {}
+    try:
+        words = doc[0].get_text('words')
+    except Exception:
+        return {}
+
+    page_width = float(doc[0].rect.width or 595)
+    candidate_words = [
+        word for word in words
+        if 0.40 * page_width <= word[0] <= 0.86 * page_width
+        and 390 <= word[1] <= 590
+    ]
+    rows = []
+    for word in sorted(candidate_words, key=lambda item: item[1]):
+        if not rows or abs(rows[-1][0] - word[1]) > 8:
+            rows.append([word[1], [word]])
+        else:
+            rows[-1][1].append(word)
+
+    row_values = [value_after_pdf_colon(join_pdf_words_rtl(row_words)) for _, row_words in rows]
+    metadata = {}
+    fields = ['course_name', 'course_code', 'program', 'department', 'college']
+    for field, value in zip(fields, row_values):
+        if not value:
+            continue
+        if field == 'course_code':
+            code_match = re.search(r'\b([A-Z]{2,8}[-\s]?\d{2,5}[A-Z]?)\b', value, flags=re.I)
+            metadata[field] = normalize_extracted_course_code(code_match.group(1) if code_match else value)
+        else:
+            metadata[field] = clean_arabic_metadata_value(value, field)
+    return metadata
+
+
+def extract_ncaaa_pdf_layout_clos(doc):
+    clos = {}
+    if not doc:
+        return clos
+
+    for page_index in range(len(doc)):
+        try:
+            page = doc[page_index]
+            words = page.get_text('words')
+        except Exception:
+            continue
+
+        page_width = float(page.rect.width or 595)
+        code_x_min = page_width * 0.84
+        outcome_x_min = page_width * 0.60
+        outcome_x_max = page_width * 0.84
+        codes = []
+        for word in words:
+            x0, y0, _x1, _y1, text = word[:5]
+            if x0 >= code_x_min and re.fullmatch(r'[123]\.\d+', str(text or '')):
+                codes.append((text, y0))
+        codes = sorted(codes, key=lambda item: item[1])
+        if not codes:
+            continue
+
+        for index, (code, y0) in enumerate(codes):
+            previous_y = codes[index - 1][1] if index else y0 - 44
+            next_y = codes[index + 1][1] if index + 1 < len(codes) else y0 + 110
+            top = (previous_y + y0) / 2 if index else y0 - 22
+            bottom = (y0 + next_y) / 2 if index + 1 < len(codes) else y0 + 55
+            if code.endswith('.0'):
+                continue
+
+            outcome_words = [
+                word for word in words
+                if outcome_x_min <= word[0] <= outcome_x_max
+                and top - 5 <= word[1] <= bottom + 5
+            ]
+            body = join_pdf_words_rtl(outcome_words)
+            body = clean_clo_text(clean_arabic_outcome_line(body))
+            if body and len(body) >= 8:
+                clos[code] = f"{code} {body}"
+
+    return final_clean_clo_map(clos)
+
+
+def extract_ncaaa_pdf_layout_topics(doc):
+    if not doc:
+        return []
+
+    for page_index in range(len(doc)):
+        try:
+            page = doc[page_index]
+            words = page.get_text('words')
+        except Exception:
+            continue
+
+        page_width = float(page.rect.width or 595)
+        code_x_min = page_width * 0.84
+        topic_x_min = page_width * 0.30
+        topic_x_max = page_width * 0.84
+        codes = []
+        for word in words:
+            x0, y0, _x1, _y1, text = word[:5]
+            if x0 >= code_x_min and y0 > 320 and re.fullmatch(r'\d{1,2}', str(text or '')):
+                number = int(text)
+                if 1 <= number <= 30:
+                    codes.append((number, y0))
+        codes = sorted(codes, key=lambda item: item[1])
+        if len(codes) < 5 or codes[0][0] != 1:
+            continue
+
+        topics = []
+        for index, (number, y0) in enumerate(codes):
+            previous_y = codes[index - 1][1] if index else y0 - 35
+            next_y = codes[index + 1][1] if index + 1 < len(codes) else y0 + 35
+            top = (previous_y + y0) / 2 if index else y0 - 16
+            bottom = (y0 + next_y) / 2 if index + 1 < len(codes) else y0 + 24
+            topic_words = [
+                word for word in words
+                if topic_x_min <= word[0] <= topic_x_max
+                and top - 3 <= word[1] <= bottom + 3
+            ]
+            topic = clean_arabic_topic_ocr_artifacts(join_pdf_words_rtl(topic_words))
+            topic = re.sub(r'^\d+\s+', '', topic).strip(' .')
+            if topic and contains_arabic(topic):
+                topics.append(topic)
+        if topics:
+            return topics
+
+    return []
+
+
+def extract_course_spec_from_pdf_layout(filepath, text=''):
+    try:
+        import fitz
+        with fitz.open(filepath) as doc:
+            metadata = extract_ncaaa_pdf_cover_metadata(doc)
+            clo_map = extract_ncaaa_pdf_layout_clos(doc)
+            topics = extract_ncaaa_pdf_layout_topics(doc)
+    except Exception:
+        return None
+
+    if not metadata and not clo_map:
+        return None
+
+    course_name = metadata.get('course_name', '')
+    course_code = metadata.get('course_code', '')
+    display_name = course_name
+    if course_code and course_name and course_code not in course_name:
+        display_name = f"{course_name} ({course_code})"
+    elif course_code and not course_name:
+        display_name = course_code
+
+    clos = list(clo_map.values())
+    return {
+        'name': display_name,
+        'course_name': course_name,
+        'course_code': course_code,
+        'course_number': course_code,
+        'college': metadata.get('college', ''),
+        'department': metadata.get('department', ''),
+        'program': metadata.get('program', ''),
+        'clos': clos,
+        'topics': topics or (extract_course_topics(text) if compact_text(text) else []),
+        'clo_plos': {},
+        'grouped_clos': group_clos_by_domain(clos),
+        'extraction_method': 'local'
+    }
+
+
 def extract_course_spec_document(filepath, filename=''):
     file_ext = os.path.splitext(filename or filepath)[1].lower()
     if file_ext == '.docx':
         text = extract_docx_text(filepath)
-        qwen_extracted = extract_course_spec_with_groq_text(text)
-        if qwen_extracted:
-            return text, qwen_extracted
         extracted = extract_course_spec_metadata(text, filename)
         extracted['extraction_method'] = 'local'
         return text, extracted
@@ -5389,10 +5630,6 @@ def extract_course_spec_document(filepath, filename=''):
         return '', gemini_extracted
 
     text = extract_pdf_text(filepath, allow_ocr=False)
-    qwen_extracted = extract_course_spec_with_groq_text(text)
-    if qwen_extracted:
-        return text, qwen_extracted
-
     if not compact_text(text):
         text = extract_pdf_text(filepath, allow_ocr=True)
     else:
@@ -5400,6 +5637,9 @@ def extract_course_spec_document(filepath, filename=''):
         if len(compact_text(ocr_text)) > len(compact_text(text)):
             text = ocr_text
     extracted = extract_course_spec_metadata(text, filename)
+    layout_extracted = extract_course_spec_from_pdf_layout(filepath, text)
+    if course_spec_extraction_score(layout_extracted) > course_spec_extraction_score(extracted):
+        extracted = layout_extracted
     extracted['extraction_method'] = 'local'
     if extracted.get('course_name') and extracted.get('course_code') and extracted.get('clos'):
         return text, extracted
@@ -5408,6 +5648,9 @@ def extract_course_spec_document(filepath, filename=''):
     if compact_text(targeted_text):
         targeted_extracted = extract_course_spec_metadata(targeted_text, filename)
         targeted_extracted['extraction_method'] = 'local'
+        targeted_layout_extracted = extract_course_spec_from_pdf_layout(filepath, targeted_text)
+        if course_spec_extraction_score(targeted_layout_extracted) > course_spec_extraction_score(targeted_extracted):
+            targeted_extracted = targeted_layout_extracted
         if course_spec_extraction_score(targeted_extracted) > course_spec_extraction_score(extracted):
             return targeted_text, targeted_extracted
     return text, extracted
@@ -6214,7 +6457,8 @@ ARABIC_DIGIT_TRANSLATION = str.maketrans({
 })
 
 def normalize_course_spec_text(text):
-    text = (text or '').translate(ARABIC_DIGIT_TRANSLATION)
+    text = unicodedata.normalize('NFKC', text or '').translate(ARABIC_DIGIT_TRANSLATION)
+    text = text.replace('\u0640', '')
     text = re.sub(r'[\u200e\u200f\u061c\u202a-\u202e]', '', text)
     text = text.replace('\xa0', ' ')
     return text
