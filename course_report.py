@@ -588,6 +588,15 @@ EN_TRANSLATIONS = {
     'course_report.no_associated_reports': 'There is no associated CLO attainment report for this course. You have to create one before creating the course report.',
     'course_report.use_report': 'Use this report',
     'course_report.create_report': 'Next',
+    'course_report.preview_title': 'Course Report Preview',
+    'course_report.preview_description': 'Review the completed course report information, then export the Word report.',
+    'course_report.saved_automatically': 'Course report saved automatically.',
+    'course_report.next': 'Next',
+    'course_report.export_word': 'Export Word',
+    'course_report.report_details': 'Report Details',
+    'course_report.grade_distribution': 'Final Grade Distribution',
+    'course_report.clo_summary': 'CLO Assessment Results',
+    'course_report.recommendations': 'Recommendations',
     'course_report.select_one_report': 'Select at least one CLO attainment report.',
     'course_report.selected_reports': 'Selected CLO Attainment Reports',
     'course_report.continue': 'Continue',
@@ -897,6 +906,9 @@ EN_TRANSLATIONS = {
     'results.max_possible': 'Max Possible Score',
     'results.target': 'Target',
     'results.students_achieved': 'No of Students Achieved',
+    'results.code': 'Code',
+    'results.max_score': 'Total Score',
+    'results.achievement': 'Achievement',
     'results.achievement_pct': 'Achievement %',
     'results.mapped_question_count': 'mapped question',
     'results.student_achievement': 'Student CLO Achievement',
@@ -1108,6 +1120,15 @@ TRANSLATIONS = {
         'course_report.no_associated_reports': '\u0644\u0627 \u064a\u0648\u062c\u062f \u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0645\u0631\u062a\u0628\u0637 \u0628\u0647\u0630\u0627 \u0627\u0644\u0645\u0642\u0631\u0631. \u064a\u062c\u0628 \u0625\u0646\u0634\u0627\u0621 \u0648\u0627\u062d\u062f \u0642\u0628\u0644 \u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'course_report.use_report': '\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0647\u0630\u0627 \u0627\u0644\u062a\u0642\u0631\u064a\u0631',
         'course_report.create_report': '\u0627\u0644\u062a\u0627\u0644\u064a',
+        'course_report.preview_title': '\u0645\u0639\u0627\u064a\u0646\u0629 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631',
+        'course_report.preview_description': '\u0631\u0627\u062c\u0639 \u0628\u064a\u0627\u0646\u0627\u062a \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631 \u0627\u0644\u0645\u0643\u062a\u0645\u0644\u0629\u060c \u062b\u0645 \u0635\u062f\u0651\u0631 \u0627\u0644\u062a\u0642\u0631\u064a\u0631 \u0628\u0635\u064a\u063a\u0629 Word.',
+        'course_report.saved_automatically': '\u062a\u0645 \u062d\u0641\u0638 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b.',
+        'course_report.next': '\u0627\u0644\u062a\u0627\u0644\u064a',
+        'course_report.export_word': '\u062a\u0635\u062f\u064a\u0631 Word',
+        'course_report.report_details': '\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u062a\u0642\u0631\u064a\u0631',
+        'course_report.grade_distribution': '\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u062f\u0631\u062c\u0627\u062a \u0627\u0644\u0646\u0647\u0627\u0626\u064a\u0629',
+        'course_report.clo_summary': '\u0646\u062a\u0627\u0626\u062c \u062a\u0642\u0648\u064a\u0645 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
+        'course_report.recommendations': '\u0627\u0644\u062a\u0648\u0635\u064a\u0627\u062a',
         'course_report.select_one_report': '\u062d\u062f\u062f \u062a\u0642\u0631\u064a\u0631 CLO \u0648\u0627\u062d\u062f\u0627\u064b \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644.',
         'course_report.selected_reports': '\u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 CLO \u0627\u0644\u0645\u062d\u062f\u062f\u0629',
         'course_report.continue': '\u0645\u062a\u0627\u0628\u0639\u0629',
@@ -1417,6 +1438,9 @@ TRANSLATIONS = {
         'results.max_possible': 'الدرجة الكلية',
         'results.target': 'المستهدف',
         'results.students_achieved': 'عدد الطلاب المحققين',
+        'results.code': '\u0627\u0644\u0631\u0645\u0632',
+        'results.max_score': '\u0627\u0644\u062f\u0631\u062c\u0629 \u0627\u0644\u0643\u0644\u064a\u0629',
+        'results.achievement': '\u0646\u0633\u0628\u0629 \u0627\u0644\u062a\u062d\u0642\u0642',
         'results.achievement_pct': 'نسبة التحقق',
         'results.mapped_question_count': 'سؤال مرتبط',
         'results.student_achievement': 'تحقق نواتج التعلم لكل طالب',
@@ -10842,11 +10866,17 @@ def read_course_report_export_inputs(redirect_url, stats=None, course_info=None,
     if not grade_distribution.get('total'):
         grade_distribution = {}
 
+    report_details = read_course_report_optional_details()
+    if total_students:
+        default_student_count = str(total_students)
+        report_details['students_started'] = report_details.get('students_started') or default_student_count
+        report_details['students_completed'] = report_details.get('students_completed') or default_student_count
+
     course_report_inputs = {
         'topics_covered': topics_covered,
         'uncovered_topic_details': read_uncovered_topic_details(),
         'grade_distribution': grade_distribution,
-        'report_details': read_course_report_optional_details(),
+        'report_details': report_details,
         'course_improvement_plan': read_course_improvement_plan(),
     }
 
@@ -10931,6 +10961,24 @@ def save_course_report_snapshot(stats, course_report_inputs, course_info, total_
                 (user['id'],)
             )
         return {'allowed': True, 'saved': True, 'reason': entitlement, 'id': row['id'] if row else None}
+
+def render_course_report_preview(report_id, payload):
+    payload = payload or {}
+    course_report_inputs = payload.get('course_report_inputs') or {}
+    grade_distribution = course_report_inputs.get('grade_distribution') or {}
+    return render_template(
+        'course_report_preview.html',
+        report_id=report_id,
+        stats=payload.get('stats') or {},
+        stats_items=sorted_clo_items(payload.get('stats') or {}),
+        course_info=payload.get('course_info') or {},
+        course_report_inputs=course_report_inputs,
+        report_details=course_report_inputs.get('report_details') or {},
+        grade_distribution=grade_distribution,
+        grade_order=GRADE_ORDER,
+        total_students=payload.get('total_students') or 0,
+        clo_number=clo_number
+    )
 
 def build_results_pdf_legacy(stats, total_students, course_info, student_achievement_rows=None, branding=None):
     branding = apply_university_identity_colors(branding or get_report_branding())
@@ -12193,17 +12241,7 @@ def report_detail(report_id):
         flash("Report not found.", "error")
         return redirect(url_for('reports'))
     if payload.get('report_type') == 'course_report':
-        try:
-            docx_bytes = build_course_report_docx(
-                payload.get('stats') or {},
-                payload.get('course_report_inputs') or {},
-                payload.get('course_info') or {},
-                payload.get('total_students') or None
-            )
-        except ValueError as e:
-            flash(str(e), "error")
-            return redirect(url_for('reports'))
-        return course_report_docx_response(docx_bytes)
+        return render_course_report_preview(report_id, payload)
     branding = merge_with_current_branding(payload.get('branding') or {})
     return render_template(
         'report_results.html',
@@ -13353,31 +13391,34 @@ def export_saved_course_report_docx(report_id):
     if error_response:
         return error_response
 
-    if request.form.get('course_report_action') == 'save':
-        save_result = save_course_report_snapshot(
-            payload.get('stats') or {},
-            course_report_inputs,
-            enriched_course_info,
-            payload.get('total_students') or None,
-            [report_id]
-        )
-        if not save_result.get('allowed'):
-            flash("Please upgrade or add report credits to save more reports.", "error")
+    if request.form.get('course_report_action') == 'export_docx':
+        try:
+            docx_bytes = build_course_report_docx(
+                payload.get('stats') or {},
+                course_report_inputs,
+                enriched_course_info,
+                payload.get('total_students') or None
+            )
+        except ValueError as e:
+            flash(str(e), "error")
             return redirect(redirect_url)
-        return redirect(url_for('reports'))
+        return course_report_docx_response(docx_bytes)
 
-    try:
-        docx_bytes = build_course_report_docx(
-            payload.get('stats') or {},
-            course_report_inputs,
-            enriched_course_info,
-            payload.get('total_students') or None
-        )
-    except ValueError as e:
-        flash(str(e), "error")
+    save_result = save_course_report_snapshot(
+        payload.get('stats') or {},
+        course_report_inputs,
+        enriched_course_info,
+        payload.get('total_students') or None,
+        [report_id]
+    )
+    if not save_result.get('allowed'):
+        flash("Please upgrade or add report credits to save more reports.", "error")
         return redirect(redirect_url)
-
-    return course_report_docx_response(docx_bytes)
+    saved_id = save_result.get('id')
+    _row, saved_payload = load_saved_report_payload(saved_id, user['id'])
+    if saved_payload:
+        return render_course_report_preview(saved_id, saved_payload)
+    return redirect(url_for('reports'))
 
 @app.route('/course-report-service/reports/export', methods=['POST'])
 def export_selected_course_report_docx():
@@ -13404,26 +13445,29 @@ def export_selected_course_report_docx():
     if error_response:
         return error_response
 
-    if request.form.get('course_report_action') == 'save':
-        source_report_ids = []
-        for value in request.form.getlist('report_ids'):
-            try:
-                source_report_ids.append(int(value))
-            except (TypeError, ValueError):
-                pass
-        save_result = save_course_report_snapshot(combined_stats, course_report_inputs, course_info, total_students, source_report_ids)
-        if not save_result.get('allowed'):
-            flash("Please upgrade or add report credits to save more reports.", "error")
+    if request.form.get('course_report_action') == 'export_docx':
+        try:
+            docx_bytes = build_course_report_docx(combined_stats, course_report_inputs, course_info, total_students)
+        except ValueError as e:
+            flash(str(e), "error")
             return redirect(redirect_url)
-        return redirect(url_for('reports'))
+        return course_report_docx_response(docx_bytes)
 
-    try:
-        docx_bytes = build_course_report_docx(combined_stats, course_report_inputs, course_info, total_students)
-    except ValueError as e:
-        flash(str(e), "error")
+    source_report_ids = []
+    for value in request.form.getlist('report_ids'):
+        try:
+            source_report_ids.append(int(value))
+        except (TypeError, ValueError):
+            pass
+    save_result = save_course_report_snapshot(combined_stats, course_report_inputs, course_info, total_students, source_report_ids)
+    if not save_result.get('allowed'):
+        flash("Please upgrade or add report credits to save more reports.", "error")
         return redirect(redirect_url)
-
-    return course_report_docx_response(docx_bytes)
+    saved_id = save_result.get('id')
+    _row, saved_payload = load_saved_report_payload(saved_id, user['id'])
+    if saved_payload:
+        return render_course_report_preview(saved_id, saved_payload)
+    return redirect(url_for('reports'))
 
 @app.route('/clo-attainment', methods=['GET', 'POST'])
 def clo_attainment():

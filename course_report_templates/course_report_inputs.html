@@ -47,13 +47,10 @@
         {% for report_id in selected_report_ids %}
             <input type="hidden" name="report_ids" value="{{ report_id }}">
         {% endfor %}
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
-            <button type="submit" name="course_report_action" value="export_docx" class="btn">{{ _('results.export_word') }}</button>
-        </div>
 
         <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff; margin-bottom: 1.25rem;">
             <h3 style="margin: 0 0 0.85rem;">{{ _('results.course_report_optional_details') }}</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem;">
+            <div style="display: grid; gap: 0.85rem;">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label">{{ _('results.course_instructor') }}</label>
                     <input type="text" name="course_instructor" class="form-control">
@@ -80,13 +77,15 @@
                     <label class="form-label">{{ _('results.number_of_sections') }}</label>
                     <input type="number" min="0" step="1" name="sections_count" class="form-control">
                 </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">{{ _('results.students_started') }}</label>
-                    <input type="number" min="0" step="1" name="students_started" class="form-control">
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">{{ _('results.students_completed') }}</label>
-                    <input type="number" min="0" step="1" name="students_completed" class="form-control">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">{{ _('results.students_started') }}</label>
+                        <input type="number" min="0" step="1" name="students_started" class="form-control" value="{{ total_students or '' }}">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">{{ _('results.students_completed') }}</label>
+                        <input type="number" min="0" step="1" name="students_completed" class="form-control" value="{{ total_students or '' }}">
+                    </div>
                 </div>
             </div>
         </section>
@@ -269,7 +268,7 @@
             </div>
         </div>
 
-        <button type="submit" name="course_report_action" value="save" class="btn">{{ _('results.save_course_report') }}</button>
+        <button type="submit" name="course_report_action" value="preview" class="btn">{{ _('course_report.next') }}</button>
     </form>
 </div>
 <script>

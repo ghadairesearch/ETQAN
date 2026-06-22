@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 1080px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+        <div>
+            <h2 style="margin: 0 0 0.35rem;">{{ _('course_report.preview_title') }}</h2>
+            <p style="color: var(--text-muted); margin: 0;">{{ _('course_report.preview_description') }}</p>
+        </div>
+        <a href="{{ url_for('export_saved_course_report_word', report_id=report_id) }}" class="btn">{{ _('course_report.export_word') }}</a>
+    </div>
+
+    <div class="alert" style="margin: 1.25rem 0;">
+        {{ _('course_report.saved_automatically') }}
+    </div>
+
+    <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb; margin-bottom: 1.25rem;">
+        <h3 style="margin: 0 0 0.75rem;">{{ _('course_report.report_details') }}</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.75rem;">
+            <div><strong>{{ _('results.course') }}</strong><br>{{ course_info.course_name or course_info.raw_name or '-' }}</div>
+            <div><strong>{{ _('courses.course_code') }}</strong><br>{{ course_info.course_id or '-' }}</div>
+            <div><strong>{{ _('results.course_instructor') }}</strong><br>{{ report_details.course_instructor or '-' }}</div>
+            <div><strong>{{ _('results.course_coordinator') }}</strong><br>{{ report_details.course_coordinator or '-' }}</div>
+            <div>
+                <strong>{{ _('results.course_location') }}</strong><br>
+                {% if report_details.location == 'main' %}
+                    {{ _('results.main_campus') }}
+                {% elif report_details.location == 'branch' %}
+                    {{ _('results.branch') }}{% if report_details.branch_name %}: {{ report_details.branch_name }}{% endif %}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+            <div><strong>{{ _('results.number_of_sections') }}</strong><br>{{ report_details.sections_count or '-' }}</div>
+            <div><strong>{{ _('results.students_started') }}</strong><br>{{ report_details.students_started or total_students or '-' }}</div>
+            <div><strong>{{ _('results.students_completed') }}</strong><br>{{ report_details.students_completed or total_students or '-' }}</div>
+        </div>
+    </section>
+
+    <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff; margin-bottom: 1.25rem;">
+        <h3 style="margin: 0 0 0.75rem;">{{ _('course_report.grade_distribution') }}</h3>
+        {% if grade_distribution and grade_distribution.total %}
+            <div style="overflow-x: auto;">
+                <table style="min-width: 720px;">
+                    <thead>
+                        <tr>
+                            {% for grade in grade_order %}
+                                <th>{{ grade }}</th>
+                            {% endfor %}
+                            <th>{{ _('checkout.total') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {% for grade in grade_order %}
+                                <td>{{ grade_distribution.counts.get(grade, 0) }}</td>
+                            {% endfor %}
+                            <td>{{ grade_distribution.total }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% if course_report_inputs.student_results_comment %}
+                <p style="margin-bottom: 0; color: var(--text-muted);">{{ course_report_inputs.student_results_comment }}</p>
+            {% endif %}
+        {% else %}
+            <p style="color: var(--text-muted); margin: 0;">-</p>
+        {% endif %}
+    </section>
+
+    <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff; margin-bottom: 1.25rem;">
+        <h3 style="margin: 0 0 0.75rem;">{{ _('course_report.clo_summary') }}</h3>
+        <div style="overflow-x: auto;">
+            <table style="min-width: 820px;">
+                <thead>
+                    <tr>
+                        <th>{{ _('results.code') }}</th>
+                        <th>{{ _('results.max_score') }}</th>
+                        <th>{{ _('results.target') }}</th>
+                        <th>{{ _('results.students_achieved') }}</th>
+                        <th>{{ _('results.achievement') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for clo, item in stats_items %}
+                        <tr>
+                            <td>{{ clo_number(clo) }}</td>
+                            <td>{{ '%.2f'|format(item.total_possible_score or 0) }}</td>
+                            <td>{{ '%.2f'|format(item.target_score or 0) }}{% if item.target_pct is not none %} ({{ '%.2f'|format(item.target_pct or 0) }}%){% endif %}</td>
+                            <td>{{ item.students_achieved or 0 }}</td>
+                            <td>{{ '%.2f'|format(item.achievement_percentage or 0) }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff; margin-bottom: 1.25rem;">
+        <h3 style="margin: 0 0 0.75rem;">{{ _('course_report.recommendations') }}</h3>
+        {% if course_report_inputs.course_improvement_plan %}
+            <div style="display: grid; gap: 0.75rem;">
+                {% for item in course_report_inputs.course_improvement_plan %}
+                    <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem; background: #f9fafb;">
+                        <strong>{{ course_report_label(item.recommendation) }}</strong>
+                        {% if item.actions_needed %}
+                            <div style="color: var(--text-muted); margin-top: 0.35rem;">{{ _('results.actions_needed') }}: {{ course_report_label(item.actions_needed) }}</div>
+                        {% endif %}
+                        {% if item.support %}
+                            <div style="color: var(--text-muted); margin-top: 0.2rem;">{{ _('results.needed_support') }}: {{ course_report_label(item.support) }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); margin: 0;">-</p>
+        {% endif %}
+    </section>
+
+    <button type="button" class="btn" style="background-color: var(--border-color); color: var(--text-main);" onclick="history.back()">{{ _('mapping.back') }}</button>
+</div>
+{% endblock %}
