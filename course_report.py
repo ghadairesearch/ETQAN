@@ -613,6 +613,7 @@ EN_TRANSLATIONS = {
     'course_report.saved_automatically': 'تم الحفظ تلقائياً.',
     'course_report.next': 'Next',
     'course_report.export_word': 'Export Word',
+    'course_report.export_pdf': 'Export PDF',
     'course_report.report_details': 'Report Details',
     'course_report.grade_distribution': 'Final Grade Distribution',
     'course_report.clo_summary': 'CLO Assessment Results',
@@ -828,6 +829,15 @@ EN_TRANSLATIONS = {
     'mapping.course': 'Course:',
     'mapping.detected': 'Detected:',
     'mapping.description': 'Assign one or more CLOs to each question.',
+    'mapping.method_title': 'Choose Mapping Method',
+    'mapping.method_description': 'Select how you want to map assessment questions to CLOs.',
+    'mapping.method_choice': 'Mapping method',
+    'mapping.method_manual_title': 'Manual mapping',
+    'mapping.method_manual_description': 'Use the current mapping table and select CLOs for each question yourself.',
+    'mapping.method_ai_title': 'AI-assisted mapping',
+    'mapping.method_ai_description': 'Upload the exam paper so ETQAN can extract questions and suggest CLO mappings for review.',
+    'mapping.method_exam_paper_help': 'Upload the exam paper for the assessment questions in the grade files.',
+    'mapping.method_continue': 'Continue',
     'mapping.exam_paper': 'Exam paper:',
     'mapping.questions': 'questions',
     'mapping.students': 'students',
@@ -1160,6 +1170,7 @@ TRANSLATIONS = {
         'course_report.saved_automatically': 'تم الحفظ تلقائياً.',
         'course_report.next': '\u0627\u0644\u062a\u0627\u0644\u064a',
         'course_report.export_word': '\u062a\u0635\u062f\u064a\u0631 Word',
+        'course_report.export_pdf': '\u062a\u0635\u062f\u064a\u0631 PDF',
         'course_report.report_details': '\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u062a\u0642\u0631\u064a\u0631',
         'course_report.grade_distribution': '\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u062f\u0631\u062c\u0627\u062a \u0627\u0644\u0646\u0647\u0627\u0626\u064a\u0629',
         'course_report.clo_summary': '\u0646\u062a\u0627\u0626\u062c \u062a\u0642\u0648\u064a\u0645 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
@@ -1665,6 +1676,18 @@ TRANSLATIONS['ar'].update({
     'exams.course': '\u0627\u0644\u0645\u0642\u0631\u0631',
     'exams.questions': '\u0627\u0644\u0623\u0633\u0626\u0644\u0629',
     'exams.created': '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
+})
+
+TRANSLATIONS['ar'].update({
+    'mapping.method_title': '\u0627\u062e\u062a\u064a\u0627\u0631 \u0637\u0631\u064a\u0642\u0629 \u0627\u0644\u0631\u0628\u0637',
+    'mapping.method_description': '\u062d\u062f\u062f \u0643\u064a\u0641 \u062a\u0631\u064a\u062f \u0631\u0628\u0637 \u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u062a\u0642\u064a\u064a\u0645 \u0628\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645.',
+    'mapping.method_choice': '\u0637\u0631\u064a\u0642\u0629 \u0627\u0644\u0631\u0628\u0637',
+    'mapping.method_manual_title': '\u0631\u0628\u0637 \u064a\u062f\u0648\u064a',
+    'mapping.method_manual_description': '\u0627\u0633\u062a\u062e\u062f\u0645 \u062c\u062f\u0648\u0644 \u0627\u0644\u0631\u0628\u0637 \u0627\u0644\u062d\u0627\u0644\u064a \u0648\u062d\u062f\u062f \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0644\u0643\u0644 \u0633\u0624\u0627\u0644 \u0628\u0646\u0641\u0633\u0643.',
+    'mapping.method_ai_title': '\u0631\u0628\u0637 \u0628\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
+    'mapping.method_ai_description': '\u0627\u0631\u0641\u0639 \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 \u0644\u064a\u0642\u062a\u0631\u062d \u0625\u062a\u0642\u0627\u0646 \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0628\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u062b\u0645 \u0631\u0627\u062c\u0639\u0647\u0627 \u0642\u0628\u0644 \u0627\u0644\u062d\u0633\u0627\u0628.',
+    'mapping.method_exam_paper_help': '\u0627\u0631\u0641\u0639 \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0623\u0633\u0626\u0644\u0629 \u0645\u0644\u0641\u0627\u062a \u0627\u0644\u062f\u0631\u062c\u0627\u062a.',
+    'mapping.method_continue': '\u0645\u062a\u0627\u0628\u0639\u0629',
 })
 
 SUPPORTED_LANGUAGES = {'en', 'ar'}
@@ -7908,11 +7931,12 @@ def extract_course_spec_metadata(text, source_filename=''):
     }
 
 def question_number_from_label(label):
-    label = str(label).strip()
+    label = str(label or '').strip()
     patterns = [
-        r'^Answers?\s*(\d{1,3})$',
-        r'^Q(?:uestion)?\s*[-#:]?\s*(\d{1,3})$',
-        r'^Item\s*[-#:]?\s*(\d{1,3})$'
+        r'\bQ(?:uestion)?\s*[-#:.]?\s*(\d{1,3})\b',
+        r'\bQuestion\s+No\.?\s*(\d{1,3})\b',
+        r'\bAnswers?\s*[-_ #:.]?\s*(\d{1,3})\b',
+        r'\bItems?\s*[-_ #:.]?\s*(\d{1,3})\b'
     ]
     for pattern in patterns:
         match = re.search(pattern, label, flags=re.I)
@@ -11215,6 +11239,180 @@ def course_report_docx_response(docx_bytes):
     response.headers["Content-Disposition"] = 'attachment; filename="course_report_filled.docx"'
     return response
 
+def build_course_report_pdf(stats, course_report_inputs=None, course_info=None, total_students=None):
+    from xml.sax.saxutils import escape
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_LEFT, TA_RIGHT
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    try:
+        import arabic_reshaper
+        from bidi.algorithm import get_display
+    except Exception:
+        arabic_reshaper = None
+        get_display = None
+
+    report_language = get_export_report_language() if has_request_context() else 'en'
+    is_arabic_report = report_language == 'ar'
+    regular_font_path, bold_font_path = get_report_pdf_font_paths()
+    regular_font = 'Helvetica'
+    bold_font = 'Helvetica-Bold'
+    if regular_font_path:
+        regular_font = 'CourseReportRegular'
+        bold_font = 'CourseReportBold'
+        if regular_font not in pdfmetrics.getRegisteredFontNames():
+            pdfmetrics.registerFont(TTFont(regular_font, regular_font_path))
+        if bold_font not in pdfmetrics.getRegisteredFontNames():
+            pdfmetrics.registerFont(TTFont(bold_font, bold_font_path or regular_font_path))
+
+    def display_text(value):
+        text = clean_report_pdf_text(value)
+        if is_arabic_report and contains_arabic(text) and arabic_reshaper:
+            text = arabic_reshaper.reshape(text)
+            if get_display:
+                text = get_display(text)
+        return text
+
+    def paragraph(value, style):
+        text = str(value or '')
+        text = '<br/>'.join(escape(display_text(line)) for line in text.splitlines())
+        return Paragraph(text or '&nbsp;', style)
+
+    def label(key, fallback):
+        translated = translate(key) if has_request_context() else key
+        return translated if translated != key else fallback
+
+    def course_label(value):
+        return course_report_label_for_language(value, report_language)
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4),
+        leftMargin=0.45 * inch,
+        rightMargin=0.45 * inch,
+        topMargin=0.45 * inch,
+        bottomMargin=0.45 * inch
+    )
+    alignment = TA_RIGHT if is_arabic_report else TA_LEFT
+    title_style = ParagraphStyle('CourseReportTitle', fontName=bold_font, fontSize=18, leading=22, alignment=alignment, textColor=colors.HexColor('#26365f'))
+    section_style = ParagraphStyle('CourseReportSection', fontName=bold_font, fontSize=12, leading=15, alignment=alignment, textColor=colors.HexColor('#26365f'), spaceBefore=10)
+    text_style = ParagraphStyle('CourseReportText', fontName=regular_font, fontSize=9, leading=12, alignment=alignment)
+    header_style = ParagraphStyle('CourseReportHeader', fontName=bold_font, fontSize=8.5, leading=11, alignment=alignment, textColor=colors.white)
+
+    def table(rows, widths):
+        result = Table(rows, colWidths=widths, repeatRows=1)
+        result.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#26365f')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), bold_font),
+            ('FONTNAME', (0, 1), (-1, -1), regular_font),
+            ('FONTSIZE', (0, 0), (-1, -1), 8.5),
+            ('GRID', (0, 0), (-1, -1), 0.35, colors.HexColor('#d1d5db')),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ]))
+        return result
+
+    course_report_inputs = course_report_inputs or {}
+    course_info = course_info or {}
+    report_details = course_report_inputs.get('report_details') or {}
+    story = [
+        paragraph(label('course_report.preview_title', 'Course Report'), title_style),
+        Spacer(1, 0.16 * inch),
+        paragraph(label('course_report.report_details', 'Report Details'), section_style),
+    ]
+
+    details = [
+        (label('results.course', 'Course'), course_info.get('course_name') or course_info.get('raw_name') or '-'),
+        (label('courses.course_code', 'Course Code'), course_info.get('course_id') or course_info.get('course_code') or '-'),
+        (label('results.course_instructor', 'Course Instructor'), report_details.get('course_instructor') or '-'),
+        (label('results.course_coordinator', 'Course Coordinator'), report_details.get('course_coordinator') or '-'),
+        (label('results.number_of_sections', 'Number of Sections'), report_details.get('sections_count') or '-'),
+        (label('results.students_started', 'Students Started'), report_details.get('students_started') or total_students or '-'),
+        (label('results.students_completed', 'Students Completed'), report_details.get('students_completed') or total_students or '-'),
+    ]
+    detail_rows = [[paragraph(label('results.item', 'Item'), header_style), paragraph(label('results.value', 'Value'), header_style)]]
+    detail_rows.extend([[paragraph(name, text_style), paragraph(value, text_style)] for name, value in details])
+    story.append(table(detail_rows, [2.2 * inch, 7.3 * inch]))
+
+    grade_distribution = course_report_inputs.get('grade_distribution') or {}
+    if grade_distribution.get('total'):
+        story.extend([Spacer(1, 0.12 * inch), paragraph(label('course_report.grade_distribution', 'Final Grade Distribution'), section_style)])
+        grade_rows = [[paragraph(item, header_style) for item in GRADE_ORDER + [label('checkout.total', 'Total')]]]
+        counts = grade_distribution.get('counts') or {}
+        grade_rows.append([paragraph(counts.get(grade, 0), text_style) for grade in GRADE_ORDER] + [paragraph(grade_distribution.get('total'), text_style)])
+        story.append(table(grade_rows, [0.72 * inch] * (len(GRADE_ORDER) + 1)))
+        if course_report_inputs.get('student_results_comment'):
+            story.extend([Spacer(1, 0.08 * inch), paragraph(course_report_inputs.get('student_results_comment'), text_style)])
+
+    story.extend([Spacer(1, 0.12 * inch), paragraph(label('course_report.clo_summary', 'CLO Assessment Results'), section_style)])
+    clo_rows = [[
+        paragraph(label('results.code', 'Code'), header_style),
+        paragraph(label('results.max_score', 'Max Score'), header_style),
+        paragraph(label('results.target', 'Target'), header_style),
+        paragraph(label('results.students_achieved', 'Students Achieved'), header_style),
+        paragraph(label('results.achievement', 'Achievement'), header_style),
+    ]]
+    for clo, item in sorted_clo_items(stats or {}):
+        target = f"{float(item.get('target_score') or 0):.2f}"
+        if item.get('target_pct') is not None:
+            target = f"{target} ({float(item.get('target_pct') or 0):.2f}%)"
+        clo_rows.append([
+            paragraph(clo_number(clo), text_style),
+            paragraph(f"{float(item.get('total_possible_score') or 0):.2f}", text_style),
+            paragraph(target, text_style),
+            paragraph(item.get('students_achieved') or 0, text_style),
+            paragraph(f"{float(item.get('achievement_percentage') or 0):.2f}%", text_style),
+        ])
+    story.append(table(clo_rows, [1.05 * inch, 1.35 * inch, 2.2 * inch, 1.55 * inch, 1.4 * inch]))
+
+    improvement_items = course_report_inputs.get('course_improvement_plan') or []
+    if improvement_items:
+        story.extend([Spacer(1, 0.12 * inch), paragraph(label('course_report.recommendations', 'Recommendations'), section_style)])
+        recommendation_rows = [[
+            paragraph(label('results.recommendation', 'Recommendation'), header_style),
+            paragraph(label('results.actions_needed', 'Actions Needed'), header_style),
+            paragraph(label('results.needed_support', 'Needed Support'), header_style),
+        ]]
+        for item in improvement_items:
+            recommendation_rows.append([
+                paragraph(course_label(item.get('recommendation')), text_style),
+                paragraph(course_label(item.get('actions_needed')), text_style),
+                paragraph(course_label(item.get('support')), text_style),
+            ])
+        story.append(table(recommendation_rows, [3.2 * inch, 3.2 * inch, 3.1 * inch]))
+
+    uncovered_items = course_report_inputs.get('uncovered_topic_details') or []
+    if course_report_inputs.get('topics_covered') != 'yes' and uncovered_items:
+        story.extend([Spacer(1, 0.12 * inch), paragraph(label('results.uncovered_topics', 'Uncovered Topics'), section_style)])
+        uncovered_rows = [[
+            paragraph(label('results.topic', 'Topic'), header_style),
+            paragraph(label('results.uncovered_reason', 'Reason'), header_style),
+            paragraph(label('results.uncovered_action', 'Action'), header_style),
+        ]]
+        for item in uncovered_items:
+            uncovered_rows.append([
+                paragraph(item.get('topic'), text_style),
+                paragraph(course_label(item.get('reason')), text_style),
+                paragraph(course_label(item.get('action')), text_style),
+            ])
+        story.append(table(uncovered_rows, [3.2 * inch, 3.2 * inch, 3.1 * inch]))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+def course_report_pdf_response(pdf_bytes):
+    response = Response(pdf_bytes, mimetype="application/pdf")
+    response.headers["Content-Disposition"] = 'attachment; filename="course_report.pdf"'
+    return response
+
 def save_course_report_snapshot(stats, course_report_inputs, course_info, total_students=None, source_report_ids=None):
     user = current_user()
     if not user:
@@ -11599,6 +11797,7 @@ def reset_course_workflow_session():
         'target_percentages',
         'custom_clos',
         'report_metrics',
+        'mapping_method',
         'mapping',
     ]:
         session.pop(key, None)
@@ -11620,6 +11819,7 @@ def back_to_upload():
         'file_id',
         'file_ext',
         'mapping',
+        'mapping_method',
         'report_metrics',
         'report_branding',
     ]
@@ -12665,6 +12865,32 @@ def export_saved_course_report_word(report_id):
         return redirect(url_for('reports'))
     return course_report_docx_response(docx_bytes)
 
+@app.route('/reports/<int:report_id>/export/course-report/pdf')
+def export_saved_course_report_pdf(report_id):
+    user = current_user()
+    if not user:
+        flash("Please login to view saved reports.", "error")
+        return redirect(url_for('login'))
+    row, payload = load_saved_report_payload(report_id, user['id'])
+    if not row:
+        flash("Report not found.", "error")
+        return redirect(url_for('reports'))
+    if payload.get('report_type') != 'course_report':
+        flash("This report is not a course report.", "error")
+        return redirect(url_for('reports'))
+    try:
+        pdf_bytes = build_course_report_pdf(
+            payload.get('stats') or {},
+            payload.get('course_report_inputs') or {},
+            payload.get('course_info') or {},
+            payload.get('total_students') or None
+        )
+    except Exception as e:
+        app.logger.exception("Failed to export course report PDF: %s", e)
+        flash(f"Failed to generate PDF: {e}", "error")
+        return redirect(url_for('reports'))
+    return course_report_pdf_response(pdf_bytes)
+
 @app.route('/reports/<int:report_id>/rename', methods=['POST'])
 def rename_saved_report(report_id):
     user = current_user()
@@ -13116,6 +13342,26 @@ def export_exam_pdf(exam_id):
     filename = secure_filename(f"{exam['title']}_mapping.pdf")
     response.headers["Content-Disposition"] = f"attachment; filename={filename}"
     return response
+
+SERVICE_PLACEHOLDERS = {
+    'review-course-report': ('home.reviewer_course_report_title', 'home.reviewer_course_report_description'),
+    'review-course-specification': ('home.reviewer_course_spec_title', 'home.reviewer_course_spec_description'),
+    'review-program-specification': ('home.reviewer_program_spec_title', 'home.reviewer_program_spec_description'),
+    'review-clo-mapping': ('home.reviewer_clo_mapping_title', 'home.reviewer_clo_mapping_description'),
+    'review-evidence': ('home.reviewer_evidence_title', 'home.reviewer_evidence_description'),
+}
+
+@app.route('/services/<service_slug>')
+def service_placeholder(service_slug):
+    title_key, description_key = SERVICE_PLACEHOLDERS.get(
+        service_slug,
+        ('home.open_service', 'service.coming_soon')
+    )
+    return render_template(
+        'service_placeholder.html',
+        title=translate(title_key),
+        description=translate(description_key)
+    )
 
 @app.route('/')
 def index():
@@ -14005,6 +14251,27 @@ def course_report_preview_draft_get(draft_id):
         
     return render_course_report_preview(draft_id, draft, is_draft=True)
 
+@app.route('/course-report-service/preview/draft/<draft_id>/export/pdf')
+def export_course_report_draft_pdf(draft_id):
+    user = current_user()
+    if not user:
+        return redirect(url_for('login'))
+
+    try:
+        draft = load_course_report_draft(draft_id)
+        pdf_bytes = build_course_report_pdf(
+            draft.get('stats') or {},
+            draft.get('course_report_inputs') or {},
+            draft.get('course_info') or {},
+            draft.get('total_students') or None
+        )
+    except Exception as exc:
+        app.logger.exception("Failed to export draft course report PDF: %s", exc)
+        flash(f"Failed to generate PDF: {exc}", "error")
+        return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
+
+    return course_report_pdf_response(pdf_bytes)
+
 @app.route('/course-report-service/preview/draft/<draft_id>/save', methods=['POST'])
 def save_course_report_draft_action(draft_id):
     user = current_user()
@@ -14167,8 +14434,9 @@ def clo_attainment():
         session['custom_clos'] = custom_clos
         session['report_metrics'] = report_metrics
         session.pop('mapping', None)
+        session.pop('mapping_method', None)
 
-        return redirect(url_for('mapping'))
+        return redirect(url_for('mapping_method'))
             
     selected_course_name = session.pop('selected_course_name', None) or session.get('course_name', '')
     return render_template(
@@ -14177,6 +14445,82 @@ def clo_attainment():
         selected_course_name=selected_course_name,
         saved_target_percentages=session.get('target_percentages', {}),
         saved_custom_clos=session.get('custom_clos', [])
+    )
+
+@app.route('/mapping-method', methods=['GET', 'POST'])
+def mapping_method():
+    assessment_files = session.get('assessment_files') or []
+    file_id = session.get('file_id')
+    file_ext = session.get('file_ext')
+    course_name = session.get('course_name')
+
+    if not (assessment_files or file_id):
+        return redirect(url_for('clo_attainment'))
+
+    if request.method == 'POST':
+        method = (request.form.get('mapping_method') or 'manual').strip().lower()
+        if method == 'manual':
+            session['mapping_method'] = 'manual'
+            session.modified = True
+            return redirect(url_for('mapping'))
+
+        if method != 'ai':
+            flash("Please choose a valid mapping method.", "error")
+            return redirect(request.url)
+
+        exam_paper = request.files.get('exam_paper')
+        if not exam_paper or not exam_paper.filename:
+            flash("Please upload the exam paper before using AI-assisted mapping.", "error")
+            return redirect(request.url)
+
+        exam_ext = os.path.splitext(exam_paper.filename)[1].lower()
+        if exam_ext not in {'.pdf', '.docx', '.txt'}:
+            flash("Exam paper must be PDF, Word, or TXT.", "error")
+            return redirect(request.url)
+
+        stored_name = f"{uuid.uuid4()}{exam_ext}"
+        filepath = get_upload_path(stored_name)
+        exam_paper.save(filepath)
+        try:
+            exam_metrics = parse_exam_paper_metrics(filepath)
+        except Exception as exc:
+            app.logger.exception("Failed to parse mapping exam paper: %s", exc)
+            flash(f"Could not read the exam paper: {exc}", "error")
+            return redirect(request.url)
+        finally:
+            try:
+                os.remove(filepath)
+            except OSError:
+                pass
+
+        course_clos = session.get('custom_clos') or get_course_clos(course_name)
+        course_clos = list(course_clos or [])
+        report_metrics = dict(session.get('report_metrics') or {})
+        report_metrics = apply_exam_paper_mappings(report_metrics, exam_metrics)
+        if course_clos:
+            report_metrics = build_gemini_question_clo_suggestions(report_metrics, course_clos)
+            report_metrics = build_smart_clo_suggestions(
+                report_metrics,
+                course_clos,
+                only_unmapped=report_metrics.get('question_clo_suggestion_source') == 'gemini'
+            )
+
+        paper_name = secure_filename(exam_paper.filename) or exam_paper.filename
+        updated_assessment_files = []
+        for item in assessment_files:
+            item = dict(item)
+            item['paper_original_name'] = paper_name
+            updated_assessment_files.append(item)
+
+        session['assessment_files'] = updated_assessment_files
+        session['report_metrics'] = report_metrics
+        session['mapping_method'] = 'ai'
+        session.modified = True
+        return redirect(url_for('mapping'))
+
+    return render_template(
+        'mapping_method.html',
+        course_name=course_name
     )
 
 @app.route('/mapping', methods=['GET', 'POST'])
@@ -14188,6 +14532,9 @@ def mapping():
     
     if not (assessment_files or file_id):
         return redirect(url_for('clo_attainment'))
+
+    if request.method == 'GET' and not session.get('mapping_method'):
+        return redirect(url_for('mapping_method'))
 
     report_metrics = session.get('report_metrics') or {}
 

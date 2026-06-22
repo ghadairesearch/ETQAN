@@ -91,7 +91,7 @@
     }
 
     .service-card-disabled {
-        cursor: not-allowed;
+        cursor: pointer;
         opacity: 0.62;
         background: #f8fafc;
     }
@@ -147,29 +147,29 @@
                 </a>
 
                 {% if current_user and saved_course_count == 0 %}
-                    <div class="service-card service-card-disabled" aria-disabled="true">
+                    <a href="/clo-attainment?fresh=1" class="service-card service-card-disabled">
                         <div>
                             <h3>{{ _('home.clo_title') }}</h3>
                             <p>{{ _('home.clo_description') }}</p>
                             <div class="service-card-note">{{ _('home.requires_course') }}</div>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="service-card service-card-disabled" aria-disabled="true">
+                    <a href="/course-report-service" class="service-card service-card-disabled">
                         <div>
                             <h3>{{ _('home.course_report_title') }}</h3>
                             <p>{{ _('home.course_report_description') }}</p>
                             <div class="service-card-note">{{ _('home.requires_course') }}</div>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="service-card service-card-disabled" aria-disabled="true">
+                    <a href="/question-clo-mapping" class="service-card service-card-disabled">
                         <div>
                             <h3>{{ _('home.question_mapping_title') }}</h3>
                             <p>{{ _('home.question_mapping_description') }}</p>
                             <div class="service-card-note">{{ _('home.requires_course') }}</div>
                         </div>
-                    </div>
+                    </a>
                 {% else %}
                     <a href="/clo-attainment?fresh=1" class="service-card">
                         <div>
@@ -195,68 +195,68 @@
             </div>
         </section>
 
-        <section class="service-level service-level-inactive" aria-disabled="true">
+        <section class="service-level service-level-inactive">
             <div class="service-level-header">
                 <h3>{{ _('home.program_level') }}</h3>
                 <span class="service-inactive-badge">{{ _('home.inactive') }}</span>
             </div>
             <div class="service-grid">
-                <div class="service-card service-card-disabled" aria-disabled="true">
+                <a href="{{ url_for('new_program') }}" class="service-card service-card-disabled">
                     <div>
                         <h3>{{ _('home.add_program_title') }}</h3>
                         <p>{{ _('home.add_program_description') }}</p>
                     </div>
-                </div>
+                </a>
 
-                <div class="service-card service-card-disabled" aria-disabled="true">
+                <a href="{{ url_for('plo_analysis_service') }}" class="service-card service-card-disabled">
                     <div>
                         <h3>{{ _('home.plo_title') }}</h3>
                         <p>{{ _('home.plo_description') }}</p>
                     </div>
-                </div>
+                </a>
             </div>
         </section>
 
-        <section class="service-level service-level-inactive" aria-disabled="true">
+        <section class="service-level service-level-inactive">
             <div class="service-level-header">
                 <h3>{{ _('home.reviewer_level') }}</h3>
                 <span class="service-inactive-badge">{{ _('home.inactive') }}</span>
             </div>
             <div class="service-grid">
-                <div class="service-card service-card-disabled" aria-disabled="true">
+                <a href="{{ url_for('service_placeholder', service_slug='review-course-report') }}" class="service-card service-card-disabled">
                     <div>
                         <h3>{{ _('home.reviewer_course_report_title') }}</h3>
                         <p>{{ _('home.reviewer_course_report_description') }}</p>
                     </div>
-                </div>
+                </a>
 
-                <div class="service-card service-card-disabled" aria-disabled="true">
+                <a href="{{ url_for('service_placeholder', service_slug='review-course-specification') }}" class="service-card service-card-disabled">
                     <div>
                         <h3>{{ _('home.reviewer_course_spec_title') }}</h3>
                         <p>{{ _('home.reviewer_course_spec_description') }}</p>
                     </div>
-                </div>
+                </a>
 
-                <div class="service-card service-card-disabled" aria-disabled="true">
+                <a href="{{ url_for('service_placeholder', service_slug='review-program-specification') }}" class="service-card service-card-disabled">
                     <div>
                         <h3>{{ _('home.reviewer_program_spec_title') }}</h3>
                         <p>{{ _('home.reviewer_program_spec_description') }}</p>
                     </div>
-                </div>
+                </a>
 
-                <div class="service-card service-card-disabled" aria-disabled="true">
+                <a href="{{ url_for('service_placeholder', service_slug='review-clo-mapping') }}" class="service-card service-card-disabled">
                     <div>
                         <h3>{{ _('home.reviewer_clo_mapping_title') }}</h3>
                         <p>{{ _('home.reviewer_clo_mapping_description') }}</p>
                     </div>
-                </div>
+                </a>
 
-                <div class="service-card service-card-disabled" aria-disabled="true">
+                <a href="{{ url_for('service_placeholder', service_slug='review-evidence') }}" class="service-card service-card-disabled">
                     <div>
                         <h3>{{ _('home.reviewer_evidence_title') }}</h3>
                         <p>{{ _('home.reviewer_evidence_description') }}</p>
                     </div>
-                </div>
+                </a>
             </div>
         </section>
     </div>

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .mapping-method-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+        margin: 1.25rem 0;
+    }
+
+    .mapping-method-option {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        background: var(--bg-card);
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+
+    .mapping-method-option:hover,
+    .mapping-method-option:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 10px 24px rgba(38, 54, 95, 0.12);
+    }
+
+    .mapping-method-option h3 {
+        margin: 0 0 0.35rem;
+        font-size: 1rem;
+        color: var(--accent);
+    }
+
+    .mapping-method-option p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.45;
+    }
+
+    .mapping-paper-field {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        background: #f9fafb;
+        margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 720px) {
+        .mapping-method-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="card" style="max-width: 860px; margin: 0 auto;">
+    <h2 style="margin-top: 0;">{{ _('mapping.method_title') }}</h2>
+    <p style="color: var(--text-muted); margin-bottom: 0;">
+        {{ _('mapping.course') }} <strong>{{ course_name }}</strong><br>
+        {{ _('mapping.method_description') }}
+    </p>
+
+    <form method="POST" action="{{ url_for('mapping_method') }}" enctype="multipart/form-data">
+        <div class="mapping-method-grid" role="radiogroup" aria-label="{{ _('mapping.method_choice') }}">
+            <label class="mapping-method-option">
+                <input type="radio" name="mapping_method" value="manual" checked>
+                <span>
+                    <h3>{{ _('mapping.method_manual_title') }}</h3>
+                    <p>{{ _('mapping.method_manual_description') }}</p>
+                </span>
+            </label>
+
+            <label class="mapping-method-option">
+                <input type="radio" name="mapping_method" value="ai">
+                <span>
+                    <h3>{{ _('mapping.method_ai_title') }}</h3>
+                    <p>{{ _('mapping.method_ai_description') }}</p>
+                </span>
+            </label>
+        </div>
+
+        <div id="exam-paper-field" class="mapping-paper-field" hidden>
+            <label style="display: block; font-weight: 700; margin-bottom: 0.4rem;">{{ _('mapping.exam_paper') }}</label>
+            <input id="exam-paper-input" type="file" name="exam_paper" class="form-control" accept=".pdf,.docx,.txt">
+            <small style="display: block; margin-top: 0.45rem; color: var(--text-muted);">{{ _('mapping.method_exam_paper_help') }}</small>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="/back-to-upload" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('mapping.back') }}</a>
+            <button type="submit" class="btn">{{ _('mapping.method_continue') }}</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const field = document.getElementById('exam-paper-field');
+        const input = document.getElementById('exam-paper-input');
+        const radios = document.querySelectorAll('input[name="mapping_method"]');
+
+        function syncExamField() {
+            const selected = document.querySelector('input[name="mapping_method"]:checked');
+            const isAi = selected && selected.value === 'ai';
+            field.hidden = !isAi;
+            input.required = isAi;
+        }
+
+        radios.forEach(function(radio) {
+            radio.addEventListener('change', syncExamField);
+        });
+        syncExamField();
+    });
+</script>
+{% endblock %}
