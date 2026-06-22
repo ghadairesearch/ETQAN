@@ -1351,7 +1351,7 @@ TRANSLATIONS = {
         'mapping.title': 'ربط الأسئلة بنواتج التعلم',
         'mapping.course': 'المقرر:',
         'mapping.detected': 'تم اكتشاف:',
-        'mapping.description': 'اربط ناتج تعلم واحداً أو أكثر بكل سؤال.',
+        'mapping.description': 'أربط كل سؤال بناتج تعلم واحد أو أكثر',
         'mapping.exam_paper': 'ورقة الاختبار:',
         'mapping.questions': 'أسئلة',
         'mapping.students': 'طلاب',
