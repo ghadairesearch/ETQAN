@@ -923,9 +923,10 @@ EN_TRANSLATIONS = {
     'results.create_new': 'Create New Report',
     'results.no_mappings': 'No mappings were provided. Please ensure you mapped at least one question to a CLO.',
     'history.title': 'My Reports',
-    'history.report': 'Report',
+    'history.report': 'Report Title',
     'history.course': 'Course',
-    'history.created': 'Created',
+    'history.type': 'Report Type',
+    'history.created': 'Created At',
     'history.open': 'Open',
     'history.rename': 'Rename',
     'history.rename_placeholder': 'Report name',
@@ -1081,7 +1082,7 @@ TRANSLATIONS = {
         'home.course_level': 'خدمات المقررات',
         'home.course_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u062e\u0627\u0635 \u0628\u062a\u062d\u0644\u064a\u0644 \u0645\u062e\u0631\u062c\u0627\u062a \u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0642\u0631\u0631 \u0648\u0623\u062f\u0644\u0629 \u0627\u0644\u062a\u062d\u0642\u0642 \u0648\u062a\u0642\u0627\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'home.program_level': 'خدمات البرامج',
-        'home.program_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u064a\u062c\u0645\u0639 \u0623\u062f\u0644\u0629 \u0627\u0644\u0645\u0642\u0631\u0637\u0627\u062a \u0644\u062a\u062d\u0644\u064a\u0644 \u0646\u0648\u0627\u062a\u062c \u062a\u0639\u0644\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c.',
+        'home.program_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u064a\u062c\u0645\u0649 \u0623\u062f\u0644\u0629 \u0627\u0644\u0645\u0642\u0631\u0637\u0627\u062a \u0644\u062a\u062d\u0644\u064a\u0644 \u0646\u0648\u0627\u062a\u062c \u062a\u0639\u0644\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c.',
         'home.add_program_title': 'إضافة برنامج',
         'home.add_program_description': 'أضف برنامجًا لتتمكن من إنشاء التقارير.',
         'home.requires_program': 'يتطلب إضافة برنامج واحد على الأقل.',
@@ -1119,7 +1120,7 @@ TRANSLATIONS = {
         'course_report.create_clo_prompt': '\u0647\u0644 \u062a\u0631\u063a\u0628 \u0628\u0625\u0646\u0634\u0627\u0621 \u0648\u0627\u062d\u062f \u0627\u0644\u0622\u0646\u061f',
         'course_report.create_clo_report': '\u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 CLO',
         'course_report.associated_reports': '\u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629',
-        'course_report.associated_reports_help': '\u062d\u062f\u062f \u062a\u0642\u0631\u064a\u0631\u0627\u064b \u0648\u0627\u062d\u062f\u0627\u064b \u0623\u0648 \u0623\u0643\u062b\u0631 \u0645\u0646 \u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0644\u0627\u0633\u062a\u062e\u062f\u0627\u0645\u0647\u0627 \u0641\u064a \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
+        'course_report.associated_reports_help': '\u062d\u062f\u062f \u062a\u0642\u0631\u064a\u0631\u0627\u064b \u0648\u0627\u062d\u062f\u0627\u064b \u0623\u0648 \u0623\u0643\u062b\u0631 \u0645\u0646 \u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0644\u0627\u0633\u062a\u062d\u062f\u0627\u0645\u0647\u0627 \u0641\u064a \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'course_report.no_associated_reports': '\u0644\u0627 \u064a\u0648\u062c\u062f \u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0645\u0631\u062a\u0628\u0637 \u0628\u0647\u0630\u0627 \u0627\u0644\u0645\u0642\u0631\u0631. \u064a\u062c\u0628 \u0625\u0646\u0634\u0627\u0621 \u0648\u0627\u062d\u062f \u0642\u0628\u0644 \u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'course_report.use_report': '\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0647\u0630\u0627 \u0627\u0644\u062a\u0642\u0631\u064a\u0631',
         'course_report.create_report': '\u0627\u0644\u062a\u0627\u0644\u064a',
@@ -2997,6 +2998,60 @@ def load_course_report_records(report_ids, user_id):
         })
     return records
 
+@app.route('/save-report', methods=['POST'])
+@login_required
+def save_report():
+    user = current_user()
+    data = request.get_json()
+    stats = data.get('stats', {})
+    total_students = data.get('total_students', 0)
+    student_achievement_matrix = data.get('student_achievement_matrix', {})
+    course_info = data.get('course_info', {})
+    payload = {
+        'stats': json_safe(stats),
+        'total_students': total_students,
+        'student_achievement_matrix': json_safe(student_achievement_matrix),
+        'course_info': json_safe(course_info),
+        'branding': get_display_branding_payload()
+    }
+    payload_json = json.dumps(payload, ensure_ascii=False)
+    report_hash = hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest()
+    created_at = datetime.now().isoformat()
+    course_name = course_info.get('course_name')
+    with get_db() as conn:
+        if is_report_saved(stats, total_students, student_achievement_matrix, course_info):
+            return {'allowed': True, 'saved': False, 'reason': 'already_saved'}
+        title = unique_saved_report_title(
+            conn, user['id'], course_name or 'Course Report', 'CLO Attainment Report')
+        
+        conn.execute(
+            """
+            INSERT INTO saved_reports (user_id, title, report_hash, payload_json, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (user['id'], title, report_hash, payload_json, created_at)
+        )
+        return {'allowed': True, 'saved': True, 'reason': 'success'}
+
+def is_report_saved(stats, total_students, student_achievement_matrix, course_info):
+    user = current_user()
+    if not user:
+        return False
+    payload = {
+        'stats': json_safe(stats),
+        'total_students': total_students,
+        'student_achievement_matrix': json_safe(student_achievement_matrix),
+        'course_info': json_safe(course_info),
+        'branding': get_display_branding_payload()
+    }
+    report_hash = hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest()
+    with get_db() as conn:
+        existing = conn.execute(
+            "SELECT id FROM saved_reports WHERE user_id = ? AND report_hash = ?",
+            (user['id'], report_hash)
+        ).fetchone()
+        return bool(existing)
+
 def build_course_report_context_from_records(records, export_action, selected_course_name=''):
     context = course_report_template_context_defaults(export_action, selected_course_name)
     combined_stats = {}
@@ -3122,9 +3177,6 @@ def normalize_report_title(value):
     return re.sub(r'\s+', ' ', str(value or '').strip())[:160]
 
 def default_saved_report_title(course_name=''):
-    course_name = normalize_report_title(course_name)
-    if course_name:
-        return f"CLO Attainment Report - {course_name}"
     return "CLO Attainment Report"
 
 def report_title_exists(conn, user_id, course_name, title, exclude_report_id=None):
@@ -13941,10 +13993,16 @@ def results():
         return redirect(url_for('clo_attainment'))
     student_achievement_matrix = build_student_achievement_matrix(student_achievement_rows, stats.keys())
     course_info = get_course_report_info()
-    save_result = save_report_snapshot(stats, total_students, student_achievement_matrix, course_info)
-    if save_result and not save_result.get('allowed', True):
-        flash(translate('billing.limit_message'), "error")
-        return redirect(url_for('billing'))
+    
+    user = current_user()
+    if user:
+        with get_db() as conn:
+            saved_count = conn.execute("SELECT COUNT(*) FROM saved_reports WHERE user_id = ?", (user['id'],)).fetchone()[0]
+            if not report_creation_entitlement(user, saved_count):
+                flash(translate('billing.limit_message'), "error")
+                return redirect(url_for('billing'))
+                
+    is_saved = is_report_saved(stats, total_students, student_achievement_matrix, course_info)
 
     return render_template('report_results.html',
                            stats=stats,
@@ -13958,9 +14016,27 @@ def results():
                            display_student_id=display_student_id,
                            course_topics=get_course_topics(session.get('course_name') or ''),
                            show_exports=True,
+                           is_saved=is_saved,
                            format_question_label=format_question_label,
                            format_mapped_questions_for_report=format_mapped_questions_for_report,
                            student_count_warning=(session.get('report_metrics') or {}).get('student_count_warning', ''))
+
+@app.route('/save-report', methods=['POST'])
+def save_report():
+    stats, total_students, student_achievement_rows, error = calculate_clo_results()
+    if error:
+        flash(error)
+        return redirect(url_for('clo_attainment'))
+    student_achievement_matrix = build_student_achievement_matrix(student_achievement_rows, stats.keys())
+    course_info = get_course_report_info()
+    save_result = save_report_snapshot(stats, total_students, student_achievement_matrix, course_info)
+    
+    if save_result and not save_result.get('allowed', True):
+        flash(translate('billing.limit_message'), "error")
+        return redirect(url_for('billing'))
+        
+    flash(translate('exams.saved') if translate('exams.saved') != 'exams.saved' else "Report saved successfully.")
+    return redirect(url_for('results'))
 
 @app.route('/update-branding', methods=['POST'])
 def update_branding():

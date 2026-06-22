@@ -155,18 +155,33 @@
         {% if can_export %}
             {% if current_user and current_user.university_name %}
             <div style="display: flex; gap: 0.45rem; justify-content: flex-end; align-items: center;">
-                <div class="result-export-menu" id="result_export_menu">
-                    <button type="button" class="result-export-button" id="result_export_button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <path d="M7 10l5 5 5-5"></path>
-                            <path d="M12 15V3"></path>
-                        </svg>
-                    </button>
-                    <div class="result-export-panel" aria-labelledby="result_export_button">
-                        <a href="{{ export_csv_url }}">{{ _('results.export_csv') }}</a>
-                        <a href="{{ export_pdf_url }}">{{ _('results.export_pdf') }}</a>
+                {% if not is_saved %}
+                    <form method="POST" action="/save-report" style="margin: 0;">
+                        <button type="submit" class="btn" style="padding: 0.45rem 0.85rem; display: flex; align-items: center; gap: 0.35rem; background-color: var(--accent); color: white;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            {{ _('question_mapping.save_mapping') }}
+                        </button>
+                    </form>
+                {% endif %}
+                <div style="display: flex; align-items: center;">
+                    <div class="result-export-menu" id="result_export_menu">
+                        <button type="button" class="result-export-button" id="result_export_button" aria-label="Export" aria-haspopup="true" aria-expanded="false" {% if not is_saved %}disabled style="opacity: 0.5; cursor: not-allowed;" title="يجب حفظ التقرير قبل التصدير"{% endif %}>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <path d="M7 10l5 5 5-5"></path>
+                                <path d="M12 15V3"></path>
+                            </svg>
+                        </button>
+                        {% if is_saved %}
+                        <div class="result-export-panel" aria-labelledby="result_export_button">
+                            <a href="{{ export_csv_url }}">{{ _('results.export_csv') }}</a>
+                            <a href="{{ export_pdf_url }}">{{ _('results.export_pdf') }}</a>
+                        </div>
+                        {% endif %}
                     </div>
+                    {% if not is_saved %}
+                        <div class="i-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.75rem; font-style: italic; font-weight: bold; cursor: help; margin-inline-start: 0.4rem;" title="يجب حفظ التقرير قبل التصدير">i</div>
+                    {% endif %}
                 </div>
                 {% if delete_report_url %}
                 <form method="POST" action="{{ delete_report_url }}" onsubmit="return confirm('{{ _('history.delete_confirm') }}');" style="margin: 0;">

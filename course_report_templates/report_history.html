@@ -101,6 +101,7 @@
             <tr>
                 <th>{{ _('history.report') }}</th>
                 <th>{{ _('history.course') }}</th>
+                <th>{{ _('history.type') if _('history.type') != 'history.type' else 'Report Type' }}</th>
                 <th>{{ _('history.created') }}</th>
                 <th></th>
             </tr>
@@ -117,6 +118,15 @@
                         </form>
                     </td>
                     <td>{{ report.course_name }}</td>
+                    <td>
+                        {% if report.report_type == 'course_report' %}
+                            {{ _('home.course_report_title') }}
+                        {% elif report.report_type == 'plo_report' %}
+                            {{ _('home.plo_title') }}
+                        {% else %}
+                            {{ _('home.clo_title') if _('home.clo_title') != 'home.clo_title' else 'CLO Attainment Report' }}
+                        {% endif %}
+                    </td>
                     <td>{{ report.created_at }}</td>
                     <td>
                         <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
