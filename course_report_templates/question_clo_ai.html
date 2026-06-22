@@ -249,7 +249,7 @@
                         <input type="hidden" name="ai_suggested_clo_{{ question }}" value="{{ suggested.clo }}">
                     {% endif %}
                     
-                    <div class="section-title">{{ _('mapping.question') }} {{ loop.index }}</div>
+                    <div class="section-title">{% if language == 'en' %}Question {{ loop.index }}{% else %}سؤال {{ loop.index }}{% endif %}</div>
                     <div class="question-box" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">
                         {{ question_text }}
                     </div>
