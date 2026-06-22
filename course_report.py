@@ -564,6 +564,7 @@ EN_TRANSLATIONS = {
     'question_mapping.back': 'Back',
     'question_mapping.review_saved': 'Question review saved.',
     'question_mapping.no_questions': 'No questions were extracted. Add at least one question before mapping.',
+    'question_mapping.select_at_least_one': 'Please select at least one CLO for:',
     'exams.title': 'My Exams',
     'exams.empty': 'No saved exams yet.',
     'exams.saved': 'Exam mapping saved.',
@@ -1104,6 +1105,7 @@ TRANSLATIONS = {
         'question_mapping.link_description': 'راجع رقم كل سؤال وناتج التعلم المرتبط الذي يقترحه إتقان.',
         'question_mapping.related_clo': 'المخرج المرتبط',
         'question_mapping.no_questions': 'لم يتم استخراج أي أسئلة. أضف سؤالًا واحدًا على الأقل قبل الربط.',
+        'question_mapping.select_at_least_one': 'يرجى تحديد مخرج تعلم واحد على الأقل لـ:',
         'home.assessment_balance_title': 'فحص توازن التقييم',
         'home.assessment_balance_description': 'راجع تغطية التقييم وتوزيع الدرجات وتوازنها عبر نواتج التعلم قبل إعداد التقرير.',
         'home.plo_title': 'تحليل تحقق مخرجات تعلم البرنامج',
@@ -13895,7 +13897,7 @@ def mapping():
 
         if missing_questions:
             missing_text = format_missing_mapping_questions(missing_questions, assessment_files)
-            flash(f"Please select at least one CLO for: {missing_text}", "error")
+            flash(f"{translate('question_mapping.select_at_least_one')} {missing_text}", "error")
             session['mapping'] = mapping_data
             session.modified = True
             return redirect(url_for('mapping'))
