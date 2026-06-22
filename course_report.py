@@ -549,10 +549,18 @@ EN_TRANSLATIONS = {
     'question_mapping.requires_ai_mapping': 'Requires Mapping',
     'question_mapping.all_mapped_success': 'All questions were mapped successfully.',
     'question_mapping.final_review': 'Final Review',
-    'question_mapping.continue_ai_mapping': 'Continue mapping questions to CLOs',
-    'question_mapping.step3_title': 'Step 3: AI Mapping for Unmapped Questions',
+    'question_mapping.continue_ai_mapping': 'Map questions to CLOs',
+    'question_mapping.step3_title': 'Step 3: Map Questions to CLOs',
     'question_mapping.step3_description': 'Review AI recommendations for questions without an explicitly mentioned CLO.',
     'question_mapping.suggested_clo': 'Suggested CLO',
+    'question_mapping.ai_suggestions': 'AI Suggestions',
+    'question_mapping.high_conf': 'High',
+    'question_mapping.medium_conf': 'Medium',
+    'question_mapping.low_conf': 'Low',
+    'question_mapping.alt_suggestions': 'Alternative Suggestions:',
+    'question_mapping.no_ai_suggestions': 'No AI suggestions available.',
+    'question_mapping.final_selection': 'Final CLO Selection',
+    'question_mapping.add_clo': 'Add CLO',
     'question_mapping.confidence_score': 'Confidence Score',
     'question_mapping.select_clo': 'Select CLO',
     'question_mapping.choose_clo': 'Choose a CLO...',
@@ -1607,10 +1615,18 @@ TRANSLATIONS['ar'].update({
     'question_mapping.requires_ai_mapping': '\u064a\u062d\u062a\u0627\u062c \u0631\u0628\u0637',
     'question_mapping.all_mapped_success': '\u062a\u0645 \u0631\u0628\u0637 \u062c\u0645\u064a\u0639 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0628\u0646\u062c\u0627\u062d.',
     'question_mapping.final_review': '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0646\u0647\u0627\u0626\u064a\u0629',
-    'question_mapping.continue_ai_mapping': 'متابعة ربط الأسئلة بمخرجات التعلم',
-    'question_mapping.step3_title': '\u0627\u0644\u062e\u0637\u0648\u0629 3: \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u063a\u064a\u0631 \u0627\u0644\u0645\u0631\u0628\u0648\u0637\u0629 \u0628\u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
+    'question_mapping.continue_ai_mapping': 'ربط الأسئلة بمخرجات التعلم',
+    'question_mapping.step3_title': 'الخطوة 3: ربط الأسئلة بمخرجات التعلم',
     'question_mapping.step3_description': '\u0631\u0627\u062c\u0639 \u0627\u0642\u062a\u0631\u0627\u062d\u0627\u062a \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a \u0644\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u062a\u064a \u0644\u0645 \u064a\u0630\u0643\u0631 \u0641\u064a\u0647\u0627 \u0645\u062e\u0631\u062c \u062a\u0639\u0644\u0645 \u0628\u0634\u0643\u0644 \u0635\u0631\u064a\u062d.',
     'question_mapping.suggested_clo': '\u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0642\u062a\u0631\u062d',
+    'question_mapping.ai_suggestions': 'اقتراحات الذكاء الاصطناعي',
+    'question_mapping.high_conf': 'عالي',
+    'question_mapping.medium_conf': 'متوسط',
+    'question_mapping.low_conf': 'منخفض',
+    'question_mapping.alt_suggestions': 'اقتراحات بديلة:',
+    'question_mapping.no_ai_suggestions': 'لا توجد اقتراحات متاحة.',
+    'question_mapping.final_selection': 'المخرجات المختارة',
+    'question_mapping.add_clo': 'إضافة مخرج تعلم',
     'question_mapping.confidence_score': '\u062f\u0631\u062c\u0629 \u0627\u0644\u062b\u0642\u0629',
     'question_mapping.select_clo': '\u0627\u062e\u062a\u0631 \u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
     'question_mapping.choose_clo': '\u0627\u062e\u062a\u0631 \u0645\u062e\u0631\u062c\u0627\u064b...',
@@ -12784,6 +12800,54 @@ def exam_delete(exam_id):
     flash("Exam deleted successfully.")
     return redirect(url_for('my_exams'))
 
+@app.route('/account/exams/<int:exam_id>/export/pdf')
+def export_exam_pdf(exam_id):
+    user = current_user()
+    if not user:
+        flash(translate('courses.login_required'), "error")
+        return redirect(url_for('login'))
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT id, title, course_name, filename, payload_json, created_at FROM saved_exams WHERE id = ? AND user_id = ?",
+            (exam_id, user['id'])
+        ).fetchone()
+    if not row:
+        flash("Exam not found.", "error")
+        return redirect(url_for('my_exams'))
+    
+    exam = {
+        'id': row_get(row, 'id'),
+        'title': row_get(row, 'title'),
+        'course_name': row_get(row, 'course_name'),
+        'filename': row_get(row, 'filename'),
+        'created_at': row_get(row, 'created_at'),
+    }
+    payload = safe_json_loads(row_get(row, 'payload_json'), {}) or {}
+
+    html = render_template('exam_view_pdf.html', exam=exam, payload=payload)
+    
+    import pdfkit
+    options = {
+        'page-size': 'A4',
+        'orientation': 'Portrait',
+        'margin-top': '0.5in',
+        'margin-right': '0.5in',
+        'margin-bottom': '0.5in',
+        'margin-left': '0.5in',
+        'encoding': "UTF-8",
+        'enable-local-file-access': None
+    }
+    try:
+        pdf_bytes = pdfkit.from_string(html, False, options=options)
+    except Exception as exc:
+        flash(f"Failed to generate PDF: {exc}", "error")
+        return redirect(url_for('exam_view', exam_id=exam_id))
+    
+    response = Response(pdf_bytes, mimetype="application/pdf")
+    filename = secure_filename(f"{exam['title']}_mapping.pdf")
+    response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+    return response
+
 @app.route('/')
 def index():
     user = current_user()
@@ -13387,13 +13451,14 @@ def question_clo_mapping_final():
         while title in existing_titles:
             title = f"{base_title} ({counter})"
             counter += 1
-        conn.execute(
+        cursor = conn.execute(
             """
             INSERT INTO saved_exams (user_id, title, course_name, filename, payload_json, created_at)
             VALUES (?, ?, ?, ?, ?, ?)
             """,
             (user['id'], title, course_name, filename, json.dumps(payload, ensure_ascii=False), created_at)
         )
+        new_exam_id = cursor.lastrowid
 
     try:
         os.remove(question_mapping_draft_path(draft_id))
@@ -13401,7 +13466,7 @@ def question_clo_mapping_final():
         pass
 
     flash(translate('exams.saved'))
-    return redirect(url_for('my_exams'))
+    return redirect(url_for('exam_view', exam_id=new_exam_id))
 
 @app.route('/question-clo-mapping/link/<draft_id>', methods=['GET'])
 def question_clo_mapping_link_get(draft_id):

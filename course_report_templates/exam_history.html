@@ -42,15 +42,24 @@
                     <tr>
                         <td>
                             <a href="/account/exams/{{ exam.id }}" style="color: var(--accent); font-weight: 700; text-decoration: underline;">{{ exam.title }}</a>
-                            {% if exam.filename %}
-                                <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">{{ exam.filename }}</div>
-                            {% endif %}
                         </td>
                         <td>{{ exam.course_name }}</td>
                         <td>{{ exam.question_count }}</td>
                         <td>{{ exam.created_at }}</td>
                         <td>
                             <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
+                                <div class="report-action-menu">
+                                    <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <path d="M7 10l5 5 5-5"></path>
+                                            <path d="M12 15V3"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="report-action-panel">
+                                        <a href="/account/exams/{{ exam.id }}/export/pdf">{{ _('results.export_pdf') }}</a>
+                                    </div>
+                                </div>
                                 <form method="POST" action="/account/exams/{{ exam.id }}/delete" onsubmit="return confirm('{{ _('history.delete_confirm') }}');" style="margin: 0;">
                                     <button type="submit" class="exam-delete-button" aria-label="{{ _('history.delete') }}">
                                         <svg viewBox="0 0 24 24" aria-hidden="true">

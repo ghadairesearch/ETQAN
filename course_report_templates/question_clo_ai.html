@@ -230,10 +230,10 @@
         <!-- Pre-existing selections for already mapped explicitly -->
         {% for question in metrics.questions %}
             <input type="hidden" name="question_ids" value="{{ question }}">
-            <input type="hidden" name="question_text_{{ question }}" value="{{ metrics.question_texts.get(question, '') }}">
-            <input type="hidden" name="question_type_{{ question }}" value="{{ metrics.question_types.get(question, '') if metrics.question_types else '' }}">
+            <input type="hidden" name="question_text_{{ question }}" value="{{ metrics.question_texts.get(question, '')|e }}">
+            <input type="hidden" name="question_type_{{ question }}" value="{{ metrics.question_types.get(question, '')|e if metrics.question_types else '' }}">
             {% for clo in review_summary.explicit_by_question.get(question, []) %}
-                <input type="hidden" name="question_clo_{{ question }}" value="{{ clo }}">
+                <input type="hidden" name="question_clo_{{ question }}" value="{{ clo|e }}">
             {% endfor %}
         {% endfor %}
 
@@ -254,7 +254,7 @@
                         {{ question_text }}
                     </div>
                     
-                    <div class="section-title">AI Suggestions</div>
+                    <div class="section-title">{{ _('question_mapping.ai_suggestions') if _('question_mapping.ai_suggestions') != 'question_mapping.ai_suggestions' else 'AI Suggestions' }}</div>
                     <div class="ai-card">
                         {% if suggested %}
                             <div class="ai-primary">
@@ -262,18 +262,18 @@
                                     <strong><span style="color: var(--accent-primary);">✓</span> {{ suggested.clo }}</strong>
                                     {% set conf = suggested.score|float if suggested.score else 0 %}
                                     {% if conf >= 70 %}
-                                        <span class="ai-confidence-badge badge-high">High ({{ suggested.score }}%)</span>
+                                        <span class="ai-confidence-badge badge-high">{{ _('question_mapping.high_conf') if _('question_mapping.high_conf') != 'question_mapping.high_conf' else 'High' }} ({{ suggested.score }}%)</span>
                                     {% elif conf >= 40 %}
-                                        <span class="ai-confidence-badge badge-medium">Medium ({{ suggested.score }}%)</span>
+                                        <span class="ai-confidence-badge badge-medium">{{ _('question_mapping.medium_conf') if _('question_mapping.medium_conf') != 'question_mapping.medium_conf' else 'Medium' }} ({{ suggested.score }}%)</span>
                                     {% else %}
-                                        <span class="ai-confidence-badge badge-low">Low ({{ suggested.score }}%)</span>
+                                        <span class="ai-confidence-badge badge-low">{{ _('question_mapping.low_conf') if _('question_mapping.low_conf') != 'question_mapping.low_conf' else 'Low' }} ({{ suggested.score }}%)</span>
                                     {% endif %}
                                 </div>
                             </div>
                             
                             {% if suggestions|length > 1 %}
                             <div class="ai-alternatives">
-                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Alternative Suggestions:</div>
+                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">{{ _('question_mapping.alt_suggestions') if _('question_mapping.alt_suggestions') != 'question_mapping.alt_suggestions' else 'Alternative Suggestions:' }}</div>
                                 {% for alt in suggestions[1:4] %}
                                     <div class="ai-alt-item">
                                         <span style="color: var(--text-muted);">○</span>
@@ -283,17 +283,17 @@
                             </div>
                             {% endif %}
                         {% else %}
-                            <div style="color: var(--text-muted);">No AI suggestions available.</div>
+                            <div style="color: var(--text-muted);">{{ _('question_mapping.no_ai_suggestions') if _('question_mapping.no_ai_suggestions') != 'question_mapping.no_ai_suggestions' else 'No AI suggestions available.' }}</div>
                         {% endif %}
                     </div>
                     
-                    <div class="section-title">Final CLO Selection</div>
+                    <div class="section-title">{{ _('question_mapping.final_selection') if _('question_mapping.final_selection') != 'question_mapping.final_selection' else 'Final CLO Selection' }}</div>
                     <div class="chip-container" id="chip-container-{{ question }}">
                         <!-- Chips injected by JS -->
                     </div>
                     <button type="button" class="btn-add-clo" onclick="openCloModal('{{ question }}')">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        Add CLO
+                        {{ _('question_mapping.add_clo') if _('question_mapping.add_clo') != 'question_mapping.add_clo' else 'Add CLO' }}
                     </button>
                     
                     <!-- Hidden inputs container for final selection -->

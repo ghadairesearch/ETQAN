@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ exam.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+        .meta {
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        [dir="rtl"] th, [dir="rtl"] td {
+            text-align: right;
+        }
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+        .clo-badge {
+            display: inline-block;
+            background-color: #000;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body dir="{{ 'rtl' if text_direction(exam.title) == 'rtl' else 'ltr' }}">
+    <h2>{{ exam.title }}</h2>
+    <div class="meta">
+        {{ _('mapping.course') if _('mapping.course') != 'mapping.course' else 'Course:' }} <strong>{{ exam.course_name }}</strong><br>
+        {{ _('detected.source') if _('detected.source') != 'detected.source' else 'Source File:' }} <strong>{{ exam.filename }}</strong>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">{{ _('mapping.question') if _('mapping.question') != 'mapping.question' else 'Question' }}</th>
+                <th style="width: 15%;">{{ _('question_mapping.question_type') if _('question_mapping.question_type') != 'question_mapping.question_type' else 'Type' }}</th>
+                <th style="width: 45%;">{{ _('question_mapping.question_text') if _('question_mapping.question_text') != 'question_mapping.question_text' else 'Question Text' }}</th>
+                <th style="width: 25%;">{{ _('question_mapping.related_clo') if _('question_mapping.related_clo') != 'question_mapping.related_clo' else 'Mapped CLOs' }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in payload.questions %}
+                <tr>
+                    <td><strong>{{ _('mapping.question') if _('mapping.question') != 'mapping.question' else 'Question' }} {{ loop.index }}</strong></td>
+                    <td>{{ item.type or '-' }}</td>
+                    <td dir="{{ text_direction(item.text) }}">{{ item.text }}</td>
+                    <td>
+                        {% if item.clos %}
+                            {% for clo in item.clos %}
+                                <span class="clo-badge">{{ clo.split(' ')[0] }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span style="color: #94a3b8;">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
