@@ -103,9 +103,7 @@
     {% set question_items = metrics.questions if metrics and metrics.questions else ['Q1'] %}
     {% set summary = review_summary or {'total': question_items|length, 'auto_mapped': 0, 'needs_ai': question_items|length, 'all_mapped': false, 'explicit_by_question': {}} %}
 
-    {% if summary.all_mapped %}
-        <div class="alert" style="margin-bottom: 1rem;">{{ _('question_mapping.all_mapped_success') }}</div>
-    {% endif %}
+
 
     <form method="POST" action="{{ url_for('question_clo_mapping_map') }}">
         <input type="hidden" name="draft_id" value="{{ draft_id }}">

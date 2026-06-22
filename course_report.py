@@ -13188,7 +13188,6 @@ def question_clo_mapping_map():
         json.dump(draft, f, ensure_ascii=False)
 
     if review_summary['all_mapped']:
-        flash(translate('question_mapping.all_mapped_success'))
         return redirect(url_for('question_clo_mapping_link_get', draft_id=draft_id))
 
     metrics = build_ai_suggestions_for_unmapped(metrics, clos, review_summary)
