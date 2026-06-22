@@ -6010,7 +6010,7 @@ def gemini_exam_question_extraction_prompt():
         '{"questions":[{"number":"Q1","text":"full question text with \\n separating options","type":"MCQ","explicit_clos":["1.1"]}]}'
     )
 
-def normalize_gemini_exam_metrics(payload):
+def normalize_gemini_exam_metrics(payload, source='gemini', confidence='Gemini'):
     if not isinstance(payload, dict):
         return {}
     raw_questions = payload.get('questions') or payload.get('items') or []
@@ -6048,12 +6048,12 @@ def normalize_gemini_exam_metrics(payload):
         'questions': questions,
         'total_questions': len(questions),
         'total_students': 0,
-        'confidence': 'Gemini',
+        'confidence': confidence,
         'text_sample': '',
         'question_texts': question_texts,
         'question_types': question_types,
         'detected_clo_mappings': detected_clo_mappings,
-        'question_extraction_source': 'gemini',
+        'question_extraction_source': source,
     }
 
 def extract_exam_text_for_ai(filepath):
@@ -6081,6 +6081,27 @@ def parse_exam_paper_with_gemini(filepath):
         timeout=120
     )
     metrics = normalize_gemini_exam_metrics(parsed)
+    if metrics:
+        return metrics
+    return {}
+
+def parse_exam_paper_with_qwen(filepath):
+    if not GROQ_KEY:
+        return {}
+    text = extract_exam_text_for_ai(filepath)
+    if not compact_text(text):
+        return {}
+    parsed, error = call_groq_json_with_error(
+        "You extract exam questions from exam papers. Return valid JSON only.",
+        gemini_exam_question_extraction_prompt()
+        + "\n\nInput JSON:\n"
+        + json.dumps({'exam_text': text[:60000]}, ensure_ascii=False),
+        timeout=120
+    )
+    if error:
+        app.logger.warning("Qwen exam question extraction failed: %s", error)
+        return {}
+    metrics = normalize_gemini_exam_metrics(parsed, source='qwen', confidence='Qwen')
     if metrics:
         return metrics
     return {}
@@ -6330,6 +6351,9 @@ def parse_exam_paper_metrics(filepath):
     gemini_metrics = parse_exam_paper_with_gemini(filepath)
     if gemini_metrics:
         return gemini_metrics
+    qwen_metrics = parse_exam_paper_with_qwen(filepath)
+    if qwen_metrics:
+        return qwen_metrics
     return parse_exam_paper_with_module(filepath)
 
 def infer_exam_paper_metrics(text):
