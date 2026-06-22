@@ -20,6 +20,11 @@
         flex-wrap: wrap;
     }
 
+    html[dir="rtl"] .question-review-header {
+        justify-content: flex-start;
+        text-align: right;
+    }
+
     .question-review-counts {
         display: flex;
         gap: 0.75rem;
@@ -109,15 +114,12 @@
         <input type="hidden" name="draft_id" value="{{ draft_id }}">
         <section class="question-review-box">
             <div class="question-review-header">
-                <div>
-                    <strong>{{ filename }}</strong>
+                <div class="question-review-counts">
+                    <span class="question-review-detected">{{ _('mapping.detected') }}</span>
+                    <span class="question-review-count" id="questionCount">{{ question_items|length }} {{ count_unit('question', question_items|length) }}</span>
+                    <span class="question-review-count"><span id="autoMappedCount">{{ summary.auto_mapped }}</span> {{ _('question_mapping.auto_mapped_questions') }}</span>
+                    <span class="question-review-count"><span id="aiRequiredCount">{{ summary.needs_ai }}</span> {{ _('question_mapping.ai_required_questions') }}</span>
                 </div>
-                    <div class="question-review-counts">
-                        <span class="question-review-detected">{{ _('mapping.detected') }}</span>
-                        <span class="question-review-count" id="questionCount">{{ question_items|length }} {{ count_unit('question', question_items|length) }}</span>
-                        <span class="question-review-count"><span id="autoMappedCount">{{ summary.auto_mapped }}</span> {{ _('question_mapping.auto_mapped_questions') }}</span>
-                        <span class="question-review-count"><span id="aiRequiredCount">{{ summary.needs_ai }}</span> {{ _('question_mapping.ai_required_questions') }}</span>
-                    </div>
             </div>
             <table id="questionTable" class="question-review-table" style="min-width: 1080px;">
                 <thead>
@@ -139,7 +141,7 @@
                         {% set question_text = metrics.question_texts.get(question, question) if metrics and metrics.question_texts else '' %}
                         {% set question_type = metrics.question_types.get(question, '') if metrics and metrics.question_types else '' %}
                         <tr class="question-edit-row">
-                            <td><strong class="question-number">{% if language == 'en' %}Q{{ loop.index }}{% else %}س{{ loop.index }}{% endif %}</strong></td>
+                            <td><strong class="question-number">{% if language == 'en' %}Q{{ loop.index }}{% else %}سؤال {{ loop.index }}{% endif %}</strong></td>
                             <td>
                                 <textarea name="question_text" class="form-control" rows="4" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</textarea>
                             </td>
@@ -243,7 +245,7 @@
             rows.forEach(function(row, index) {
                 const label = row.querySelector('.question-number');
                 if (label) {
-                    label.textContent = currentLang === 'en' ? ('Q' + (index + 1)) : ('س' + (index + 1));
+                    label.textContent = currentLang === 'en' ? ('Q' + (index + 1)) : ('سؤال ' + (index + 1));
                 }
                 row.querySelectorAll('.paper-clo-hidden').forEach(function(input) {
                     input.name = 'paper_clo_' + index;

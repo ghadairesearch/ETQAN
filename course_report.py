@@ -1644,7 +1644,7 @@ TRANSLATIONS['ar'].update({
     'question_mapping.auto_mapped_questions': '\u0623\u0633\u0626\u0644\u0629 \u0645\u0631\u0628\u0648\u0637\u0629',
     'question_mapping.ai_required_questions': '\u062a\u062d\u062a\u0627\u062c \u0631\u0628\u0637',
     'question_mapping.question_number': '\u0631\u0642\u0645 \u0627\u0644\u0633\u0624\u0627\u0644',
-    'question_mapping.explicit_clo': 'CLO',
+    'question_mapping.explicit_clo': '\u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
     'question_mapping.status': '\u0627\u0644\u062d\u0627\u0644\u0629',
     'question_mapping.mapped_automatically': '\u0631\u064f\u0628\u0637 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b',
     'question_mapping.requires_ai_mapping': '\u064a\u062d\u062a\u0627\u062c \u0631\u0628\u0637',
