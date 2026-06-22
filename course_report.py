@@ -13269,7 +13269,7 @@ def course_report_service():
         try:
             with get_db() as conn:
                 report_rows = conn.execute(
-                    "SELECT id, title, course_name, created_at FROM saved_reports WHERE user_id = ? AND course_name = ? ORDER BY id DESC",
+                    "SELECT id, title, course_name, created_at, payload_json FROM saved_reports WHERE user_id = ? AND course_name = ? ORDER BY id DESC",
                     (user['id'], course_name)
                 ).fetchall()
         except Exception:
@@ -13282,14 +13282,17 @@ def course_report_service():
                 associated_reports=[]
             )
             
-        associated_reports = [
-            {
+        associated_reports = []
+        for row in report_rows:
+            payload = safe_json_loads(row_get(row, 'payload_json'), {}) or {}
+            report_type = payload.get('report_type') or 'clo_attainment'
+            if report_type != 'clo_attainment':
+                continue
+            associated_reports.append({
                 'id': row_get(row, 'id'),
                 'display_title': display_saved_report_title(row),
                 'created_at': row_get(row, 'created_at')
-            }
-            for row in report_rows
-        ]
+            })
 
         if not associated_reports:
             session['selected_course_name'] = course_name
@@ -13426,7 +13429,7 @@ def export_saved_course_report_docx(report_id):
     saved_id = save_result.get('id')
     _row, saved_payload = load_saved_report_payload(saved_id, user['id'])
     if saved_payload:
-        return render_course_report_preview(saved_id, saved_payload)
+        return redirect(url_for('report_detail', report_id=saved_id))
     return redirect(url_for('reports'))
 
 @app.route('/course-report-service/reports/export', methods=['POST'])
@@ -13475,7 +13478,7 @@ def export_selected_course_report_docx():
     saved_id = save_result.get('id')
     _row, saved_payload = load_saved_report_payload(saved_id, user['id'])
     if saved_payload:
-        return render_course_report_preview(saved_id, saved_payload)
+        return redirect(url_for('report_detail', report_id=saved_id))
     return redirect(url_for('reports'))
 
 @app.route('/clo-attainment', methods=['GET', 'POST'])
