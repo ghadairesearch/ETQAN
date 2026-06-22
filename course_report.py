@@ -10963,7 +10963,26 @@ def save_course_report_snapshot(stats, course_report_inputs, course_info, total_
             )
         return {'allowed': True, 'saved': True, 'reason': entitlement, 'id': row['id'] if row else None}
 
-def render_course_report_preview(report_id, payload):
+def course_report_draft_path(draft_id):
+    safe_id = re.sub(r'[^A-Za-z0-9_-]', '', str(draft_id or ''))
+    if not safe_id:
+        raise ValueError("Invalid course report draft.")
+    return get_upload_path(f"course_report_draft_{safe_id}.json")
+
+def save_course_report_draft(payload):
+    draft_id = str(uuid.uuid4())
+    with open(course_report_draft_path(draft_id), 'w', encoding='utf-8') as f:
+        json.dump(payload, f, ensure_ascii=False)
+    return draft_id
+
+def load_course_report_draft(draft_id):
+    path = course_report_draft_path(draft_id)
+    if not os.path.exists(path):
+        raise FileNotFoundError("Course report draft was not found. Please try again.")
+    with open(path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def render_course_report_preview(report_id, payload, is_draft=False):
     payload = payload or {}
     course_report_inputs = payload.get('course_report_inputs') or {}
     grade_distribution = course_report_inputs.get('grade_distribution') or {}
@@ -10978,7 +10997,8 @@ def render_course_report_preview(report_id, payload):
         grade_distribution=grade_distribution,
         grade_order=GRADE_ORDER,
         total_students=payload.get('total_students') or 0,
-        clo_number=clo_number
+        clo_number=clo_number,
+        is_draft=is_draft
     )
 
 def build_results_pdf_legacy(stats, total_students, course_info, student_achievement_rows=None, branding=None):
@@ -13106,19 +13126,36 @@ def question_clo_mapping_service():
             flash(f"Error reading exam paper: {e}", "error")
             return redirect(request.url)
 
-        return render_template(
-            'question_clo_review.html',
-            course_name=course_name,
-            clos=clos,
-            metrics=metrics,
-            review_summary=build_question_review_summary(metrics, clos),
-            filename=paper_file.filename,
-            draft_id=draft_id
-        )
+        return redirect(url_for('question_clo_mapping_review_get', draft_id=draft_id))
 
     return render_template(
         'question_clo_mapping.html',
         courses=courses
+    )
+
+@app.route('/question-clo-mapping/review/<draft_id>', methods=['GET'])
+def question_clo_mapping_review_get(draft_id):
+    try:
+        draft = load_question_mapping_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    course_name = (draft.get('course_name') or '').strip()
+    clos = get_course_clos(course_name)
+    if not clos:
+        flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    metrics = draft.get('metrics') or {}
+    return render_template(
+        'question_clo_review.html',
+        course_name=course_name,
+        clos=clos,
+        metrics=metrics,
+        review_summary=build_question_review_summary(metrics, clos),
+        filename=draft.get('filename') or '',
+        draft_id=draft_id
     )
 
 @app.route('/question-clo-mapping/map', methods=['POST'])
@@ -13139,16 +13176,7 @@ def question_clo_mapping_map():
     metrics, paper_detected_mappings = build_question_review_metrics_from_form(clos)
     if not metrics.get('questions'):
         flash(translate('question_mapping.no_questions'), "error")
-        existing_metrics = draft.get('metrics') or {}
-        return render_template(
-            'question_clo_review.html',
-            course_name=course_name,
-            clos=clos,
-            metrics=existing_metrics,
-            review_summary=build_question_review_summary(existing_metrics, clos),
-            filename=draft.get('filename') or '',
-            draft_id=draft_id
-        )
+        return redirect(url_for('question_clo_mapping_review_get', draft_id=draft_id))
 
     if paper_detected_mappings:
         detected = dict(metrics.get('detected_clo_mappings') or {})
@@ -13161,15 +13189,31 @@ def question_clo_mapping_map():
 
     if review_summary['all_mapped']:
         flash(translate('question_mapping.all_mapped_success'))
-        return render_template(
-            'question_clo_link.html',
-            course_name=course_name,
-            clos=clos,
-            metrics=metrics,
-            filename=draft.get('filename') or ''
-        )
+        return redirect(url_for('question_clo_mapping_link_get', draft_id=draft_id))
 
     metrics = build_ai_suggestions_for_unmapped(metrics, clos, review_summary)
+    draft['metrics'] = metrics
+    with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
+        json.dump(draft, f, ensure_ascii=False)
+
+    return redirect(url_for('question_clo_mapping_ai_get', draft_id=draft_id))
+
+@app.route('/question-clo-mapping/ai/<draft_id>', methods=['GET'])
+def question_clo_mapping_ai_get(draft_id):
+    try:
+        draft = load_question_mapping_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    course_name = (draft.get('course_name') or '').strip()
+    clos = get_course_clos(course_name)
+    if not clos:
+        flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    metrics = draft.get('metrics') or {}
+    review_summary = build_question_review_summary(metrics, clos)
 
     return render_template(
         'question_clo_ai.html',
@@ -13180,6 +13224,8 @@ def question_clo_mapping_map():
         filename=draft.get('filename') or '',
         draft_id=draft_id
     )
+
+
 
 @app.route('/question-clo-mapping/save-review', methods=['POST'])
 def question_clo_mapping_save_review():
@@ -13199,25 +13245,21 @@ def question_clo_mapping_save_review():
     metrics, _paper_detected_mappings = build_question_review_metrics_from_form(clos)
     if not metrics.get('questions'):
         flash(translate('question_mapping.no_questions'), "error")
-        metrics = draft.get('metrics') or {}
     else:
         draft['metrics'] = metrics
         with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
             json.dump(draft, f, ensure_ascii=False)
         flash(translate('question_mapping.review_saved'))
 
-    return render_template(
-        'question_clo_review.html',
-        course_name=course_name,
-        clos=clos,
-        metrics=metrics,
-        review_summary=build_question_review_summary(metrics, clos),
-        filename=draft.get('filename') or '',
-        draft_id=draft_id
-    )
+    return redirect(url_for('question_clo_mapping_review_get', draft_id=draft_id))
 
 @app.route('/question-clo-mapping/final', methods=['POST'])
 def question_clo_mapping_final():
+    user = current_user()
+    if not user:
+        flash(translate('courses.login_required'), "error")
+        return redirect(url_for('login'))
+
     draft_id = (request.form.get('draft_id') or '').strip()
     try:
         draft = load_question_mapping_draft(draft_id)
@@ -13236,10 +13278,79 @@ def question_clo_mapping_final():
         flash(translate('question_mapping.no_questions'), "error")
         return redirect(url_for('question_clo_mapping_service'))
 
-    draft['metrics'] = metrics
-    with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
-        json.dump(draft, f, ensure_ascii=False)
+    filename = draft.get('filename') or ''
+    cleaned_questions = []
+    seen_questions = set()
+    for question in metrics.get('questions', []):
+        question = str(question or '').strip()
+        if not question or question in seen_questions:
+            continue
+        seen_questions.add(question)
+        
+        q_clos = metrics.get('detected_clo_mappings', {}).get(question, [])
+        q_text = metrics.get('question_texts', {}).get(question, '')
+        q_type = metrics.get('question_types', {}).get(question, '')
+        
+        cleaned_questions.append({
+            'question': question,
+            'text': q_text,
+            'type': q_type,
+            'clos': q_clos,
+        })
 
+    created_at = datetime.now().strftime('%Y-%m-%d %H:%M')
+    base_title = os.path.splitext(os.path.basename(filename or ''))[0].strip() or course_name or 'Question CLO Mapping'
+    payload = {
+        'course_name': course_name,
+        'filename': filename,
+        'questions': cleaned_questions,
+        'created_at': created_at,
+    }
+
+    with get_db() as conn:
+        existing_titles = {
+            row['title']
+            for row in conn.execute(
+                "SELECT title FROM saved_exams WHERE user_id = ?",
+                (user['id'],)
+            ).fetchall()
+        }
+        title = base_title
+        counter = 2
+        while title in existing_titles:
+            title = f"{base_title} ({counter})"
+            counter += 1
+        conn.execute(
+            """
+            INSERT INTO saved_exams (user_id, title, course_name, filename, payload_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (user['id'], title, course_name, filename, json.dumps(payload, ensure_ascii=False), created_at)
+        )
+
+    try:
+        os.remove(question_mapping_draft_path(draft_id))
+    except Exception:
+        pass
+
+    flash(translate('exams.saved'))
+    return redirect(url_for('my_exams'))
+
+@app.route('/question-clo-mapping/link/<draft_id>', methods=['GET'])
+def question_clo_mapping_link_get(draft_id):
+    try:
+        draft = load_question_mapping_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    course_name = (draft.get('course_name') or '').strip()
+    clos = get_course_clos(course_name)
+    if not clos:
+        flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    metrics = draft.get('metrics') or {}
     return render_template(
         'question_clo_link.html',
         course_name=course_name,
@@ -13417,21 +13528,16 @@ def export_saved_course_report_docx(report_id):
             return redirect(redirect_url)
         return course_report_docx_response(docx_bytes)
 
-    save_result = save_course_report_snapshot(
-        payload.get('stats') or {},
-        course_report_inputs,
-        enriched_course_info,
-        payload.get('total_students') or None,
-        [report_id]
-    )
-    if not save_result.get('allowed'):
-        flash("Please upgrade or add report credits to save more reports.", "error")
-        return redirect(redirect_url)
-    saved_id = save_result.get('id')
-    _row, saved_payload = load_saved_report_payload(saved_id, user['id'])
-    if saved_payload:
-        return redirect(url_for('report_detail', report_id=saved_id))
-    return redirect(url_for('reports'))
+    payload = {
+        'stats': payload.get('stats') or {},
+        'course_report_inputs': course_report_inputs,
+        'course_info': enriched_course_info,
+        'total_students': payload.get('total_students') or None,
+        'source_report_ids': [report_id],
+        'report_type': 'course_report'
+    }
+    draft_id = save_course_report_draft(payload)
+    return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
 
 @app.route('/course-report-service/reports/export', methods=['POST'])
 def export_selected_course_report_docx():
@@ -13472,15 +13578,72 @@ def export_selected_course_report_docx():
             source_report_ids.append(int(value))
         except (TypeError, ValueError):
             pass
+            
+    payload = {
+        'stats': combined_stats,
+        'course_report_inputs': course_report_inputs,
+        'course_info': course_info,
+        'total_students': total_students,
+        'source_report_ids': source_report_ids,
+        'report_type': 'course_report'
+    }
+    draft_id = save_course_report_draft(payload)
+    return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
+
+@app.route('/course-report-service/preview/draft/<draft_id>', methods=['GET'])
+def course_report_preview_draft_get(draft_id):
+    user = current_user()
+    if not user:
+        return redirect(url_for('login'))
+    
+    try:
+        draft = load_course_report_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('course_report_service'))
+        
+    return render_course_report_preview(draft_id, draft, is_draft=True)
+
+@app.route('/course-report-service/preview/draft/<draft_id>/save', methods=['POST'])
+def save_course_report_draft_action(draft_id):
+    user = current_user()
+    if not user:
+        return redirect(url_for('login'))
+        
+    try:
+        draft = load_course_report_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('course_report_service'))
+        
+    combined_stats = draft.get('stats') or {}
+    course_report_inputs = draft.get('course_report_inputs') or {}
+    course_info = draft.get('course_info') or {}
+    total_students = draft.get('total_students') or 0
+    source_report_ids = draft.get('source_report_ids') or []
+    
+    if request.form.get('student_results_comment') is not None:
+        course_report_inputs['student_results_comment'] = request.form.get('student_results_comment').strip()
+        
+    if course_report_inputs.get('course_improvement_plan'):
+        for i, item in enumerate(course_report_inputs['course_improvement_plan']):
+            rec_text = request.form.get(f'rec_text_{i}')
+            if rec_text is not None:
+                item['recommendation'] = rec_text.strip()
+            rec_action = request.form.get(f'rec_action_{i}')
+            if rec_action is not None:
+                item['actions_needed'] = rec_action.strip()
+            rec_support = request.form.get(f'rec_support_{i}')
+            if rec_support is not None:
+                item['support'] = rec_support.strip()
+    
     save_result = save_course_report_snapshot(combined_stats, course_report_inputs, course_info, total_students, source_report_ids)
     if not save_result.get('allowed'):
         flash("Please upgrade or add report credits to save more reports.", "error")
-        return redirect(redirect_url)
+        return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
+        
     saved_id = save_result.get('id')
-    _row, saved_payload = load_saved_report_payload(saved_id, user['id'])
-    if saved_payload:
-        return redirect(url_for('report_detail', report_id=saved_id))
-    return redirect(url_for('reports'))
+    return redirect(url_for('report_detail', report_id=saved_id))
 
 @app.route('/clo-attainment', methods=['GET', 'POST'])
 def clo_attainment():

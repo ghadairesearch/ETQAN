@@ -141,12 +141,17 @@
                         {% set question_text = metrics.question_texts.get(question, question) if metrics and metrics.question_texts else '' %}
                         {% set question_type = metrics.question_types.get(question, '') if metrics and metrics.question_types else '' %}
                         <tr class="question-edit-row">
-                            <td><strong class="question-number">{{ _('mapping.question') }} {{ loop.index }}</strong></td>
+                            <td><strong class="question-number">{% if language == 'en' %}Q{{ loop.index }}{% else %}س{{ loop.index }}{% endif %}</strong></td>
                             <td>
                                 <textarea name="question_text" class="form-control" rows="4" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</textarea>
                             </td>
                             <td>
-                                <input type="text" name="question_type" class="form-control" value="{{ question_type }}">
+                                <select name="question_type" class="form-control">
+                                    <option value="MCQ" {% if question_type == 'MCQ' %}selected{% endif %}>MCQ</option>
+                                    <option value="T/F" {% if question_type == 'T/F' %}selected{% endif %}>T/F</option>
+                                    <option value="Essay" {% if question_type == 'Essay' %}selected{% endif %}>Essay</option>
+                                    <option value="Other" {% if question_type not in ['MCQ', 'T/F', 'Essay'] %}selected{% endif %}>Other</option>
+                                </select>
                             </td>
                             <td class="explicit-clo-cell">
                                 {% if detected_clos %}
@@ -180,7 +185,7 @@
         <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap;">
             <button type="submit" class="btn" formaction="{{ url_for('question_clo_mapping_save_review') }}" style="background-color: var(--border-color); color: var(--text-main);">{{ _('question_mapping.save_mapping') }}</button>
             {% if summary.all_mapped %}
-                <button type="submit" class="btn" formaction="{{ url_for('question_clo_mapping_final') }}">{{ _('question_mapping.final_review') }}</button>
+                <button type="submit" class="btn" formaction="{{ url_for('question_clo_mapping_final') }}">{{ _('question_mapping.save_mapping') }}</button>
             {% else %}
                 <button type="submit" class="btn">{{ _('question_mapping.continue_ai_mapping') }}</button>
             {% endif %}
@@ -195,7 +200,12 @@
             <textarea name="question_text" class="form-control" rows="4"></textarea>
         </td>
         <td>
-            <input type="text" name="question_type" class="form-control" value="">
+            <select name="question_type" class="form-control">
+                <option value="MCQ">MCQ</option>
+                <option value="T/F">T/F</option>
+                <option value="Essay">Essay</option>
+                <option value="Other" selected>Other</option>
+            </select>
         </td>
         <td class="explicit-clo-cell"><span style="color: var(--text-muted);">-</span></td>
         <td class="status-cell"><span class="status-pill status-ai">{{ _('question_mapping.requires_ai_mapping') }}</span></td>
@@ -219,6 +229,7 @@
         const unitMany = {{ count_unit('question', 3)|tojson }};
         const unitLarge = {{ count_unit('question', 11)|tojson }};
         const requiresAiHtml = {{ ('<span class="status-pill status-ai">' ~ _('question_mapping.requires_ai_mapping') ~ '</span>')|tojson }};
+        const currentLang = {{ language|tojson }};
 
         function applyTextDirection(textarea) {
             if (!textarea) return;
@@ -234,7 +245,7 @@
             rows.forEach(function(row, index) {
                 const label = row.querySelector('.question-number');
                 if (label) {
-                    label.textContent = questionWord + ' ' + (index + 1);
+                    label.textContent = currentLang === 'en' ? ('Q' + (index + 1)) : ('س' + (index + 1));
                 }
                 row.querySelectorAll('.paper-clo-hidden').forEach(function(input) {
                     input.name = 'paper_clo_' + index;
