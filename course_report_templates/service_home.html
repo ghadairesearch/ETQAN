@@ -216,6 +216,36 @@
                 </div>
             </div>
         </section>
+
+        <section class="service-level service-level-inactive" aria-disabled="true">
+            <div class="service-level-header">
+                <h3>{{ _('home.reviewer_level') }}</h3>
+                <p>{{ _('home.reviewer_level_description') }}</p>
+                <span class="service-inactive-badge">{{ _('home.inactive') }}</span>
+            </div>
+            <div class="service-grid">
+                <div class="service-card service-card-disabled" aria-disabled="true">
+                    <div>
+                        <h3>{{ _('home.reviewer_course_report_title') }}</h3>
+                        <p>{{ _('home.reviewer_course_report_description') }}</p>
+                    </div>
+                </div>
+
+                <div class="service-card service-card-disabled" aria-disabled="true">
+                    <div>
+                        <h3>{{ _('home.reviewer_clo_mapping_title') }}</h3>
+                        <p>{{ _('home.reviewer_clo_mapping_description') }}</p>
+                    </div>
+                </div>
+
+                <div class="service-card service-card-disabled" aria-disabled="true">
+                    <div>
+                        <h3>{{ _('home.reviewer_evidence_title') }}</h3>
+                        <p>{{ _('home.reviewer_evidence_description') }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 {% endblock %}
