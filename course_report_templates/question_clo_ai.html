@@ -2,189 +2,503 @@
 
 {% block content %}
 <style>
-    .ai-map-grid {
-        display: grid;
-        gap: 1rem;
+    .wizard-slide { display: none; }
+    .wizard-slide.active { display: block; animation: fadeIn 0.3s ease; }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-
-    .ai-map-card {
+    
+    .question-box {
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        background: var(--bg-card);
+        background: #f9fafb;
         padding: 1rem;
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
     }
-
-    .ai-map-card h3 {
-        margin: 0 0 0.75rem;
-        color: var(--text-main);
-    }
-
-    .ai-map-question {
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        background: #f9fafb;
-        padding: 0.85rem;
-        white-space: pre-wrap;
-        margin-bottom: 1rem;
-    }
-
-    .ai-suggestion-line {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        margin-bottom: 0.85rem;
+    
+    .section-title {
+        font-size: 0.95rem;
         color: var(--text-muted);
+        margin-bottom: 0.75rem;
         font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
-
-    .ai-suggestion-line strong {
+    
+    .ai-card {
+        border: 1px solid var(--accent-primary);
+        background: color-mix(in srgb, var(--accent-primary) 3%, white);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .ai-primary {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .ai-confidence-badge {
+        display: inline-block;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: white;
+    }
+    .badge-high { background: var(--success, #10b981); }
+    .badge-medium { background: var(--warning, #f59e0b); }
+    .badge-low { background: var(--danger, #ef4444); }
+    
+    .ai-alternatives {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    }
+    
+    .ai-alt-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 0.4rem;
+    }
+    
+    .chip-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        min-height: 40px;
+    }
+    
+    .clo-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        padding: 0.4rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .clo-chip button {
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        width: 1.2rem;
+        height: 1.2rem;
+        transition: background 0.2s;
+    }
+    
+    .clo-chip button:hover {
+        background: #f3f4f6;
+        color: var(--danger, #ef4444);
+    }
+    
+    .btn-add-clo {
+        background: white;
+        border: 1px dashed var(--border-color);
         color: var(--accent-primary);
+        font-weight: 600;
+        padding: 0.5rem 1.25rem;
+        border-radius: 999px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s;
+    }
+    
+    .btn-add-clo:hover {
+        border-color: var(--accent-primary);
+        background: color-mix(in srgb, var(--accent-primary) 5%, white);
+    }
+    
+    .wizard-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
     }
 
-    .clo-card-grid {
-        display: grid;
-        gap: 0.65rem;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        margin-top: 0.6rem;
+    /* Modal styling */
+    .clo-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        backdrop-filter: blur(2px);
     }
-
-    .clo-card-option {
-        display: block;
+    
+    .clo-modal.open {
+        display: flex;
+    }
+    
+    .clo-modal-content {
+        background: var(--bg-card);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 600px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+    
+    .clo-modal-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .clo-modal-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+    
+    .clo-modal-body {
+        padding: 1.25rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+    
+    .clo-search-input {
+        width: 100%;
+        padding: 0.85rem;
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        background: #f9fafb;
-        padding: 0.7rem 0.8rem;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    
+    .clo-search-input:focus {
+        border-color: var(--accent-primary);
+    }
+    
+    .clo-list-item {
+        padding: 0.85rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
         cursor: pointer;
-        min-height: 100%;
+        transition: all 0.2s;
     }
-
-    .clo-card-option input {
-        margin-inline-end: 0.45rem;
-    }
-
-    .clo-card-option.is-suggested {
+    
+    .clo-list-item:hover {
         border-color: var(--accent-primary);
-        background: color-mix(in srgb, var(--accent-primary) 10%, white);
-    }
-
-    .clo-card-option:has(input:checked) {
-        border-color: var(--accent-primary);
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent);
-    }
-
-    .clo-card-code {
-        font-weight: 800;
-        color: var(--accent-primary);
-        margin-inline-end: 0.25rem;
-    }
-
-    .clo-card-hint {
-        display: block;
-        color: var(--text-muted);
-        font-size: 0.78rem;
-        margin-top: 0.25rem;
+        background: #f9fafb;
     }
 </style>
 
-<div class="card" style="max-width: 1080px; margin: 0 auto;">
+<div class="card" style="max-width: 800px; margin: 0 auto;">
     <h2 style="margin-top: 0;">{{ _('question_mapping.step3_title') }}</h2>
-    <p style="color: var(--text-muted); margin-top: -0.5rem;">
-        {{ _('question_mapping.step3_description') }}
-    </p>
-    <p style="color: var(--text-muted);">
-        {{ _('mapping.course') }} <strong>{{ course_name }}</strong><br>
-        {{ _('detected.source') }} <strong>{{ filename }}</strong>
-    </p>
-
-    {% if metrics.question_clo_suggestion_source %}
-        <div class="alert" style="margin-bottom: 1.5rem;">
-            {% if metrics.question_clo_suggestion_source == 'gemini' %}
-                {{ _('detected.mapping_used_gemini') }}
-            {% elif metrics.question_clo_suggestion_source == 'qwen' %}
-                {{ _('detected.mapping_used_qwen') }}
-            {% else %}
-                {{ _('detected.mapping_used_local') }}
-            {% endif %}
+    
+    <div style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="color: var(--text-muted); font-weight: 600;" id="wizard-progress-text"></span>
+            <div style="flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; margin: 0 1rem; overflow: hidden;">
+                <div id="wizard-progress-bar" style="height: 100%; background: var(--accent-primary); width: 0%; transition: width 0.3s;"></div>
+            </div>
         </div>
-    {% endif %}
+    </div>
 
-    <form method="POST" action="{{ url_for('question_clo_mapping_final') }}">
+    <form method="POST" action="{{ url_for('question_clo_mapping_final') }}" id="mapping-form">
         <input type="hidden" name="draft_id" value="{{ draft_id }}">
+        
+        <!-- Pre-existing selections for already mapped explicitly -->
         {% for question in metrics.questions %}
-            {% set question_text = metrics.question_texts.get(question, '') %}
-            {% set question_type = metrics.question_types.get(question, '') if metrics.question_types else '' %}
             <input type="hidden" name="question_ids" value="{{ question }}">
-            <input type="hidden" name="question_text_{{ question }}" value="{{ question_text }}">
-            <input type="hidden" name="question_type_{{ question }}" value="{{ question_type }}">
+            <input type="hidden" name="question_text_{{ question }}" value="{{ metrics.question_texts.get(question, '') }}">
+            <input type="hidden" name="question_type_{{ question }}" value="{{ metrics.question_types.get(question, '') if metrics.question_types else '' }}">
             {% for clo in review_summary.explicit_by_question.get(question, []) %}
                 <input type="hidden" name="question_clo_{{ question }}" value="{{ clo }}">
             {% endfor %}
         {% endfor %}
 
-        <div class="ai-map-grid">
+        <!-- Needs AI Questions -->
+        <div id="wizard-slides">
             {% for question in review_summary.needs_ai_questions %}
                 {% set suggestions = metrics.smart_clo_suggestions.get(question, []) if metrics.smart_clo_suggestions else [] %}
                 {% set suggested = suggestions[0] if suggestions else None %}
-                {% set suggested_clos = suggestions|map(attribute='clo')|list if suggestions else [] %}
                 {% set question_text = metrics.question_texts.get(question, '') %}
-                <section class="ai-map-card">
-                    <h3>{{ _('mapping.question') }} {{ loop.index }}</h3>
-                    <div class="ai-map-question" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</div>
-                    <div class="ai-suggestion-line">
-                        <span>{{ _('question_mapping.suggested_clo') }}:
-                            <strong>{{ suggested.clo.split(' ')[0] if suggested else '-' }}</strong>
-                        </span>
-                        <span>{{ _('question_mapping.confidence_score') }}:
-                            <strong>{{ (suggested.score ~ '%') if suggested else '-' }}</strong>
-                        </span>
+                
+                <div class="wizard-slide" data-question="{{ question }}">
+                    {% if suggested %}
+                        <input type="hidden" name="ai_suggested_clo_{{ question }}" value="{{ suggested.clo }}">
+                    {% endif %}
+                    
+                    <div class="section-title">{{ _('mapping.question') }} {{ loop.index }}</div>
+                    <div class="question-box" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">
+                        {{ question_text }}
                     </div>
-                    <strong>{{ _('question_mapping.select_clo') }}</strong>
-                    <div class="clo-select-wrapper">
-                        <select name="question_clo_{{ question }}" class="form-control" multiple size="5" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; background: #fff;">
-                            {% for clo in clos %}
-                                {% set is_suggested = clo in suggested_clos %}
-                                {% set score_text = '' %}
-                                {% if is_suggested %}
-                                    {% for suggestion in suggestions if suggestion.clo == clo %}
-                                        {% if suggestion.score %}
-                                            {% set score_text = ' (' ~ suggestion.score ~ '%)' %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                                <option value="{{ clo }}" {% if suggested and clo == suggested.clo %}selected{% endif %}>
-                                    {{ clo }}{{ score_text }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <small style="color: var(--text-muted); display: block; margin-top: 0.4rem;">{{ _('mapping.multi_help') }}</small>
-                        <input type="text" class="form-control selected-clo-ids" style="margin-top: 0.5rem;" value="" placeholder="{{ _('mapping.selected_clo') }}" readonly>
+                    
+                    <div class="section-title">AI Suggestions</div>
+                    <div class="ai-card">
+                        {% if suggested %}
+                            <div class="ai-primary">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <strong><span style="color: var(--accent-primary);">✓</span> {{ suggested.clo }}</strong>
+                                    {% set conf = suggested.score|float if suggested.score else 0 %}
+                                    {% if conf >= 70 %}
+                                        <span class="ai-confidence-badge badge-high">High ({{ suggested.score }}%)</span>
+                                    {% elif conf >= 40 %}
+                                        <span class="ai-confidence-badge badge-medium">Medium ({{ suggested.score }}%)</span>
+                                    {% else %}
+                                        <span class="ai-confidence-badge badge-low">Low ({{ suggested.score }}%)</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if suggestions|length > 1 %}
+                            <div class="ai-alternatives">
+                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Alternative Suggestions:</div>
+                                {% for alt in suggestions[1:4] %}
+                                    <div class="ai-alt-item">
+                                        <span style="color: var(--text-muted);">○</span>
+                                        <span>{{ alt.clo }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <div style="color: var(--text-muted);">No AI suggestions available.</div>
+                        {% endif %}
                     </div>
-                </section>
+                    
+                    <div class="section-title">Final CLO Selection</div>
+                    <div class="chip-container" id="chip-container-{{ question }}">
+                        <!-- Chips injected by JS -->
+                    </div>
+                    <button type="button" class="btn-add-clo" onclick="openCloModal('{{ question }}')">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Add CLO
+                    </button>
+                    
+                    <!-- Hidden inputs container for final selection -->
+                    <div id="hidden-inputs-{{ question }}">
+                        <!-- Hidden inputs injected by JS -->
+                    </div>
+                </div>
             {% endfor %}
         </div>
-
-        <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap;">
-            <button type="button" class="btn" style="background-color: var(--border-color); color: var(--text-main);" onclick="history.back()">{{ _('question_mapping.back') }}</button>
-            <button type="submit" class="btn">{{ _('question_mapping.save_mapping') }}</button>
+        
+        <div class="wizard-footer">
+            <button type="button" class="btn" id="btn-prev" style="background-color: var(--border-color); color: var(--text-main);">Previous Question</button>
+            <button type="button" class="btn" id="btn-next">Save and Next</button>
         </div>
     </form>
 </div>
 
+<!-- CLO Search Modal -->
+<div class="clo-modal" id="clo-modal">
+    <div class="clo-modal-content">
+        <div class="clo-modal-header">
+            <h3>Select CLO</h3>
+            <button type="button" onclick="closeCloModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+        <div class="clo-modal-body">
+            <input type="text" id="clo-search" class="clo-search-input" placeholder="Search by code or description...">
+            <div id="clo-list">
+                {% for clo in clos %}
+                    <div class="clo-list-item" data-clo="{{ clo }}" onclick="addCloFromModal('{{ clo|e }}')">
+                        <strong style="color: var(--accent-primary);">{{ clo.split(' ')[0] }}</strong> <span>{{ clo[clo.split(' ')[0]|length:] }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('select[name^="question_clo_"]').forEach(function(select) {
-            const wrapper = select.closest('.clo-select-wrapper');
-            const idField = wrapper.querySelector('.selected-clo-ids');
-            const updateIds = function() {
-                const ids = Array.from(select.selectedOptions).map(function(option) {
-                    const match = option.value.trim().match(/^(\d+(?:\.\d+)*)/);
-                    return match ? match[1] : option.value.trim();
-                });
-                idField.value = ids.join(', ');
-            };
-            select.addEventListener('change', updateIds);
-            updateIds();
+    // Data structures
+    const initialSuggestions = {
+        {% for question in review_summary.needs_ai_questions %}
+            {% set suggestions = metrics.smart_clo_suggestions.get(question, []) if metrics.smart_clo_suggestions else [] %}
+            {{ question|tojson }}: {{ (suggestions[0].clo if suggestions else None)|tojson }},
+        {% endfor %}
+    };
+    
+    const selectedClos = {};
+    const slides = document.querySelectorAll('.wizard-slide');
+    let currentIndex = 0;
+    let targetQuestionForModal = null;
+    
+    function init() {
+        slides.forEach(slide => {
+            const q = slide.getAttribute('data-question');
+            selectedClos[q] = new Set();
+            if (initialSuggestions[q]) {
+                selectedClos[q].add(initialSuggestions[q]);
+            }
+            renderChips(q);
         });
+        updateWizard();
+    }
+    
+    function updateWizard() {
+        slides.forEach((slide, idx) => {
+            slide.classList.toggle('active', idx === currentIndex);
+        });
+        
+        document.getElementById('btn-prev').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+        
+        const btnNext = document.getElementById('btn-next');
+        if (currentIndex === slides.length - 1) {
+            btnNext.textContent = "{{ _('question_mapping.save_mapping') }}";
+        } else {
+            btnNext.textContent = "Save and Next";
+        }
+        
+        // Progress bar
+        const total = slides.length;
+        if (total > 0) {
+            document.getElementById('wizard-progress-text').textContent = `${currentIndex + 1} / ${total}`;
+            document.getElementById('wizard-progress-bar').style.width = `${((currentIndex + 1) / total) * 100}%`;
+        }
+    }
+    
+    document.getElementById('btn-prev').addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateWizard();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
     });
+    
+    document.getElementById('btn-next').addEventListener('click', () => {
+        if (currentIndex < slides.length - 1) {
+            currentIndex++;
+            updateWizard();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        } else {
+            document.getElementById('mapping-form').submit();
+        }
+    });
+    
+    function renderChips(question) {
+        const container = document.getElementById(`chip-container-${question}`);
+        const hiddenContainer = document.getElementById(`hidden-inputs-${question}`);
+        container.innerHTML = '';
+        hiddenContainer.innerHTML = '';
+        
+        selectedClos[question].forEach(clo => {
+            const codeMatch = clo.match(/^([^\s]+)/);
+            const code = codeMatch ? codeMatch[1] : clo;
+            
+            // Chip UI
+            const chip = document.createElement('div');
+            chip.className = 'clo-chip';
+            
+            const textSpan = document.createElement('span');
+            textSpan.textContent = code;
+            
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.innerHTML = '&times;';
+            btn.onclick = function() { removeClo(question, clo); };
+            
+            chip.appendChild(textSpan);
+            chip.appendChild(btn);
+            container.appendChild(chip);
+            
+            // Hidden input
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = `question_clo_${question}`;
+            input.value = clo;
+            hiddenContainer.appendChild(input);
+        });
+    }
+    
+    window.removeClo = function(question, clo) {
+        selectedClos[question].delete(clo);
+        renderChips(question);
+    };
+    
+    window.openCloModal = function(question) {
+        targetQuestionForModal = question;
+        document.getElementById('clo-search').value = '';
+        filterCloList('');
+        document.getElementById('clo-modal').classList.add('open');
+        document.getElementById('clo-search').focus();
+    };
+    
+    window.closeCloModal = function() {
+        document.getElementById('clo-modal').classList.remove('open');
+        targetQuestionForModal = null;
+    };
+    
+    window.addCloFromModal = function(clo) {
+        if (targetQuestionForModal) {
+            selectedClos[targetQuestionForModal].add(clo);
+            renderChips(targetQuestionForModal);
+            closeCloModal();
+        }
+    };
+    
+    document.getElementById('clo-search').addEventListener('input', (e) => {
+        filterCloList(e.target.value.toLowerCase());
+    });
+    
+    function filterCloList(query) {
+        const items = document.querySelectorAll('.clo-list-item');
+        items.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            if (text.includes(query)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+    
+    // Close modal on outside click
+    document.getElementById('clo-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'clo-modal') {
+            closeCloModal();
+        }
+    });
+    
+    // Allow enter in search to add the first visible item
+    document.getElementById('clo-search').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const items = document.querySelectorAll('.clo-list-item');
+            for (let item of items) {
+                if (item.style.display !== 'none') {
+                    item.click();
+                    break;
+                }
+            }
+        }
+    });
+    
+    init();
 </script>
 {% endblock %}

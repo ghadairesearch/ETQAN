@@ -6047,6 +6047,7 @@ def build_question_final_metrics_from_form(clos):
         'question_texts': {},
         'question_types': {},
         'detected_clo_mappings': {},
+        'ai_suggested_clos': {},
     }
     seen = set()
     for raw_question in question_ids:
@@ -6069,6 +6070,11 @@ def build_question_final_metrics_from_form(clos):
         resolved = resolve_detected_clos_to_course_list(selected_clos, clos)
         if resolved:
             metrics['detected_clo_mappings'][question] = resolved
+            
+        ai_suggested = request.form.get(f'ai_suggested_clo_{question}')
+        if ai_suggested:
+            metrics['ai_suggested_clos'][question] = ai_suggested
+            
     metrics['total_questions'] = len(metrics['questions'])
     return metrics
 
@@ -13328,12 +13334,14 @@ def question_clo_mapping_final():
         q_clos = metrics.get('detected_clo_mappings', {}).get(question, [])
         q_text = metrics.get('question_texts', {}).get(question, '')
         q_type = metrics.get('question_types', {}).get(question, '')
+        q_ai_suggested = metrics.get('ai_suggested_clos', {}).get(question)
         
         cleaned_questions.append({
             'question': question,
             'text': q_text,
             'type': q_type,
             'clos': q_clos,
+            'ai_suggested_clo': q_ai_suggested,
         })
 
     created_at = datetime.now().strftime('%Y-%m-%d %H:%M')
