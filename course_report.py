@@ -164,11 +164,11 @@ COURSE_IMPROVEMENT_RECOMMENDATION_GROUPS = [
     },
 ]
 COURSE_REPORT_AR_LABELS = {
-    'CLO Attainment and Assessment': 'تحقق مخرجات التعلم والتقييم',
+    'CLO Attainment and Assessment': 'تحقق نواتج التعلم والتقييم',
     'Teaching and Learning Strategies': 'استراتيجيات التعليم والتعلم',
     'Curriculum and Course Content': 'المنهج ومحتوى المقرر',
     'Learning Resources and Skills': 'مصادر التعلم والمهارات',
-    'Improve student performance in CLOs': 'تحسين أداء الطلاب في مخرجات التعلم',
+    'Improve student performance in CLOs': 'تحسين أداء الطلاب في نواتج التعلم',
     'Enhance practical/laboratory activities': 'تعزيز الأنشطة العملية أو المعملية',
     'Update course content': 'تحديث محتوى المقرر',
     'Improve assessment methods': 'تحسين أساليب التقييم',
@@ -178,7 +178,7 @@ COURSE_REPORT_AR_LABELS = {
     'Improve course materials and resources': 'تحسين مواد ومصادر المقرر',
     'Enhance critical thinking skills': 'تعزيز مهارات التفكير الناقد',
     'Enhance teamwork and communication skills': 'تعزيز مهارات العمل الجماعي والتواصل',
-    'Improve alignment between CLOs and assessments': 'تحسين مواءمة مخرجات التعلم مع التقييمات',
+    'Improve alignment between CLOs and assessments': 'تحسين مواءمة نواتج التعلم مع التقييمات',
     'Increase use of real-world case studies': 'زيادة استخدام دراسات حالة واقعية',
     'Reduce content overload': 'تقليل كثافة محتوى المقرر',
     'Curriculum committee approval': 'موافقة لجنة المناهج',
@@ -190,7 +190,7 @@ COURSE_REPORT_AR_LABELS = {
     'Conduct remedial/support sessions': 'تنفيذ جلسات علاجية أو داعمة',
     'Revise assessment methods': 'مراجعة أساليب التقييم',
     'Update course materials': 'تحديث مواد المقرر',
-    'Review CLO-assessment alignment': 'مراجعة مواءمة مخرجات التعلم مع التقييم',
+    'Review CLO-assessment alignment': 'مراجعة مواءمة نواتج التعلم مع التقييم',
     'Increase practical/application activities': 'زيادة الأنشطة العملية أو التطبيقية',
     'Coordinate with the department/course team': 'التنسيق مع القسم أو فريق المقرر',
     'Monitor implementation in the next offering': 'متابعة التنفيذ في الطرح القادم',
@@ -214,7 +214,7 @@ COURSE_REPORT_AR_LABELS = {
     'Implement attendance improvement measures in future offerings.': 'تطبيق إجراءات لتحسين الحضور في الطروحات القادمة.',
     'Coordinate with the related course instructor.': 'التنسيق مع أستاذ المقرر المرتبط.',
     'Recommend redistribution of content across courses.': 'اقتراح إعادة توزيع المحتوى بين المقررات.',
-    'Prioritize content directly linked to CLOs.': 'إعطاء الأولوية للمحتوى المرتبط مباشرة بمخرجات التعلم.',
+    'Prioritize content directly linked to CLOs.': 'إعطاء الأولوية للمحتوى المرتبط مباشرة بنواتج التعلم.',
     'Move lower-priority content to self-study activities.': 'نقل المحتوى الأقل أولوية إلى أنشطة تعلم ذاتي.',
     'Provide supplementary reading materials.': 'توفير قراءات إضافية.',
     'Use simulations or virtual laboratories.': 'استخدام المحاكاة أو المعامل الافتراضية.',
@@ -222,7 +222,7 @@ COURSE_REPORT_AR_LABELS = {
     'Use alternative equipment where available.': 'استخدام تجهيزات بديلة عند توفرها.',
     'Share recorded practical sessions.': 'مشاركة جلسات عملية مسجلة.',
     'Schedule the activity when resources become available.': 'جدولة النشاط عند توفر الموارد.',
-    'Verify alignment with CLOs.': 'التحقق من المواءمة مع مخرجات التعلم.',
+    'Verify alignment with CLOs.': 'التحقق من المواءمة مع نواتج التعلم.',
     'Update course materials and references.': 'تحديث مواد ومراجع المقرر.',
     'Propose formal curriculum updates if the change is permanent.': 'اقتراح تحديث رسمي للمنهج إذا كان التغيير دائمًا.',
     'Provide asynchronous learning materials.': 'توفير مواد تعلم غير متزامنة.',
@@ -1095,32 +1095,32 @@ TRANSLATIONS = {
         'home.add_program_description': 'أضف برنامجًا لتتمكن من إنشاء التقارير.',
         'home.requires_program': 'يتطلب إضافة برنامج واحد على الأقل.',
         'home.inactive': '\u063a\u064a\u0631 \u0645\u0641\u0639\u0644',
-        'home.clo_title': 'تحليل تحقق مخرجات تعلم المقرر',
-        'home.clo_description': 'قياس تحقق مخرجات تعلم المقرر من بيانات التقييمات، وتحديد فجوات الأداء، وإنشاء تقارير قائمة على الأدلة.',
+        'home.clo_title': 'تحليل تحقق نواتج تعلم المقرر',
+        'home.clo_description': 'قياس تحقق نواتج تعلم المقرر من بيانات التقييمات، وتحديد فجوات الأداء، وإنشاء تقارير قائمة على الأدلة.',
         'home.add_course_title': 'إضافة مقرر',
         'home.add_course_description': 'أضف مقرراً لتتمكن من إنشاء التقارير.',
         'home.requires_course': 'يتطلب إضافة مقرر واحد على الأقل.',
-        'home.question_mapping_title': 'ربط أسئلة الاختبار بمخرجات التعلم',
+        'home.question_mapping_title': 'ربط أسئلة الاختبار بنواتج التعلم',
         'home.question_mapping_description': 'ارفع ورقة الاختبار لربط الأسئلة بنواتج تعلم المقرر.',
         'home.question_mapping_extract': 'استخراج الأسئلة',
         'question_mapping.review_title': 'مراجعة الأسئلة المستخرجة',
         'question_mapping.review_description': 'عدّل الأسئلة المستخرجة، وأضف أي سؤال ناقص عند الحاجة، ثم اربطها بنواتج التعلم.',
         'question_mapping.add_question': 'إضافة سؤال',
-        'question_mapping.map_to_clos': 'ربط بالمخرجات',
+        'question_mapping.map_to_clos': 'ربط بالنواتج',
         'question_mapping.question_text': 'نص السؤال',
-        'question_mapping.paper_clo': 'مخرج التعلم من الورقة',
+        'question_mapping.paper_clo': 'ناتج التعلم من الورقة',
         'question_mapping.paper_clo_help': '',
-        'question_mapping.link_title': 'ربط الأسئلة بالمخرجات',
+        'question_mapping.link_title': 'ربط الأسئلة بالنواتج',
         'question_mapping.link_description': 'راجع رقم كل سؤال وناتج التعلم المرتبط الذي يقترحه إتقان.',
-        'question_mapping.related_clo': 'المخرج المرتبط',
+        'question_mapping.related_clo': 'الناتج المرتبط',
         'question_mapping.no_questions': 'لم يتم استخراج أي أسئلة. أضف سؤالًا واحدًا على الأقل قبل الربط.',
-        'question_mapping.select_at_least_one': 'يرجى تحديد مخرج تعلم واحد على الأقل لـ:',
+        'question_mapping.select_at_least_one': 'يرجى تحديد ناتج تعلم واحد على الأقل لـ:',
         'home.assessment_balance_title': 'فحص توازن التقييم',
         'home.assessment_balance_description': 'راجع تغطية التقييم وتوزيع الدرجات وتوازنها عبر نواتج التعلم قبل إعداد التقرير.',
-        'home.plo_title': 'تحليل تحقق مخرجات تعلم البرنامج',
-        'home.plo_description': 'قياس تحقق مخرجات تعلم البرنامج من خلال تحليل أدلة المقررات وإنشاء تقرير أداء مخرجات تعلم البرنامج.',
+        'home.plo_title': 'تحليل تحقق نواتج تعلم البرنامج',
+        'home.plo_description': 'قياس تحقق نواتج تعلم البرنامج من خلال تحليل أدلة المقررات وإنشاء تقرير أداء نواتج تعلم البرنامج.',
         'home.course_report_title': 'تقرير المقرر',
-        'home.course_report_description': 'إنشاء تقرير مقرر متوافق مع نموذج NCAAA باستخدام نتائج تحليل تحقق مخرجات التعلم وبيانات أداء المقرر.',
+        'home.course_report_description': 'إنشاء تقرير مقرر متوافق مع نموذج NCAAA باستخدام نتائج تحليل تحقق نواتج التعلم وبيانات أداء المقرر.',
         'home.no_courses_message': 'مرحباً بك في إتقان. ابدأ بإضافة مقررك الأول.',
         'home.add_course': 'إضافة مقرر',
         'course_report.select_description': '\u0627\u062e\u062a\u0631 \u0645\u0642\u0631\u0631\u0627\u064b \u0644\u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631\u0647.',
@@ -1286,10 +1286,10 @@ TRANSLATIONS = {
         'programs.program_code': 'رمز البرنامج',
         'programs.college': 'الكلية',
         'programs.department': 'القسم',
-        'programs.plos': 'مخرجات تعلم البرنامج',
-        'programs.plos_help': 'اكتب كل مخرج تعلم في سطر مستقل، مثل: K1 المعرفة، S1 المهارات، V1 القيم.',
+        'programs.plos': 'نواتج تعلم البرنامج',
+        'programs.plos_help': 'اكتب كل ناتج تعلم في سطر مستقل، مثل: K1 المعرفة، S1 المهارات، V1 القيم.',
         'programs.save': 'حفظ البرنامج',
-        'programs.invalid': 'أدخل اسم البرنامج ومخرج تعلم واحداً على الأقل.',
+        'programs.invalid': 'أدخل اسم البرنامج وناتج تعلم واحداً على الأقل.',
         'courses.invalid': 'أدخل اسم المقرر وناتج تعلم واحد على الأقل، أو ارفع ملف توصيف مقرر قابل للقراءة.',
         'courses.limit': 'خطتك لا تسمح بحفظ المزيد من المقررات.',
         'courses.login_required': 'يرجى تسجيل الدخول لإدارة المقررات المحفوظة.',
@@ -1306,16 +1306,16 @@ TRANSLATIONS = {
         'index.inline_spec_file': 'توصيف المقرر',
         'index.inline_clos': 'لصق نواتج التعلم',
         'index.inline_clos_placeholder': 'الصق مخرجاً واحداً في كل سطر، مثال:\n1.1 يعرّف المفاهيم الأساسية\n2.1 يطبق الأساليب المناسبة\n3.1 يلتزم بالقيم المهنية',
-        'index.target_label': 'المستوى المستهدف لكل مخرج تعلم',
-        'index.target_help': 'حدد الحد الأدنى للنسبة التي يحتاج الطالب إلى تحقيقها لكل مخرج تعلم.',
-        'index.clo': 'مخرج تعلم المقرر (CLO)',
+        'index.target_label': 'المستوى المستهدف لكل ناتج تعلم',
+        'index.target_help': 'حدد الحد الأدنى للنسبة التي يحتاج الطالب إلى تحقيقها لكل ناتج تعلم.',
+        'index.clo': 'ناتج تعلم المقرر (CLO)',
         'index.target_level': 'المستوى المستهدف (%)',
         'domain.knowledge': '1.0 المعرفة والفهم',
         'domain.skills': '2.0 المهارات',
         'domain.values': '3.0 القيم',
         'domain.other': 'أخرى',
-        'index.select_course_populate': 'اختر مقرراً لعرض المخرجات...',
-        'index.no_clos_category': 'لا توجد مخرجات تعلم في هذه الفئة.',
+        'index.select_course_populate': 'اختر مقرراً لعرض النواتج...',
+        'index.no_clos_category': 'لا توجد نواتج تعلم في هذه الفئة.',
         'index.assessment_files': 'ملفات التقييم',
         'index.assessment_help': 'ارفع ملف درجات واحداً على الأقل لكل تقييم.',
         'index.type': 'النوع',
@@ -1329,7 +1329,7 @@ TRANSLATIONS = {
         'assessment.other': 'أخرى',
         'index.remove': 'حذف',
         'index.add_file': 'إضافة ملف آخر',
-        'index.next_mapping': 'التالي: ربط المخرجات',
+        'index.next_mapping': 'التالي: ربط النواتج',
         'index.error_course': 'يرجى اختيار مقرر أو إضافة معلومات المقرر قبل المتابعة.',
         'index.error_file': 'يرجى رفع ملف درجات واحد على الأقل.',
         'spec.title': 'رفع توصيف المقرر',
@@ -1342,23 +1342,23 @@ TRANSLATIONS = {
         'spec.course_name': 'اسم المقرر',
         'spec.course_number': 'رقم المقرر',
         'spec.clos': 'نواتج التعلم',
-        'spec.no_knowledge': 'لم يتم اكتشاف مخرجات معرفة.',
-        'spec.no_skills': 'لم يتم اكتشاف مخرجات مهارات.',
-        'spec.no_values': 'لم يتم اكتشاف مخرجات قيم.',
+        'spec.no_knowledge': 'لم يتم اكتشاف نواتج معرفة.',
+        'spec.no_skills': 'لم يتم اكتشاف نواتج مهارات.',
+        'spec.no_values': 'لم يتم اكتشاف نواتج قيم.',
         'spec.add_course': 'إضافة المقرر إلى القائمة',
         'spec.upload_another': 'رفع ملف PDF آخر',
         'spec.cannot_add': 'لا يمكن إضافة المقرر حتى يتم اكتشاف اسم المقرر وقائمة نواتج التعلم.',
         'mapping.title': 'ربط الأسئلة بنواتج التعلم',
         'mapping.course': 'المقرر:',
         'mapping.detected': 'تم اكتشاف:',
-        'mapping.description': 'اربط مخرج تعلم واحداً أو أكثر بكل سؤال.',
+        'mapping.description': 'اربط ناتج تعلم واحداً أو أكثر بكل سؤال.',
         'mapping.exam_paper': 'ورقة الاختبار:',
         'mapping.questions': 'أسئلة',
         'mapping.students': 'طلاب',
         'mapping.question': 'السؤال',
         'mapping.max_score': 'الدرجة القصوى',
-        'mapping.multi_help': 'اضغط Ctrl لاختيار أكثر من مخرج تعلم.',
-        'mapping.selected_clo': 'معرّف مخرج التعلم المحدد',
+        'mapping.multi_help': 'اضغط Ctrl لاختيار أكثر من ناتج تعلم.',
+        'mapping.selected_clo': 'معرّف ناتج التعلم المحدد',
         'mapping.no_questions': 'لم يتم اكتشاف أي أسئلة. يرجى الرجوع ورفع ملف درجات صالح.',
         'mapping.back': 'عودة',
         'mapping.calculate': 'حساب تحقق نواتج التعلم',
@@ -1367,16 +1367,16 @@ TRANSLATIONS = {
         'detected.questions': 'الأسئلة',
         'detected.students': 'الطلاب',
         'detected.detection': 'الاكتشاف',
-        'detected.save': 'حفظ اختيار المخرجات',
+        'detected.save': 'حفظ اختيار النواتج',
         'detected.back_upload': 'العودة إلى الرفع',
         'detected.no_table': 'لم يتم اكتشاف جدول أسئلة من هذا الملف.',
         'detected.text_sample': 'عرض عينة النص المستخرج',
         'detected.suggestion_source': 'مصدر الاقتراح:',
         'detected.source_gemini': 'Gemini Flash',
         'detected.source_local': 'المطابقة الدلالية المحلية',
-        'detected.mapping_used_gemini': 'تم ربط الأسئلة بالمخرجات باستخدام Gemini Flash.',
-        'detected.mapping_used_qwen': 'تم ربط الأسئلة بالمخرجات باستخدام Qwen عبر Groq.',
-        'detected.mapping_used_local': 'تم ربط الأسئلة بالمخرجات باستخدام المطابقة الدلالية المحلية.',
+        'detected.mapping_used_gemini': 'تم ربط الأسئلة بالنواتج باستخدام Gemini Flash.',
+        'detected.mapping_used_qwen': 'تم ربط الأسئلة بالنواتج باستخدام Qwen عبر Groq.',
+        'detected.mapping_used_local': 'تم ربط الأسئلة بالنواتج باستخدام المطابقة الدلالية المحلية.',
         'detected.question_text': 'نص السؤال',
         'results.title': 'تقرير تحقق نواتج التعلم',
         'results.course': 'المقرر:',
@@ -1463,7 +1463,7 @@ TRANSLATIONS = {
         'results.start_over': 'البدء من جديد',
         'results.back_reports': 'العودة إلى تقاريري',
         'results.create_new': 'إنشاء تقرير جديد',
-        'results.no_mappings': 'لم يتم تقديم أي ربط. يرجى التأكد من ربط سؤال واحد على الأقل بمخرج تعلم.',
+        'results.no_mappings': 'لم يتم تقديم أي ربط. يرجى التأكد من ربط سؤال واحد على الأقل بناتج تعلم.',
         'history.title': 'تقاريري',
         'history.report': 'التقرير',
         'history.course': 'المقرر',
@@ -1615,8 +1615,8 @@ TRANSLATIONS['ar'].update({
     'question_mapping.requires_ai_mapping': '\u064a\u062d\u062a\u0627\u062c \u0631\u0628\u0637',
     'question_mapping.all_mapped_success': '\u062a\u0645 \u0631\u0628\u0637 \u062c\u0645\u064a\u0639 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0628\u0646\u062c\u0627\u062d.',
     'question_mapping.final_review': '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0646\u0647\u0627\u0626\u064a\u0629',
-    'question_mapping.continue_ai_mapping': 'ربط الأسئلة بمخرجات التعلم',
-    'question_mapping.step3_title': 'الخطوة 3: ربط الأسئلة بمخرجات التعلم',
+    'question_mapping.continue_ai_mapping': 'ربط الأسئلة بنواتج التعلم',
+    'question_mapping.step3_title': 'الخطوة 3: ربط الأسئلة بنواتج التعلم',
     'question_mapping.step3_description': '\u0631\u0627\u062c\u0639 \u0627\u0642\u062a\u0631\u0627\u062d\u0627\u062a \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a \u0644\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u062a\u064a \u0644\u0645 \u064a\u0630\u0643\u0631 \u0641\u064a\u0647\u0627 \u0645\u062e\u0631\u062c \u062a\u0639\u0644\u0645 \u0628\u0634\u0643\u0644 \u0635\u0631\u064a\u062d.',
     'question_mapping.suggested_clo': '\u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0642\u062a\u0631\u062d',
     'question_mapping.ai_suggestions': 'اقتراحات الذكاء الاصطناعي',
@@ -1625,8 +1625,8 @@ TRANSLATIONS['ar'].update({
     'question_mapping.low_conf': 'منخفض',
     'question_mapping.alt_suggestions': 'اقتراحات بديلة:',
     'question_mapping.no_ai_suggestions': 'لا توجد اقتراحات متاحة.',
-    'question_mapping.final_selection': 'المخرجات المختارة',
-    'question_mapping.add_clo': 'إضافة مخرج تعلم',
+    'question_mapping.final_selection': 'النواتج المختارة',
+    'question_mapping.add_clo': 'إضافة ناتج تعلم',
     'question_mapping.confidence_score': '\u062f\u0631\u062c\u0629 \u0627\u0644\u062b\u0642\u0629',
     'question_mapping.select_clo': '\u0627\u062e\u062a\u0631 \u0645\u062e\u0631\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
     'question_mapping.choose_clo': '\u0627\u062e\u062a\u0631 \u0645\u062e\u0631\u062c\u0627\u064b...',
@@ -5670,7 +5670,7 @@ def gemini_exam_question_extraction_prompt():
         "including sub-parts and options. IMPORTANT: For multiple choice questions, ensure each option appears on a new line within the question text (insert \\n before options if needed). "
         "Detect the question type, such as MCQ, True/False, Essay, Short Answer, Problem Solving, or Other. "
         "Detect only CLOs explicitly written in the exam paper near or inside each question, such as CLO1, CLO 1, "
-        "CLO1.1, 1.1, مخرج 1.1, or ناتج 1.1. Do not infer CLOs by meaning. "
+        "CLO1.1, 1.1, or ناتج 1.1. Do not infer CLOs by meaning. "
         "Return JSON only with this exact schema: "
         '{"questions":[{"number":"Q1","text":"full question text with \\n separating options","type":"MCQ","explicit_clos":["1.1"]}]}'
     )
@@ -6490,7 +6490,7 @@ def extract_legacy_course_goal_clos(raw_text):
     normalized = compact_text(str(raw_text or '').replace('|', ' '))
     goal_label = r'(?:هدف\s+المقرر|أهداف\s+المقرر|الهدف\s+الرئيس\s+للمقرر|الهدف\s+الرئيسي\s+للمقرر)'
     stop_label = (
-        r'(?:موضوعات\s+المقرر|قائمة\s+الموضوعات|محتوى\s+المقرر|مخرجات\s+التعلم|نواتج\s+التعلم|'
+        r'(?:موضوعات\s+المقرر|قائمة\s+الموضوعات|محتوى\s+المقرر|نواتج\s+التعلم|'
         r'المراجع|مصادر\s+التعلم|Course\s+Learning\s+Outcomes|Course\s+Content|References)'
     )
     match = re.search(rf'{goal_label}\s*[:\-–—؛،]?\s*(.+?)(?=\s+{stop_label}\b|$)', normalized, flags=re.I | re.S)
@@ -7283,7 +7283,7 @@ def extract_arabic_numbered_table_clos(raw_text):
     section_lines = []
     in_section = False
     for line in lines:
-        if line_has_arabic_label(line, 'نواتج التعلم') or line_has_arabic_label(line, 'مخرجات التعلم'):
+        if line_has_arabic_label(line, 'نواتج التعلم'):
             if re.search(r'\.{5,}|…{2,}', line):
                 continue
             in_section = True
@@ -7560,7 +7560,7 @@ def extract_course_spec_metadata(text, source_filename=''):
         arabic_stop_labels = (
             r'المعرفة|الفهم|المهارات|القيم|استراتيجيات|طرق\s+التدريس|'
             r'طرق\s+التقييم|أساليب\s+التقييم|محتوى\s+المقرر|موضوعات\s+المقرر|'
-            r'قائمة\s+الموضوعات|مخرجات\s+التعلم|رمز\s+المقرر|اسم\s+المقرر'
+            r'قائمة\s+الموضوعات|نواتج\s+التعلم|رمز\s+المقرر|اسم\s+المقرر'
         )
         arabic_clo_pattern = re.compile(
             rf'(?:^|\s)([123]\s*[\.\-]\s*[1-9]\d*)\s+(.+?)(?=\s+[123]\s*[\.\-]\s*[1-9]\d*\s+|\s+(?:{arabic_stop_labels})\b|$)',
@@ -10291,7 +10291,7 @@ def build_clo_assessment_word_table(stats, course_info=None, language=None):
     table.append(table_properties)
 
     headers = (
-        ['مخرجات تعلم المقرر', 'مخرجات البرنامج المرتبطة', 'طرق التقييم', 'المستوى المستهدف', 'المستوى الفعلي', 'التعليق على نتائج القياس']
+        ['نواتج تعلم المقرر', 'نواتج البرنامج المرتبطة', 'طرق التقييم', 'المستوى المستهدف', 'المستوى الفعلي', 'التعليق على نتائج القياس']
         if language == 'ar'
         else ['Course Learning Outcomes (CLOs)', 'Related PLOs Code', 'Assessment Methods', 'Targeted Level', 'Actual Level', 'Comment on Assessment Results']
     )
