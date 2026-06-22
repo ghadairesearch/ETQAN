@@ -2998,40 +2998,7 @@ def load_course_report_records(report_ids, user_id):
         })
     return records
 
-@app.route('/save-report', methods=['POST'])
-@login_required
-def save_report():
-    user = current_user()
-    data = request.get_json()
-    stats = data.get('stats', {})
-    total_students = data.get('total_students', 0)
-    student_achievement_matrix = data.get('student_achievement_matrix', {})
-    course_info = data.get('course_info', {})
-    payload = {
-        'stats': json_safe(stats),
-        'total_students': total_students,
-        'student_achievement_matrix': json_safe(student_achievement_matrix),
-        'course_info': json_safe(course_info),
-        'branding': get_display_branding_payload()
-    }
-    payload_json = json.dumps(payload, ensure_ascii=False)
-    report_hash = hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest()
-    created_at = datetime.now().isoformat()
-    course_name = course_info.get('course_name')
-    with get_db() as conn:
-        if is_report_saved(stats, total_students, student_achievement_matrix, course_info):
-            return {'allowed': True, 'saved': False, 'reason': 'already_saved'}
-        title = unique_saved_report_title(
-            conn, user['id'], course_name or 'Course Report', 'CLO Attainment Report')
-        
-        conn.execute(
-            """
-            INSERT INTO saved_reports (user_id, title, report_hash, payload_json, created_at)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (user['id'], title, report_hash, payload_json, created_at)
-        )
-        return {'allowed': True, 'saved': True, 'reason': 'success'}
+
 
 def is_report_saved(stats, total_students, student_achievement_matrix, course_info):
     user = current_user()
@@ -14023,6 +13990,10 @@ def results():
 
 @app.route('/save-report', methods=['POST'])
 def save_report():
+    user = current_user()
+    if not user:
+        flash(translate('results.login_export') if translate('results.login_export') != 'results.login_export' else "Please login to save reports.", "error")
+        return redirect(url_for('login'))
     stats, total_students, student_achievement_rows, error = calculate_clo_results()
     if error:
         flash(error)
