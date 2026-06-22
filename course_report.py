@@ -542,7 +542,7 @@ EN_TRANSLATIONS = {
     'question_mapping.total_questions': 'Total Questions',
     'question_mapping.auto_mapped_questions': 'Mapped Questions',
     'question_mapping.ai_required_questions': 'Requires Mapping',
-    'question_mapping.question_number': 'Question Number',
+    'question_mapping.question_number': 'Q. No.',
     'question_mapping.explicit_clo': 'CLO',
     'question_mapping.status': 'Status',
     'question_mapping.mapped_automatically': 'Mapped Automatically',
@@ -811,7 +811,8 @@ EN_TRANSLATIONS = {
     'mapping.exam_paper': 'Exam paper:',
     'mapping.questions': 'questions',
     'mapping.students': 'students',
-    'mapping.question': 'Question',
+    'mapping.question': 'Q. No.',
+    'mapping.question_prefix': 'Q',
     'mapping.max_score': 'Max Score',
     'mapping.multi_help': 'Hold Ctrl to select multiple CLOs.',
     'mapping.selected_clo': 'Selected CLO ID',
@@ -1079,7 +1080,7 @@ TRANSLATIONS = {
         'home.course_level': 'خدمات المقررات',
         'home.course_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u062e\u0627\u0635 \u0628\u062a\u062d\u0644\u064a\u0644 \u0645\u062e\u0631\u062c\u0627\u062a \u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0642\u0631\u0631 \u0648\u0623\u062f\u0644\u0629 \u0627\u0644\u062a\u062d\u0642\u0642 \u0648\u062a\u0642\u0627\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'home.program_level': 'خدمات البرامج',
-        'home.program_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u064a\u062c\u0645\u0639 \u0623\u062f\u0644\u0629 \u0627\u0644\u0645\u0642\u0631\u0631\u0627\u062a \u0644\u062a\u062d\u0644\u064a\u0644 \u0646\u0648\u0627\u062a\u062c \u062a\u0639\u0644\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c.',
+        'home.program_level_description': '\u0633\u064a\u0631 \u0639\u0645\u0644 \u064a\u062c\u0645\u0639 \u0623\u062f\u0644\u0629 \u0627\u0644\u0645\u0642\u0631\u0637\u0627\u062a \u0644\u062a\u062d\u0644\u064a\u0644 \u0646\u0648\u0627\u062a\u062c \u062a\u0639\u0644\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c.',
         'home.add_program_title': 'إضافة برنامج',
         'home.add_program_description': 'أضف برنامجًا لتتمكن من إنشاء التقارير.',
         'home.requires_program': 'يتطلب إضافة برنامج واحد على الأقل.',
@@ -5629,12 +5630,12 @@ def gemini_exam_question_extraction_prompt():
     return (
         "Extract exam questions from the provided exam paper text. "
         "The exam may be Arabic or English. Preserve each question text as completely as possible, "
-        "including sub-parts and options when they belong to the same question. "
+        "including sub-parts and options. IMPORTANT: For multiple choice questions, ensure each option appears on a new line within the question text (insert \\n before options if needed). "
         "Detect the question type, such as MCQ, True/False, Essay, Short Answer, Problem Solving, or Other. "
         "Detect only CLOs explicitly written in the exam paper near or inside each question, such as CLO1, CLO 1, "
         "CLO1.1, 1.1, مخرج 1.1, or ناتج 1.1. Do not infer CLOs by meaning. "
         "Return JSON only with this exact schema: "
-        '{"questions":[{"number":"Q1","text":"full question text","type":"MCQ","explicit_clos":["1.1"]}]}'
+        '{"questions":[{"number":"Q1","text":"full question text with \\n separating options","type":"MCQ","explicit_clos":["1.1"]}]}'
     )
 
 def normalize_gemini_exam_metrics(payload):
