@@ -159,27 +159,29 @@
         {% endif %}
     </section>
 
-    {% if course_report_inputs.uncovered_topics %}
     <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff; margin-bottom: 1.25rem;">
         <h3 style="margin: 0 0 0.75rem;">{{ _('results.uncovered_topics') }}</h3>
-        <div style="display: grid; gap: 0.75rem;">
-            {% for item in course_report_inputs.uncovered_topics %}
-                <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem; background: #f9fafb;">
-                    <strong style="color: var(--accent-primary);">{{ item.topic }}</strong>
-                    {% if item.reason %}
-                        <div style="color: var(--text-muted); margin-top: 0.35rem;"><strong>{{ _('results.uncovered_reason') }}:</strong> {{ course_report_label(item.reason) }}{% if item.reason_other %} ({{ item.reason_other }}){% endif %}</div>
-                    {% endif %}
-                    {% if item.impact %}
-                        <div style="color: var(--text-muted); margin-top: 0.2rem;"><strong>{{ _('results.uncovered_impact') }}:</strong> {{ course_report_label(item.impact) }}</div>
-                    {% endif %}
-                    {% if item.action %}
-                        <div style="color: var(--text-muted); margin-top: 0.2rem;"><strong>{{ _('results.uncovered_action') }}:</strong> {{ course_report_label(item.action) }}{% if item.action_other %} ({{ item.action_other }}){% endif %}</div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </div>
+        {% if course_report_inputs.topics_covered == 'yes' or not course_report_inputs.uncovered_topic_details %}
+            <p style="color: var(--text-muted); margin: 0;">{{ _('results.all_topics_covered') | default('تمت تغطية جميع المواضيع بنجاح.' if request.cookies.get('lang') == 'ar' else 'All topics were successfully covered.') }}</p>
+        {% else %}
+            <div style="display: grid; gap: 0.75rem;">
+                {% for item in course_report_inputs.uncovered_topic_details %}
+                    <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem; background: #f9fafb;">
+                        <strong style="color: var(--accent-primary);">{{ item.topic }}</strong>
+                        {% if item.reason %}
+                            <div style="color: var(--text-muted); margin-top: 0.35rem;"><strong>{{ _('results.uncovered_reason') }}:</strong> {{ course_report_label(item.reason) }}{% if item.reason_other %} ({{ item.reason_other }}){% endif %}</div>
+                        {% endif %}
+                        {% if item.impact %}
+                            <div style="color: var(--text-muted); margin-top: 0.2rem;"><strong>{{ _('results.uncovered_impact') }}:</strong> {{ course_report_label(item.impact) }}</div>
+                        {% endif %}
+                        {% if item.action %}
+                            <div style="color: var(--text-muted); margin-top: 0.2rem;"><strong>{{ _('results.uncovered_action') }}:</strong> {{ course_report_label(item.action) }}{% if item.action_other %} ({{ item.action_other }}){% endif %}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </section>
-    {% endif %}
 
     <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
         <button type="button" class="btn" style="background-color: var(--border-color); color: var(--text-main);" onclick="history.back()">
