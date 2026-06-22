@@ -6087,6 +6087,7 @@ def parse_exam_paper_with_gemini(filepath):
 
 def gemini_question_clo_prompt():
     return (
+        "You are an academic assessment alignment assistant. "
         "Map exam questions to Course Learning Outcomes. "
         "Use question intent, required action, concepts, and CLO domain. "
         "The questions and CLOs may be Arabic or English. "
