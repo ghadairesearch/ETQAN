@@ -150,7 +150,7 @@
             </div>
         <div class="icon-action-row" style="gap: 0.5rem;">
         {% if saved_report_view or not can_export %}
-            <a href="/reports" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_reports') }}</a>
+            <a href="/reports" class="btn back-action" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_reports') }}</a>
         {% endif %}
         {% if can_export %}
             {% if current_user and current_user.university_name %}
@@ -322,7 +322,7 @@
     {% if saved_report_view %}
     {% elif can_export %}
         <div class="form-action-row" style="margin-top: 1rem;">
-            <a href="/mapping" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_mapping') }}</a>
+            <a href="/mapping" class="btn back-action" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_mapping') }}</a>
         </div>
     {% else %}
         <div class="form-action-row" style="margin-top: 1rem;">

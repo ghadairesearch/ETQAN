@@ -236,6 +236,14 @@
             direction: rtl;
         }
 
+        .form-action-row .back-action {
+            order: -1;
+        }
+
+        html[dir="rtl"] .form-action-row .back-action {
+            order: 10;
+        }
+
         form > button.btn[type="submit"]:last-child {
             display: flex;
             margin-left: auto;
