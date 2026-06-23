@@ -194,6 +194,31 @@
             flex: 0 0 auto;
         }
 
+        .icon-action-row {
+            display: flex;
+            gap: 0.45rem;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            direction: ltr;
+        }
+
+        html[dir="rtl"] .icon-action-row {
+            justify-content: flex-start;
+        }
+
+        html[dir="rtl"] .icon-action-row > * {
+            direction: rtl;
+        }
+
+        .icon-action-cell {
+            text-align: right;
+        }
+
+        html[dir="rtl"] .icon-action-cell {
+            text-align: left;
+        }
+
         .report-action-button,
         .report-extra-button,
         .report-delete-button,

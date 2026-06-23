@@ -59,8 +59,8 @@
                         <td>{{ course.department or '-' }}</td>
                         <td>{{ course.program or '-' }}</td>
                         <td>{{ course.clos|length }}</td>
-                        <td style="text-align: right;">
-                            <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
+                        <td class="icon-action-cell">
+                            <div class="icon-action-row">
                                 <a href="/account/courses/{{ course.id }}/edit" class="action-button" aria-label="{{ _('courses.edit') }}" title="{{ _('courses.edit') }}">
                                     <svg viewBox="0 0 24 24" aria-hidden="true">
                                         <path d="M12 20h9"></path>

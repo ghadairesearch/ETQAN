@@ -148,13 +148,13 @@
             </p>
             </div>
             </div>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; align-items: center;">
+        <div class="icon-action-row" style="gap: 0.5rem;">
         {% if saved_report_view or not can_export %}
             <a href="/reports" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_reports') }}</a>
         {% endif %}
         {% if can_export %}
             {% if current_user and current_user.university_name %}
-            <div style="display: flex; gap: 0.45rem; justify-content: flex-end; align-items: center;">
+            <div class="icon-action-row">
                 {% if not saved_report_view %}
                     <form method="POST" action="/save-report" style="margin: 0;">
                         <button type="submit" class="btn" style="padding: 0.45rem 0.85rem; display: flex; align-items: center; gap: 0.35rem; background-color: var(--accent); color: white;">
