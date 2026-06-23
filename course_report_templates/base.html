@@ -225,20 +225,25 @@
             align-items: center;
             justify-content: flex-end;
             flex-wrap: wrap;
+            direction: ltr;
         }
 
         html[dir="rtl"] .form-action-row {
             justify-content: flex-start;
         }
 
+        html[dir="rtl"] .form-action-row > * {
+            direction: rtl;
+        }
+
         form > button.btn[type="submit"]:last-child {
             display: flex;
-            margin-inline-start: auto;
+            margin-left: auto;
         }
 
         html[dir="rtl"] form > button.btn[type="submit"]:last-child {
-            margin-inline-start: 0;
-            margin-inline-end: auto;
+            margin-left: 0;
+            margin-right: auto;
         }
 
         .save-icon-button {
