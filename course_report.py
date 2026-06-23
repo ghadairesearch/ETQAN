@@ -809,7 +809,7 @@ EN_TRANSLATIONS = {
     'assessment.project': 'Project',
     'assessment.other': 'Other',
     'index.remove': 'Remove',
-    'index.add_file': 'Add another file',
+    'index.add_file': 'Add File',
     'index.next_mapping': 'Continue',
     'index.error_course': 'Please select a course or add course information before continuing.',
     'index.error_file': 'Please upload at least one grades file.',
@@ -1197,7 +1197,7 @@ TRANSLATIONS = {
         'course_report.continue': '\u0645\u062a\u0627\u0628\u0639\u0629',
         'home.open_service': 'ابدأ',
         'service.coming_soon': 'صفحة هذه الخدمة جاهزة. ستتم إضافة أدوات سير العمل الكاملة هنا.',
-        'service.back_home': 'العودة إلى الخدمات',
+        'service.back_home': 'عودة',
         'footer.copyright': 'إتقان © 2026. جميع الحقوق محفوظة.',
         'footer.privacy': 'سياسة الخصوصية',
         'footer.faq': 'الأسئلة الشائعة',
@@ -1230,7 +1230,7 @@ TRANSLATIONS = {
         'auth.new_password': 'كلمة المرور الجديدة',
         'auth.confirm_password': 'تأكيد كلمة المرور',
         'auth.reset_button': 'تحديث كلمة المرور',
-        'auth.back_login': 'العودة إلى تسجيل الدخول',
+        'auth.back_login': 'عودة',
         'org.title': 'الهوية البصرية',
         'org.description': 'تُستخدم هذه البيانات كهوية بصرية في التقارير المصدّرة.',
         'org.university': 'الجامعة',
@@ -1290,7 +1290,7 @@ TRANSLATIONS = {
         'courses.title': 'مقرراتي',
         'courses.description': 'احفظ معلومات المقرر مرة واحدة ثم أعد استخدامها عند إنشاء التقارير.',
         'courses.add_new': 'إضافة مقرر',
-        'courses.back_to_courses': 'العودة إلى مقرراتي',
+        'courses.back_to_courses': 'عودة',
         'courses.add_title': 'إضافة مقرر',
         'courses.edit_title': 'تعديل المقرر',
         'courses.edit_help': 'تحديث معلومات المقرر أو رفع توصيف جديد.',
@@ -1379,7 +1379,7 @@ TRANSLATIONS = {
         'assessment.project': 'مشروع',
         'assessment.other': 'أخرى',
         'index.remove': 'حذف',
-        'index.add_file': 'إضافة ملف آخر',
+        'index.add_file': 'إضافة ملف',
         'index.next_mapping': 'متابعة',
         'index.error_course': 'يرجى اختيار مقرر أو إضافة معلومات المقرر قبل المتابعة.',
         'index.error_file': 'يرجى رفع ملف درجات واحد على الأقل.',
@@ -1419,7 +1419,7 @@ TRANSLATIONS = {
         'detected.students': 'الطلاب',
         'detected.detection': 'الاكتشاف',
         'detected.save': 'حفظ اختيار النواتج',
-        'detected.back_upload': 'العودة إلى الرفع',
+        'detected.back_upload': 'عودة',
         'detected.no_table': 'لم يتم اكتشاف جدول أسئلة من هذا الملف.',
         'detected.text_sample': 'عرض عينة النص المستخرج',
         'detected.suggestion_source': 'مصدر الاقتراح:',
@@ -1513,7 +1513,7 @@ TRANSLATIONS = {
         'results.not_achieved': 'غير محقق',
         'results.back_mapping': 'عودة',
         'results.start_over': 'البدء من جديد',
-        'results.back_reports': 'العودة إلى تقاريري',
+        'results.back_reports': 'عودة',
         'results.create_new': 'إنشاء تقرير جديد',
         'results.no_mappings': 'لم يتم تقديم أي ربط. يرجى التأكد من ربط سؤال واحد على الأقل بناتج تعلم.',
         'history.title': 'تقاريري',
@@ -1623,7 +1623,7 @@ TRANSLATIONS = {
         'privacy.user_responsibility_text': 'تعتمد منصة إتقان على إجراءات آلية للتحقق من البيانات وحساب النتائج بهدف توفير تقارير دقيقة ومتسقة. ومع ذلك، تبقى المراجعة النهائية للتقارير واعتمادها ضمن مسؤولية المستخدم وفق السياسات والإجراءات المعمول بها في مؤسسته.',
         'privacy.updates_title': 'تحديثات سياسة الخصوصية',
         'privacy.updates_text': 'تحتفظ منصة إتقان بالحق في تحديث سياسة الخصوصية من وقت لآخر بما يتوافق مع تطور المنصة وخدماتها. ويُعد استمرار استخدام المنصة بعد نشر التحديثات موافقة على السياسة المعدلة.',
-        'privacy.back': 'العودة إلى الأداة',
+        'privacy.back': 'عودة',
         'faq.title': 'الأسئلة الشائعة',
         'faq.home': 'الرئيسية',
         'faq.q_supported_files': 'ما ملفات الدرجات التي يدعمها إتقان؟',
@@ -1687,7 +1687,7 @@ TRANSLATIONS['ar'].update({
     'question_mapping.choose_clo': '\u0627\u062e\u062a\u0631 \u0645\u062e\u0631\u062c\u0627\u064b...',
     'question_mapping.all_course_clos': '\u062c\u0645\u064a\u0639 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u0645\u0642\u0631\u0631',
     'question_mapping.save_mapping': '\u062d\u0641\u0638',
-    'question_mapping.back': '\u0631\u062c\u0648\u0639',
+    'question_mapping.back': '\u0639\u0648\u062f\u0629',
     'question_mapping.review_saved': 'تم الحفظ بنجاح.',
     'exams.title': '\u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a\u064a',
     'exams.empty': '\u0644\u0627 \u062a\u0648\u062c\u062f \u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a \u0645\u062d\u0641\u0648\u0638\u0629 \u0628\u0639\u062f.',
@@ -6663,6 +6663,38 @@ def merge_ai_default_clo_selections_from_form(metrics, clos):
         metrics['ai_removed_clos'] = removed
     return metrics
 
+def question_mapping_values_for_key(mapping, question):
+    if not isinstance(mapping, dict):
+        return []
+    question_text = re.sub(r'\s+', ' ', str(question or '').strip()).lower()
+    question_number = question_number_from_label(question)
+
+    candidates = []
+    if question in mapping:
+        candidates.append(mapping.get(question))
+
+    for key, value in mapping.items():
+        key_text = re.sub(r'\s+', ' ', str(key or '').strip()).lower()
+        if key_text and key_text == question_text:
+            candidates.append(value)
+            continue
+        if question_number and question_number_from_label(key) == question_number:
+            candidates.append(value)
+
+    values = []
+    for candidate in candidates:
+        if candidate is None:
+            continue
+        if isinstance(candidate, (list, tuple, set)):
+            iterable = candidate
+        else:
+            iterable = [candidate]
+        for item in iterable:
+            item = str(item or '').strip()
+            if item and item not in values:
+                values.append(item)
+    return values
+
 def ensure_final_review_clo_selections(metrics, draft_metrics, clos):
     metrics = dict(metrics or {})
     draft_metrics = dict(draft_metrics or {})
@@ -6678,12 +6710,14 @@ def ensure_final_review_clo_selections(metrics, draft_metrics, clos):
     draft_detected = draft_metrics.get('detected_clo_mappings') or {}
 
     for question in metrics.get('questions') or []:
-        current = list(resolve_detected_clos_to_course_list(mappings.get(question, []), clos))
+        current = list(resolve_detected_clos_to_course_list(question_mapping_values_for_key(mappings, question), clos))
         fallback_values = []
-        fallback_values.extend(draft_selections.get(question) or [])
-        fallback_values.extend(draft_detected.get(question) or [])
-        if not removed.get(question) and suggested.get(question):
-            fallback_values.append(suggested.get(question))
+        fallback_values.extend(question_mapping_values_for_key(draft_selections, question))
+        fallback_values.extend(question_mapping_values_for_key(draft_detected, question))
+        removed_values = question_mapping_values_for_key(removed, question)
+        suggested_values = question_mapping_values_for_key(suggested, question)
+        if not removed_values:
+            fallback_values.extend(suggested_values)
         for clo in resolve_detected_clos_to_course_list(fallback_values, clos):
             if clo not in current:
                 current.append(clo)
@@ -8227,6 +8261,7 @@ def extract_course_spec_metadata(text, source_filename=''):
 def question_number_from_label(label):
     label = str(label or '').strip()
     patterns = [
+        r'(?:السؤال|سؤال|س)\s*[-#:.]?\s*(\d{1,3})',
         r'\bQ(?:uestion)?\s*[-#:.]?\s*(\d{1,3})\b',
         r'\bQuestion\s+No\.?\s*(\d{1,3})\b',
         r'\bAnswers?\s*[-_ #:.]?\s*(\d{1,3})\b',
@@ -14371,6 +14406,7 @@ def question_clo_mapping_ai_review_post():
         return redirect(url_for('question_clo_mapping_ai_get', draft_id=draft_id))
 
     draft_metrics = dict(draft.get('metrics') or {})
+    form_metrics = ensure_final_review_clo_selections(form_metrics, draft_metrics, clos)
     draft_metrics['final_review_metrics'] = form_metrics
     draft_metrics['ai_draft_clo_selections'] = {
         question: selected
@@ -14408,6 +14444,10 @@ def question_clo_mapping_final_review_get(draft_id):
     if not metrics.get('questions'):
         return redirect(url_for('question_clo_mapping_ai_get', draft_id=draft_id))
     metrics = ensure_final_review_clo_selections(metrics, draft_metrics, clos)
+    draft_metrics['final_review_metrics'] = metrics
+    draft['metrics'] = draft_metrics
+    with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
+        json.dump(draft, f, ensure_ascii=False)
 
     return render_template(
         'question_clo_final_review.html',
@@ -14474,6 +14514,7 @@ def question_clo_mapping_final():
     if not metrics.get('questions'):
         flash(translate('question_mapping.no_questions'), "error")
         return redirect(url_for('question_clo_mapping_service'))
+    metrics = ensure_final_review_clo_selections(metrics, draft_metrics, clos)
 
     filename = draft.get('filename') or ''
     question_mapping_metadata = draft_metrics.get('question_clo_mapping_metadata') or {}

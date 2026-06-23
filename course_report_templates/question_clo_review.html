@@ -54,9 +54,23 @@
         width: 100%;
     }
 
+    .question-review-table th,
+    .question-review-table td {
+        padding: 0.55rem 0.65rem;
+        vertical-align: middle;
+    }
+
     .question-review-table textarea {
-        min-height: 92px;
+        min-height: 54px;
+        line-height: 1.35;
+        padding: 0.45rem 0.55rem;
         resize: vertical;
+    }
+
+    .question-review-table select {
+        min-height: 42px;
+        padding: 0.45rem 0.55rem;
+        width: 100%;
     }
 
     .explicit-clo-pill,
@@ -129,9 +143,9 @@
             <table id="questionTable" class="question-review-table" style="min-width: 1080px;">
                 <thead>
                     <tr>
-                        <th style="width: 140px;">{{ _('question_mapping.question_number') }}</th>
+                        <th style="width: 110px;">{{ _('question_mapping.question_number') }}</th>
                         <th style="width: 52%;">{{ _('question_mapping.question_text') }}</th>
-                        <th style="width: 145px;">{{ _('question_mapping.question_type') }}</th>
+                        <th style="width: 96px;">{{ _('question_mapping.question_type') }}</th>
                         <th style="width: 150px;">
                             {{ _('question_mapping.explicit_clo') }}
                         </th>
@@ -148,7 +162,7 @@
                         <tr class="question-edit-row">
                             <td><strong class="question-number">{% if language == 'en' %}Q{{ loop.index }}{% else %}سؤال {{ loop.index }}{% endif %}</strong></td>
                             <td>
-                                <textarea name="question_text" class="form-control" rows="4" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</textarea>
+                                <textarea name="question_text" class="form-control" rows="2" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</textarea>
                             </td>
                             <td>
                                 <select name="question_type" class="form-control">
@@ -208,7 +222,7 @@
     <tr class="question-edit-row">
         <td><strong class="question-number"></strong></td>
         <td>
-            <textarea name="question_text" class="form-control" rows="4"></textarea>
+            <textarea name="question_text" class="form-control" rows="2"></textarea>
         </td>
         <td>
             <select name="question_type" class="form-control">
