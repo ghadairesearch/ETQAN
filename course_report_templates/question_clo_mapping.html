@@ -39,7 +39,7 @@
             <input type="file" name="exam_paper" class="form-control" accept=".pdf,.docx,.txt" required style="padding: 0.5rem;">
         </div>
 
-        <div class="question-submit-row">
+        <div class="question-submit-row" style="justify-content: {{ 'flex-start' if language == 'ar' else 'flex-end' }};">
             <button type="submit" class="btn">{{ _('home.question_mapping_extract') }}</button>
         </div>
     </form>
