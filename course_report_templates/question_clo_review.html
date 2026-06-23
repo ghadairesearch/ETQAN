@@ -56,20 +56,20 @@
 
     .question-review-table th,
     .question-review-table td {
-        padding: 0.55rem 0.65rem;
+        padding: 0.35rem 0.45rem;
         vertical-align: middle;
     }
 
     .question-review-table textarea {
-        min-height: 54px;
+        min-height: 38px;
         line-height: 1.35;
-        padding: 0.45rem 0.55rem;
+        padding: 0.35rem 0.45rem;
         resize: vertical;
     }
 
     .question-review-table select {
-        min-height: 42px;
-        padding: 0.45rem 0.55rem;
+        min-height: 36px;
+        padding: 0.3rem 0.45rem;
         width: 100%;
     }
 
@@ -162,7 +162,7 @@
                         <tr class="question-edit-row">
                             <td><strong class="question-number">{% if language == 'en' %}Q{{ loop.index }}{% else %}سؤال {{ loop.index }}{% endif %}</strong></td>
                             <td>
-                                <textarea name="question_text" class="form-control" rows="2" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</textarea>
+                                <textarea name="question_text" class="form-control" rows="1" dir="{{ text_direction(question_text) }}" style="text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</textarea>
                             </td>
                             <td>
                                 <select name="question_type" class="form-control">
@@ -222,7 +222,7 @@
     <tr class="question-edit-row">
         <td><strong class="question-number"></strong></td>
         <td>
-            <textarea name="question_text" class="form-control" rows="2"></textarea>
+            <textarea name="question_text" class="form-control" rows="1"></textarea>
         </td>
         <td>
             <select name="question_type" class="form-control">
