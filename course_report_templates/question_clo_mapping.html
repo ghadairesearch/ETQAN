@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    html[dir="rtl"] .question-course-help-icon {
+        order: -1;
+    }
+</style>
+
 <div class="card" style="max-width: 820px; margin: 0 auto;">
     <h2 style="margin-top: 0;">{{ _('home.question_mapping_title') }}</h2>
     <p style="color: var(--text-muted); margin-top: -0.5rem;">
@@ -17,7 +23,7 @@
                         <option value="{{ course.name }}">{{ (course.display_label_ar if language == 'ar' else course.display_label_en) or course.display_label or course.name }}</option>
                     {% endfor %}
                 </select>
-                <span title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: help; align-self: center; flex-shrink: 0;">
+                <span class="question-course-help-icon" title="{{ _('index.course_not_found_my_courses') }}" aria-label="{{ _('index.course_not_found_my_courses') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: help; align-self: center; flex-shrink: 0;">
                     i
                 </span>
             </div>
