@@ -313,7 +313,7 @@
     {% endif %}
     
 
-    <form method="POST" action="{{ url_for('question_clo_mapping_final') }}" id="mapping-form">
+    <form method="POST" action="{{ url_for('question_clo_mapping_ai_review_post') }}" id="mapping-form">
         <input type="hidden" name="draft_id" value="{{ draft_id }}">
         
         <!-- Pre-existing selections for already mapped explicitly -->
@@ -411,16 +411,7 @@
             <button type="submit" class="btn" formaction="{{ url_for('question_clo_mapping_ai_back') }}" formnovalidate style="background-color: var(--border-color); color: var(--text-main);">
                 {{ _('mapping.back') }}
             </button>
-            <div class="wizard-footer-actions">
-                <button type="submit" class="btn wizard-save-button">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                    {{ _('question_mapping.save_mapping') }}
-                </button>
-                <button type="button" class="btn wizard-export-disabled" disabled title="{{ _('question_mapping.save_mapping') }}">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15h6"></path><path d="M9 18h6"></path><path d="M9 12h1"></path></svg>
-                    {{ _('results.export_pdf') }}
-                </button>
-            </div>
+            <button type="submit" class="btn">{{ _('course_report.next') }}</button>
         </div>
     </form>
 </div>

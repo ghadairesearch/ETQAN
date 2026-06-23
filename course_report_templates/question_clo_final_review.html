@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .clo-review-badge {
+        display: inline-block;
+        background-color: var(--accent-primary);
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-inline-end: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+</style>
+
+<div class="card">
+    <h2 style="margin-top: 0;">{{ _('question_mapping.final_review') }}</h2>
+    <p style="color: var(--text-muted); margin-top: -0.5rem;">
+        {{ _('mapping.course') }} <strong>{{ course_name }}</strong><br>
+        {{ _('detected.source') }} <strong>{{ filename }}</strong>
+    </p>
+
+    <form method="POST" action="{{ url_for('question_clo_mapping_final') }}">
+        <input type="hidden" name="draft_id" value="{{ draft_id }}">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 140px;">{{ _('mapping.question') }}</th>
+                    <th style="width: 150px;">{{ _('question_mapping.question_type') }}</th>
+                    <th>{{ _('question_mapping.question_text') }}</th>
+                    <th style="width: 260px;">{{ _('question_mapping.related_clo') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in metrics.questions %}
+                    {% set question_text = metrics.question_texts.get(question, '') if metrics.question_texts else '' %}
+                    {% set question_type = metrics.question_types.get(question, '') if metrics.question_types else '' %}
+                    {% set selected_clos = metrics.detected_clo_mappings.get(question, []) if metrics.detected_clo_mappings else [] %}
+                    <tr>
+                        <td>
+                            <input type="hidden" name="question_ids" value="{{ question }}">
+                            <input type="hidden" name="question_text_{{ question }}" value="{{ question_text|e }}">
+                            <input type="hidden" name="question_type_{{ question }}" value="{{ question_type|e }}">
+                            {% if metrics.ai_suggested_clos and metrics.ai_suggested_clos.get(question) %}
+                                <input type="hidden" name="ai_suggested_clo_{{ question }}" value="{{ metrics.ai_suggested_clos.get(question)|e }}">
+                            {% endif %}
+                            {% for clo in selected_clos %}
+                                <input type="hidden" name="question_clo_{{ question }}" value="{{ clo|e }}">
+                            {% endfor %}
+                            <strong>{{ _('mapping.question') }} {{ loop.index }}</strong>
+                        </td>
+                        <td>{{ question_type or '-' }}</td>
+                        <td dir="{{ text_direction(question_text) }}" style="white-space: pre-wrap; text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</td>
+                        <td>
+                            {% if selected_clos %}
+                                {% for clo in selected_clos %}
+                                    <span class="clo-review-badge">{{ clo.split(' ')[0] }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span style="color: var(--text-muted);">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap;">
+            <a href="{{ url_for('question_clo_mapping_ai_get', draft_id=draft_id) }}" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('question_mapping.back') }}</a>
+            <button type="submit" class="btn" name="final_action" value="save">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                {{ _('question_mapping.save_mapping') }}
+            </button>
+            <button type="submit" class="btn" name="final_action" value="export_pdf">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15h6"></path><path d="M9 18h6"></path><path d="M9 12h1"></path></svg>
+                {{ _('results.export_pdf') }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

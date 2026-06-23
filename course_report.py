@@ -14173,6 +14173,70 @@ def question_clo_mapping_ai_back():
     return redirect(url_for('question_clo_mapping_review_get', draft_id=draft_id))
 
 
+@app.route('/question-clo-mapping/ai-review', methods=['POST'])
+def question_clo_mapping_ai_review_post():
+    draft_id = (request.form.get('draft_id') or '').strip()
+    try:
+        draft = load_question_mapping_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    course_name = (draft.get('course_name') or '').strip()
+    clos = get_course_clos(course_name)
+    if not clos:
+        flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    form_metrics = build_question_final_metrics_from_form(clos)
+    if not form_metrics.get('questions'):
+        flash(translate('question_mapping.no_questions'), "error")
+        return redirect(url_for('question_clo_mapping_ai_get', draft_id=draft_id))
+
+    draft_metrics = dict(draft.get('metrics') or {})
+    draft_metrics['final_review_metrics'] = form_metrics
+    draft_metrics['ai_draft_clo_selections'] = {
+        question: selected
+        for question, selected in (form_metrics.get('detected_clo_mappings') or {}).items()
+        if selected
+    }
+    if form_metrics.get('ai_suggested_clos'):
+        draft_metrics['ai_suggested_clos'] = form_metrics.get('ai_suggested_clos')
+    draft['metrics'] = draft_metrics
+    with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
+        json.dump(draft, f, ensure_ascii=False)
+    return redirect(url_for('question_clo_mapping_final_review_get', draft_id=draft_id))
+
+
+@app.route('/question-clo-mapping/final-review/<draft_id>', methods=['GET'])
+def question_clo_mapping_final_review_get(draft_id):
+    try:
+        draft = load_question_mapping_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    course_name = (draft.get('course_name') or '').strip()
+    clos = get_course_clos(course_name)
+    if not clos:
+        flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    draft_metrics = draft.get('metrics') or {}
+    metrics = draft_metrics.get('final_review_metrics') or {}
+    if not metrics.get('questions'):
+        return redirect(url_for('question_clo_mapping_ai_get', draft_id=draft_id))
+
+    return render_template(
+        'question_clo_final_review.html',
+        course_name=course_name,
+        clos=clos,
+        metrics=metrics,
+        filename=draft.get('filename') or '',
+        draft_id=draft_id
+    )
+
+
 
 @app.route('/question-clo-mapping/save-review', methods=['POST'])
 def question_clo_mapping_save_review():
@@ -14331,6 +14395,8 @@ def question_clo_mapping_final():
         pass
 
     flash(translate('exams.saved'))
+    if request.form.get('final_action') == 'export_pdf':
+        return redirect(url_for('export_exam_pdf', exam_id=new_exam_id))
     return redirect(url_for('exam_view', exam_id=new_exam_id))
 
 @app.route('/question-clo-mapping/link/<draft_id>', methods=['GET'])
