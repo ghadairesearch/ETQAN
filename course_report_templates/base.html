@@ -158,9 +158,23 @@
             cursor: pointer;
             font-weight: 600;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
             font-size: 1rem;
             font-family: inherit;
+            line-height: 1.2;
+            vertical-align: middle;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .btn svg {
+            width: 1.1em;
+            height: 1.1em;
+            flex: 0 0 auto;
+            display: block;
         }
 
         .btn:hover {
@@ -169,6 +183,113 @@
 
         .extract-progress-button {
             position: relative;
+        }
+
+        .report-action-menu,
+        .result-export-menu {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        .report-action-button,
+        .report-extra-button,
+        .report-delete-button,
+        .action-button,
+        .delete-button,
+        .exam-delete-button,
+        .result-export-button,
+        .result-delete-button {
+            width: 2.5rem;
+            height: 2.5rem;
+            min-width: 2.5rem;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            line-height: 1;
+            vertical-align: middle;
+            background: var(--accent);
+            color: #fff;
+            border: 0;
+            border-radius: 4px;
+            cursor: pointer;
+            box-sizing: border-box;
+            flex: 0 0 auto;
+        }
+
+        .report-delete-button,
+        .delete-button,
+        .exam-delete-button,
+        .result-delete-button {
+            background: var(--danger);
+        }
+
+        .report-action-button svg,
+        .report-extra-button svg,
+        .report-delete-button svg,
+        .action-button svg,
+        .delete-button svg,
+        .exam-delete-button svg,
+        .result-export-button svg,
+        .result-delete-button svg {
+            width: 1.1rem;
+            height: 1.1rem;
+            display: block;
+            flex: 0 0 auto;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .report-action-panel,
+        .result-export-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 0.35rem);
+            inset-inline-end: 0;
+            min-width: 135px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-shadow: 0 10px 20px rgba(20, 29, 47, 0.12);
+            z-index: 25;
+            padding: 0.35rem;
+        }
+
+        .report-action-menu.open .report-action-panel,
+        .result-export-menu.open .result-export-panel {
+            display: grid;
+            gap: 0.15rem;
+        }
+
+        .report-action-panel a,
+        .report-action-panel button,
+        .result-export-panel a,
+        .result-export-panel button {
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 0.65rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            font: inherit;
+            text-align: start;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .report-action-panel a:hover,
+        .report-action-panel button:hover,
+        .result-export-panel a:hover,
+        .result-export-panel button:hover {
+            background: #f3f4f6;
+            color: var(--accent);
         }
 
         .extract-progress-button[disabled] {
