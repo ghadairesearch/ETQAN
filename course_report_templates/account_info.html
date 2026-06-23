@@ -76,7 +76,7 @@
             <input type="text" name="department" class="form-control" value="{{ current_user.department|default('', true) }}">
         </div>
 
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="form-action-row">
             <button type="submit" class="btn">{{ _('account.save') }}</button>
             <button type="button" id="account_cancel_button" class="btn" style="background: #f3f4f6; color: var(--text-main);">{{ _('account.cancel') }}</button>
         </div>
@@ -93,7 +93,9 @@
                 <label class="form-label" style="color: #7f1d1d;">{{ _('account.confirm_label') }}</label>
                 <input type="text" name="delete_confirmation" class="form-control" autocomplete="off">
             </div>
-            <button type="submit" class="btn" style="background: #b91c1c;">{{ _('account.delete_button') }}</button>
+            <div class="form-action-row">
+                <button type="submit" class="btn" style="background: #b91c1c;">{{ _('account.delete_button') }}</button>
+            </div>
         </form>
     </section>
 </div>

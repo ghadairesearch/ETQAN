@@ -137,7 +137,7 @@
     
     .wizard-footer {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         gap: 0.75rem;
         flex-wrap: wrap;
@@ -145,6 +145,11 @@
         margin-top: 2rem;
         padding-top: 1.5rem;
         border-top: 1px solid var(--border-color);
+    }
+
+    html[dir="rtl"] .wizard-footer {
+        justify-content: flex-start;
+        direction: rtl;
     }
 
     .wizard-footer-actions {
@@ -408,7 +413,7 @@
             {% endfor %}
         </div>
         
-        <div class="wizard-footer">
+        <div class="wizard-footer form-action-row">
             <button type="submit" class="btn" formaction="{{ url_for('question_clo_mapping_ai_back') }}" formnovalidate style="background-color: var(--border-color); color: var(--text-main);">
                 {{ _('mapping.back') }}
             </button>

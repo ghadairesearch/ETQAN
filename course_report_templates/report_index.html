@@ -159,13 +159,15 @@
                         <button type="button" class="btn remove-assessment" style="background-color: var(--border-color); color: var(--text-main); padding: 0.75rem 1rem;">{{ _('index.remove') }}</button>
                     </div>
                 </div>
-                <div style="display: flex; justify-content: flex-start; margin-top: 0.75rem;">
+                <div class="form-action-row" style="margin-top: 0.75rem;">
                     <button type="button" id="add_assessment_file" class="btn" style="background-color: var(--accent-secondary); padding: 0.65rem 1rem;">{{ _('index.add_file') }}</button>
                 </div>
             </div>
         </div>
 
-        <button type="submit" class="btn">{{ _('index.next_mapping') }}</button>
+        <div class="form-action-row">
+            <button type="submit" class="btn">{{ _('index.next_mapping') }}</button>
+        </div>
     </form>
 </div>
 

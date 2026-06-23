@@ -198,11 +198,11 @@
                 {% endif %}
             </div>
             {% elif current_user %}
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end;">
+            <div class="form-action-row">
                 <a href="/account/organization" class="btn">{{ _('results.complete_org') }}</a>
             </div>
             {% else %}
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end;">
+            <div class="form-action-row">
                 <a href="/login" class="btn">{{ _('results.login_export') }}</a>
                 <a href="/register" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.create_account') }}</a>
             </div>
@@ -322,11 +322,11 @@
 
     {% if saved_report_view %}
     {% elif can_export %}
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; margin-top: 1rem;">
+        <div class="form-action-row" style="margin-top: 1rem;">
             <a href="/mapping" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_mapping') }}</a>
         </div>
     {% else %}
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; margin-top: 1rem;">
+        <div class="form-action-row" style="margin-top: 1rem;">
             <a href="/clo-attainment" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.create_new') }}</a>
         </div>
     {% endif %}
