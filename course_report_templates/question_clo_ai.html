@@ -336,6 +336,7 @@
                 <div class="wizard-slide" data-question="{{ question }}">
                     {% if suggested %}
                         <input type="hidden" name="ai_suggested_clo_{{ question }}" value="{{ suggested.clo }}">
+                        <input type="hidden" name="ai_default_clo_{{ question }}" value="{{ suggested.clo }}">
                     {% endif %}
                     
                     <div class="section-title">{% if language == 'en' %}Question {{ loop.index }}{% else %}سؤال {{ loop.index }}{% endif %}</div>
@@ -450,6 +451,12 @@
             {{ question|tojson }}: {{ (metrics.ai_draft_clo_selections.get(question, []) if metrics.ai_draft_clo_selections else [])|tojson }},
         {% endfor %}
     };
+
+    const removedDefaults = {
+        {% for question in review_summary.needs_ai_questions %}
+            {{ question|tojson }}: {{ (true if metrics.ai_removed_clos and metrics.ai_removed_clos.get(question) else false)|tojson }},
+        {% endfor %}
+    };
     
     const selectedClos = {};
     const slides = document.querySelectorAll('.wizard-slide');
@@ -461,6 +468,8 @@
             selectedClos[q] = new Set();
             if (savedSelections[q] && savedSelections[q].length) {
                 savedSelections[q].forEach(clo => selectedClos[q].add(clo));
+            } else if (removedDefaults[q]) {
+                // User explicitly removed the AI default suggestion.
             } else if (initialSuggestions[q]) {
                 selectedClos[q].add(initialSuggestions[q]);
             }
@@ -501,6 +510,14 @@
             input.value = clo;
             hiddenContainer.appendChild(input);
         });
+
+        if (initialSuggestions[question] && !selectedClos[question].has(initialSuggestions[question])) {
+            const removedInput = document.createElement('input');
+            removedInput.type = 'hidden';
+            removedInput.name = `ai_removed_clo_${question}`;
+            removedInput.value = '1';
+            hiddenContainer.appendChild(removedInput);
+        }
     }
     
     window.removeClo = function(question, clo) {

@@ -49,7 +49,7 @@
                             {% for clo in selected_clos %}
                                 <input type="hidden" name="question_clo_{{ question }}" value="{{ clo|e }}">
                             {% endfor %}
-                            <strong>{{ _('mapping.question') }} {{ loop.index }}</strong>
+                            <strong>{% if language == 'en' %}Question {{ loop.index }}{% else %}&#1587;&#1572;&#1575;&#1604; {{ loop.index }}{% endif %}</strong>
                         </td>
                         <td>{{ question_type or '-' }}</td>
                         <td dir="{{ text_direction(question_text) }}" style="white-space: pre-wrap; text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</td>

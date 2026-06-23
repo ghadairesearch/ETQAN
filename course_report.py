@@ -6636,6 +6636,33 @@ def build_question_final_metrics_from_form(clos):
     metrics['total_questions'] = len(metrics['questions'])
     return metrics
 
+def merge_ai_default_clo_selections_from_form(metrics, clos):
+    metrics = dict(metrics or {})
+    mappings = dict(metrics.get('detected_clo_mappings') or {})
+    removed = dict(metrics.get('ai_removed_clos') or {})
+    suggested = dict(metrics.get('ai_suggested_clos') or {})
+    for question in metrics.get('questions') or []:
+        default_clo = (request.form.get(f'ai_default_clo_{question}') or '').strip()
+        if not default_clo:
+            continue
+        suggested.setdefault(question, default_clo)
+        if request.form.get(f'ai_removed_clo_{question}') == '1':
+            removed[question] = default_clo
+            continue
+        resolved_default = resolve_detected_clos_to_course_list([default_clo], clos)
+        if not resolved_default:
+            continue
+        current = list(mappings.get(question) or [])
+        for clo in resolved_default:
+            if clo not in current:
+                current.append(clo)
+        mappings[question] = current
+    metrics['detected_clo_mappings'] = mappings
+    metrics['ai_suggested_clos'] = suggested
+    if removed:
+        metrics['ai_removed_clos'] = removed
+    return metrics
+
 def build_ai_suggestions_for_unmapped(metrics, clos, review_summary):
     metrics = dict(metrics or {})
     unmapped_questions = list((review_summary or {}).get('needs_ai_questions') or [])
@@ -14157,7 +14184,10 @@ def question_clo_mapping_ai_back():
         flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
         return redirect(url_for('question_clo_mapping_service'))
 
-    form_metrics = build_question_final_metrics_from_form(clos)
+    form_metrics = merge_ai_default_clo_selections_from_form(
+        build_question_final_metrics_from_form(clos),
+        clos
+    )
     draft_metrics = dict(draft.get('metrics') or {})
     selections = {}
     for question in form_metrics.get('questions') or []:
@@ -14167,6 +14197,10 @@ def question_clo_mapping_ai_back():
     draft_metrics['ai_draft_clo_selections'] = selections
     if form_metrics.get('ai_suggested_clos'):
         draft_metrics['ai_suggested_clos'] = form_metrics.get('ai_suggested_clos')
+    if form_metrics.get('ai_removed_clos'):
+        draft_metrics['ai_removed_clos'] = form_metrics.get('ai_removed_clos')
+    else:
+        draft_metrics.pop('ai_removed_clos', None)
     draft['metrics'] = draft_metrics
     with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
         json.dump(draft, f, ensure_ascii=False)
@@ -14188,7 +14222,10 @@ def question_clo_mapping_ai_review_post():
         flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
         return redirect(url_for('question_clo_mapping_service'))
 
-    form_metrics = build_question_final_metrics_from_form(clos)
+    form_metrics = merge_ai_default_clo_selections_from_form(
+        build_question_final_metrics_from_form(clos),
+        clos
+    )
     if not form_metrics.get('questions'):
         flash(translate('question_mapping.no_questions'), "error")
         return redirect(url_for('question_clo_mapping_ai_get', draft_id=draft_id))
@@ -14202,6 +14239,10 @@ def question_clo_mapping_ai_review_post():
     }
     if form_metrics.get('ai_suggested_clos'):
         draft_metrics['ai_suggested_clos'] = form_metrics.get('ai_suggested_clos')
+    if form_metrics.get('ai_removed_clos'):
+        draft_metrics['ai_removed_clos'] = form_metrics.get('ai_removed_clos')
+    else:
+        draft_metrics.pop('ai_removed_clos', None)
     draft['metrics'] = draft_metrics
     with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
         json.dump(draft, f, ensure_ascii=False)
@@ -14285,7 +14326,10 @@ def question_clo_mapping_final():
         return redirect(url_for('question_clo_mapping_service'))
 
     draft_metrics = draft.get('metrics') or {}
-    metrics = build_question_final_metrics_from_form(clos)
+    metrics = merge_ai_default_clo_selections_from_form(
+        build_question_final_metrics_from_form(clos),
+        clos
+    )
     if not metrics.get('questions'):
         flash(translate('question_mapping.no_questions'), "error")
         return redirect(url_for('question_clo_mapping_service'))
