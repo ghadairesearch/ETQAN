@@ -144,17 +144,17 @@
                     <span class="question-review-count"><span id="aiRequiredCount">{{ summary.needs_ai }}</span> {{ _('question_mapping.ai_required_questions') }}</span>
                 </div>
             </div>
-            <table id="questionTable" class="question-review-table" style="min-width: 1080px;">
+            <table id="questionTable" class="question-review-table" style="width: 100%;">
                 <thead>
                     <tr>
-                        <th style="width: 110px;">{{ _('question_mapping.question_number') }}</th>
-                        <th style="width: 52%;">{{ _('question_mapping.question_text') }}</th>
-                        <th style="width: 96px;">{{ _('question_mapping.question_type') }}</th>
-                        <th style="width: 150px;">
+                        <th style="width: 80px;">{{ _('question_mapping.question_number') }}</th>
+                        <th>{{ _('question_mapping.question_text') }}</th>
+                        <th style="width: 110px;">{{ _('question_mapping.question_type') }}</th>
+                        <th style="width: 140px;">
                             {{ _('question_mapping.explicit_clo') }}
                         </th>
-                        <th style="width: 165px;">{{ _('question_mapping.status') }}</th>
-                        <th style="width: 70px;"></th>
+                        <th style="width: 150px;">{{ _('question_mapping.status') }}</th>
+                        <th style="width: 50px;"></th>
                     </tr>
                 </thead>
                 <tbody id="questionList">
