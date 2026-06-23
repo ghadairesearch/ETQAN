@@ -114,7 +114,7 @@
                         <a href="/reports/{{ report.id }}" style="color: var(--accent); font-weight: 700; text-decoration: underline;">{{ report.display_title }}</a>
                         <form id="rename-report-{{ report.id }}" class="report-rename-form" method="POST" action="/reports/{{ report.id }}/rename">
                             <input type="text" name="title" class="form-control" value="{{ report.display_title }}" placeholder="{{ _('history.rename_placeholder') }}" maxlength="160" required style="padding: 0.45rem;">
-                            <button type="submit" class="btn" style="padding: 0.45rem 0.75rem;">{{ _('history.rename_save') }}</button>
+                            <button type="submit" class="btn save-icon-button" aria-label="{{ _('history.rename_save') }}" title="{{ _('history.rename_save') }}">{% include "save_icon.html" %}</button>
                         </form>
                     </td>
                     <td>{{ report.course_name }}</td>

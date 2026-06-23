@@ -30,7 +30,7 @@
             <textarea name="plos" class="form-control" rows="9" placeholder="{{ _('programs.plos_help') }}" required>{{ draft.plos|default('', true) }}</textarea>
         </div>
 
-        <button type="submit" class="btn">{{ _('programs.save') }}</button>
+        <button type="submit" class="btn save-icon-button" aria-label="{{ _('programs.save') }}" title="{{ _('programs.save') }}">{% include "save_icon.html" %}</button>
     </form>
 </div>
 {% endblock %}

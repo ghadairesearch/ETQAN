@@ -10,9 +10,8 @@
         <div style="display: flex; gap: 0.5rem; align-items: center;">
             {% if is_draft %}
                 <form id="draft_save_form" method="POST" action="{{ url_for('save_course_report_draft_action', draft_id=report_id) }}" style="margin: 0;">
-                    <button type="submit" class="btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                        {{ _('question_mapping.save_mapping') }}
+                    <button type="submit" class="btn save-icon-button" aria-label="{{ _('question_mapping.save_mapping') }}" title="{{ _('question_mapping.save_mapping') }}">
+                        {% include "save_icon.html" %}
                     </button>
                 </form>
                 <div class="report-action-menu" data-auto-menu>
@@ -29,9 +28,8 @@
                     </div>
                 </div>
             {% else %}
-                <button type="button" class="btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; opacity: 0.8; cursor: default;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                    {{ _('question_mapping.save_mapping') }}
+                <button type="button" class="btn save-icon-button" aria-label="{{ _('question_mapping.save_mapping') }}" title="{{ _('question_mapping.save_mapping') }}" style="opacity: 0.8; cursor: default;">
+                    {% include "save_icon.html" %}
                 </button>
                 <div class="report-action-menu" data-auto-menu>
                     <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">

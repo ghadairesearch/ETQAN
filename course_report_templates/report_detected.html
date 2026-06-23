@@ -98,8 +98,10 @@
                 </tbody>
             </table>
 
-            <button type="submit" class="btn">{{ _('detected.save') }}</button>
-            <a href="/clo-attainment" class="btn" style="background: #6b7280; margin-left: 0.5rem;">{{ _('mapping.back') }}</a>
+            <div class="form-action-row">
+                <button type="submit" class="btn save-icon-button" aria-label="{{ _('detected.save') }}" title="{{ _('detected.save') }}">{% include "save_icon.html" %}</button>
+                <a href="/clo-attainment" class="btn" style="background: #6b7280;">{{ _('mapping.back') }}</a>
+            </div>
         </form>
     {% else %}
         <div class="alert">
