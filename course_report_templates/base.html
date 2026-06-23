@@ -418,6 +418,12 @@
             color: var(--danger);
         }
 
+        .alert-success {
+            background-color: rgba(36, 116, 95, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -869,7 +875,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert {% if category in ['error', 'danger'] %}alert-error{% endif %}">{{ localized_flash_message(message) }}</div>
+                    <div class="alert {% if category in ['error', 'danger'] %}alert-error{% elif category == 'success' %}alert-success{% endif %}">{{ localized_flash_message(message) }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}

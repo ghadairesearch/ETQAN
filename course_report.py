@@ -14615,17 +14615,13 @@ def question_clo_mapping_final():
         )
         new_exam_id = cursor.lastrowid
 
-    try:
-        os.remove(question_mapping_draft_path(draft_id))
-    except Exception:
-        pass
-
-    flash(translate('exams.saved'))
     if request.form.get('final_action') == 'export_word':
         return redirect(url_for('export_exam_docx', exam_id=new_exam_id))
     if request.form.get('final_action') == 'export_pdf':
         return redirect(url_for('export_exam_pdf', exam_id=new_exam_id))
-    return redirect(url_for('exam_view', exam_id=new_exam_id))
+    
+    flash(translate('exams.saved'), 'success')
+    return redirect(url_for('question_clo_mapping_final_review_get', draft_id=draft_id))
 
 @app.route('/question-clo-mapping/link/<draft_id>', methods=['GET'])
 def question_clo_mapping_link_get(draft_id):
