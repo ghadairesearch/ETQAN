@@ -551,6 +551,49 @@
             existing.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
 
+        const validationLanguage = {{ language|tojson }};
+        const validationMessages = {
+            default: {{ _('validation.complete_required')|tojson }},
+            select: {{ _('validation.select_item')|tojson }},
+            fill: {{ _('validation.fill_field')|tojson }},
+            file: {{ _('validation.select_file')|tojson }},
+            email: {{ _('validation.valid_email')|tojson }},
+            pattern: {{ _('validation.match_format')|tojson }},
+            number: {{ _('validation.number')|tojson }},
+            rangeUnderflow: {{ _('validation.range_underflow')|tojson }},
+            rangeOverflow: {{ _('validation.range_overflow')|tojson }},
+            tooShort: {{ _('validation.too_short')|tojson }},
+            tooLong: {{ _('validation.too_long')|tojson }},
+            stepMismatch: {{ _('validation.step_mismatch')|tojson }}
+        };
+
+        function localizedValidationMessage(message, field) {
+            if (validationLanguage !== 'ar') return message || validationMessages.default;
+            const validity = field && field.validity ? field.validity : null;
+            if (validity) {
+                if (validity.valueMissing) {
+                    if (field.tagName === 'SELECT') return validationMessages.select;
+                    if (field.type === 'file') return validationMessages.file;
+                    return validationMessages.fill;
+                }
+                if (validity.typeMismatch && field.type === 'email') return validationMessages.email;
+                if (validity.patternMismatch) return validationMessages.pattern;
+                if (validity.badInput) return validationMessages.number;
+                if (validity.rangeUnderflow) return validationMessages.rangeUnderflow;
+                if (validity.rangeOverflow) return validationMessages.rangeOverflow;
+                if (validity.tooShort) return validationMessages.tooShort;
+                if (validity.tooLong) return validationMessages.tooLong;
+                if (validity.stepMismatch) return validationMessages.stepMismatch;
+            }
+            const text = String(message || '').toLowerCase();
+            if (text.includes('select an item')) return validationMessages.select;
+            if (text.includes('fill out this field')) return validationMessages.fill;
+            if (text.includes('include an') || text.includes('email')) return validationMessages.email;
+            if (text.includes('match the requested format')) return validationMessages.pattern;
+            if (message && !/[A-Za-z]/.test(String(message))) return message;
+            return validationMessages.default;
+        }
+
         window.showValidationError = function(message, field) {
             const container = document.querySelector('.container');
             if (!container) return;
@@ -562,7 +605,7 @@
                 existing.setAttribute('role', 'alert');
                 container.insertBefore(existing, container.firstElementChild);
             }
-            existing.textContent = message || 'Please complete the required fields.';
+            existing.textContent = localizedValidationMessage(message, field);
             existing.scrollIntoView({ behavior: 'smooth', block: 'start' });
             if (field && typeof field.focus === 'function') {
                 window.setTimeout(function() {
@@ -596,7 +639,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert {% if category in ['error', 'danger'] %}alert-error{% endif %}">{{ message }}</div>
+                    <div class="alert {% if category in ['error', 'danger'] %}alert-error{% endif %}">{{ localized_flash_message(message) }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}

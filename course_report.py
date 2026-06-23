@@ -1089,6 +1089,19 @@ EN_TRANSLATIONS = {
     'checkout.expiry': 'Expiry Date',
     'checkout.cvv': 'CVV',
     'checkout.pay': 'Pay Now',
+    'validation.complete_required': 'Please complete the required fields.',
+    'validation.select_item': 'Please select an item in the list.',
+    'validation.fill_field': 'Please fill out this field.',
+    'validation.select_file': 'Please select a file.',
+    'validation.valid_email': 'Please enter a valid email address.',
+    'validation.match_format': 'Please match the requested format.',
+    'validation.number': 'Please enter a number.',
+    'validation.range_underflow': 'The value is too low.',
+    'validation.range_overflow': 'The value is too high.',
+    'validation.too_short': 'The value is too short.',
+    'validation.too_long': 'The value is too long.',
+    'validation.step_mismatch': 'Please enter a valid value.',
+    'validation.duplicate_course_report': 'This course report is already added.',
 }
 
 TRANSLATIONS = {
@@ -1697,6 +1710,22 @@ TRANSLATIONS['ar'].update({
     'mapping.method_continue': '\u0645\u062a\u0627\u0628\u0639\u0629',
 })
 
+TRANSLATIONS['ar'].update({
+    'validation.complete_required': '\u064a\u0631\u062c\u0649 \u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062d\u0642\u0648\u0644 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629.',
+    'validation.select_item': '\u064a\u0631\u062c\u0649 \u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0646\u0635\u0631 \u0645\u0646 \u0627\u0644\u0642\u0627\u0626\u0645\u0629.',
+    'validation.fill_field': '\u064a\u0631\u062c\u0649 \u062a\u0639\u0628\u0626\u0629 \u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644.',
+    'validation.select_file': '\u064a\u0631\u062c\u0649 \u0627\u062e\u062a\u064a\u0627\u0631 \u0645\u0644\u0641.',
+    'validation.valid_email': '\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0628\u0631\u064a\u062f \u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0635\u062d\u064a\u062d.',
+    'validation.match_format': '\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0642\u064a\u0645\u0629 \u0628\u0627\u0644\u0635\u064a\u063a\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629.',
+    'validation.number': '\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0631\u0642\u0645 \u0635\u062d\u064a\u062d.',
+    'validation.range_underflow': '\u0627\u0644\u0642\u064a\u0645\u0629 \u0623\u0642\u0644 \u0645\u0646 \u0627\u0644\u062d\u062f \u0627\u0644\u0645\u0633\u0645\u0648\u062d.',
+    'validation.range_overflow': '\u0627\u0644\u0642\u064a\u0645\u0629 \u0623\u0639\u0644\u0649 \u0645\u0646 \u0627\u0644\u062d\u062f \u0627\u0644\u0645\u0633\u0645\u0648\u062d.',
+    'validation.too_short': '\u0627\u0644\u0642\u064a\u0645\u0629 \u0642\u0635\u064a\u0631\u0629 \u062c\u062f\u0627\u064b.',
+    'validation.too_long': '\u0627\u0644\u0642\u064a\u0645\u0629 \u0637\u0648\u064a\u0644\u0629 \u062c\u062f\u0627\u064b.',
+    'validation.step_mismatch': '\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0642\u064a\u0645\u0629 \u0635\u062d\u064a\u062d\u0629.',
+    'validation.duplicate_course_report': '\u062a\u0645\u062a \u0625\u0636\u0627\u0641\u0629 \u062a\u0642\u0631\u064a\u0631 \u0647\u0630\u0627 \u0627\u0644\u0645\u0642\u0631\u0631 \u0645\u0633\u0628\u0642\u0627\u064b.',
+})
+
 SUPPORTED_LANGUAGES = {'en', 'ar'}
 
 def get_language():
@@ -1708,6 +1737,40 @@ def translate(key):
     if lang == 'en':
         return EN_TRANSLATIONS.get(key, key)
     return TRANSLATIONS.get(lang, {}).get(key, key)
+
+AR_FLASH_EXACT_TRANSLATIONS = {
+    'No course report file uploaded': '\u0644\u0645 \u064a\u062a\u0645 \u0631\u0641\u0639 \u0645\u0644\u0641 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
+    'No selected course report file': '\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0645\u0644\u0641 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
+    'Please upload a PDF, CSV, or Excel course report.': '\u064a\u0631\u062c\u0649 \u0631\u0641\u0639 \u062a\u0642\u0631\u064a\u0631 \u0645\u0642\u0631\u0631 \u0628\u0635\u064a\u063a\u0629 PDF \u0623\u0648 CSV \u0623\u0648 Excel.',
+    'Please enter an assessment name.': '\u064a\u0631\u062c\u0649 \u0625\u062f\u062e\u0627\u0644 \u0627\u0633\u0645 \u0627\u0644\u062a\u0642\u064a\u064a\u0645.',
+    'Please upload an assessment file.': '\u064a\u0631\u062c\u0649 \u0631\u0641\u0639 \u0645\u0644\u0641 \u0627\u0644\u062a\u0642\u064a\u064a\u0645.',
+    'Invalid file format. Please upload PDF, DOCX, TXT, CSV, or Excel.': '\u0635\u064a\u063a\u0629 \u0627\u0644\u0645\u0644\u0641 \u063a\u064a\u0631 \u0635\u062d\u064a\u062d\u0629. \u064a\u0631\u062c\u0649 \u0631\u0641\u0639 PDF \u0623\u0648 DOCX \u0623\u0648 TXT \u0623\u0648 CSV \u0623\u0648 Excel.',
+    'Course specification must be uploaded as a PDF or Word document (.docx).': '\u064a\u062c\u0628 \u0631\u0641\u0639 \u062a\u0648\u0635\u064a\u0641 \u0627\u0644\u0645\u0642\u0631\u0631 \u0628\u0635\u064a\u063a\u0629 PDF \u0623\u0648 Word (.docx).',
+    'No saved CLO attainment report was selected.': '\u0644\u0645 \u064a\u062a\u0645 \u062a\u062d\u062f\u064a\u062f \u0623\u064a \u062a\u0642\u0631\u064a\u0631 \u0645\u062d\u0641\u0648\u0638 \u0644\u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645.',
+    'Invalid question mapping draft.': '\u0645\u0633\u0648\u062f\u0629 \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u063a\u064a\u0631 \u0635\u062d\u064a\u062d\u0629.',
+    'Question mapping draft was not found.': '\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0645\u0633\u0648\u062f\u0629 \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629.',
+    'No CLOs were found for the selected course. Add or update the course through My Courses.': '\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0646\u0648\u0627\u062a\u062c \u062a\u0639\u0644\u0645 \u0644\u0644\u0645\u0642\u0631\u0631 \u0627\u0644\u0645\u062d\u062f\u062f. \u0623\u0636\u0641 \u0627\u0644\u0645\u0642\u0631\u0631 \u0623\u0648 \u062d\u062f\u062b\u0647 \u0645\u0646 \u0635\u0641\u062d\u0629 \u0645\u0642\u0631\u0631\u0627\u062a\u064a.',
+}
+
+AR_FLASH_PREFIX_TRANSLATIONS = {
+    'Could not read course specification:': '\u062a\u0639\u0630\u0631 \u0642\u0631\u0627\u0621\u0629 \u062a\u0648\u0635\u064a\u0641 \u0627\u0644\u0645\u0642\u0631\u0631:',
+    'Could not read course specification PDF:': '\u062a\u0639\u0630\u0631 \u0642\u0631\u0627\u0621\u0629 \u0645\u0644\u0641 PDF \u0644\u062a\u0648\u0635\u064a\u0641 \u0627\u0644\u0645\u0642\u0631\u0631:',
+    'Error reading exam paper:': '\u062d\u062f\u062b \u062e\u0637\u0623 \u0623\u062b\u0646\u0627\u0621 \u0642\u0631\u0627\u0621\u0629 \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631:',
+    'Error reading file:': '\u062d\u062f\u062b \u062e\u0637\u0623 \u0623\u062b\u0646\u0627\u0621 \u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0645\u0644\u0641:',
+    'A required file for the course report could not be found.': '\u062a\u0639\u0630\u0631 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0645\u0644\u0641 \u0645\u0637\u0644\u0648\u0628 \u0644\u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
+    'The saved report is missing required field:': '\u0627\u0644\u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u062d\u0641\u0648\u0638 \u064a\u0641\u062a\u0642\u062f \u062d\u0642\u0644\u0627\u064b \u0645\u0637\u0644\u0648\u0628\u0627\u064b:',
+}
+
+def localized_flash_message(message):
+    message = str(message or '')
+    if not has_request_context() or get_language() != 'ar':
+        return message
+    if message in AR_FLASH_EXACT_TRANSLATIONS:
+        return AR_FLASH_EXACT_TRANSLATIONS[message]
+    for prefix, translated_prefix in AR_FLASH_PREFIX_TRANSLATIONS.items():
+        if message.startswith(prefix):
+            return translated_prefix + message[len(prefix):]
+    return message
 
 def count_unit(kind, count):
     try:
@@ -2359,6 +2422,7 @@ def inject_global_template_data():
         'display_student_id': display_student_id,
         'text_direction': text_direction,
         'course_report_label': course_report_label,
+        'localized_flash_message': localized_flash_message,
     }
 
 def is_valid_hex_color(value):
@@ -14023,6 +14087,15 @@ def question_clo_mapping_map():
         flash(translate('question_mapping.no_questions'), "error")
         return redirect(url_for('question_clo_mapping_review_get', draft_id=draft_id))
 
+    previous_ai_selections = (draft.get('metrics') or {}).get('ai_draft_clo_selections') or {}
+    if previous_ai_selections:
+        current_questions = set(metrics.get('questions') or [])
+        metrics['ai_draft_clo_selections'] = {
+            question: values
+            for question, values in previous_ai_selections.items()
+            if question in current_questions and values
+        }
+
     if paper_detected_mappings:
         detected = dict(metrics.get('detected_clo_mappings') or {})
         detected.update(paper_detected_mappings)
@@ -14068,6 +14141,36 @@ def question_clo_mapping_ai_get(draft_id):
         filename=draft.get('filename') or '',
         draft_id=draft_id
     )
+
+@app.route('/question-clo-mapping/ai-back', methods=['POST'])
+def question_clo_mapping_ai_back():
+    draft_id = (request.form.get('draft_id') or '').strip()
+    try:
+        draft = load_question_mapping_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    course_name = (draft.get('course_name') or '').strip()
+    clos = get_course_clos(course_name)
+    if not clos:
+        flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
+        return redirect(url_for('question_clo_mapping_service'))
+
+    form_metrics = build_question_final_metrics_from_form(clos)
+    draft_metrics = dict(draft.get('metrics') or {})
+    selections = {}
+    for question in form_metrics.get('questions') or []:
+        selected = form_metrics.get('detected_clo_mappings', {}).get(question, [])
+        if selected:
+            selections[question] = selected
+    draft_metrics['ai_draft_clo_selections'] = selections
+    if form_metrics.get('ai_suggested_clos'):
+        draft_metrics['ai_suggested_clos'] = form_metrics.get('ai_suggested_clos')
+    draft['metrics'] = draft_metrics
+    with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
+        json.dump(draft, f, ensure_ascii=False)
+    return redirect(url_for('question_clo_mapping_review_get', draft_id=draft_id))
 
 
 

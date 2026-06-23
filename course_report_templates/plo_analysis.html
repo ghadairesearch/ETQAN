@@ -119,7 +119,7 @@
         
         if (document.getElementById('input_' + reportId)) {
             if (window.showValidationError) {
-                window.showValidationError('This course report is already added.', dropdown);
+                window.showValidationError({{ _('validation.duplicate_course_report')|tojson }}, dropdown);
             }
             return;
         }
