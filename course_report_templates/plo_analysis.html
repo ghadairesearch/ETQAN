@@ -118,7 +118,9 @@
         const date = selectedOption.getAttribute('data-date');
         
         if (document.getElementById('input_' + reportId)) {
-            alert('This course report is already added.');
+            if (window.showValidationError) {
+                window.showValidationError('This course report is already added.', dropdown);
+            }
             return;
         }
         

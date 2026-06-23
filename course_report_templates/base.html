@@ -550,6 +550,47 @@
             existing.textContent = message;
             existing.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
+
+        window.showValidationError = function(message, field) {
+            const container = document.querySelector('.container');
+            if (!container) return;
+            let existing = document.getElementById('global_validation_alert');
+            if (!existing) {
+                existing = document.createElement('div');
+                existing.id = 'global_validation_alert';
+                existing.className = 'alert alert-error';
+                existing.setAttribute('role', 'alert');
+                container.insertBefore(existing, container.firstElementChild);
+            }
+            existing.textContent = message || 'Please complete the required fields.';
+            existing.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (field && typeof field.focus === 'function') {
+                window.setTimeout(function() {
+                    try {
+                        field.focus({ preventScroll: true });
+                    } catch (error) {
+                        field.focus();
+                    }
+                }, 120);
+            }
+        };
+
+        document.addEventListener('invalid', function(event) {
+            const field = event.target;
+            if (!field || !field.form) return;
+            event.preventDefault();
+            const firstInvalid = field.form.querySelector(':invalid');
+            if (firstInvalid && firstInvalid !== field) return;
+            window.showValidationError(field.validationMessage, field);
+        }, true);
+
+        document.addEventListener('submit', function(event) {
+            const form = event.target;
+            if (!form || !form.checkValidity || form.checkValidity()) return;
+            event.preventDefault();
+            const field = form.querySelector(':invalid');
+            window.showValidationError(field ? field.validationMessage : '', field);
+        }, true);
     </script>
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}

@@ -367,6 +367,9 @@
                                     <div class="ai-alt-item">
                                         <span style="color: var(--text-muted);">○</span>
                                         <span>{{ alt.clo }}</span>
+                                        {% if alt.score is defined and alt.score is not none %}
+                                            <span class="ai-confidence-badge badge-low" style="font-size: 0.72rem; padding: 0.12rem 0.45rem;">{{ alt.score }}%</span>
+                                        {% endif %}
                                     </div>
                                 {% endfor %}
                             </div>

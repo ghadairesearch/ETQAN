@@ -19,6 +19,7 @@
     <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb; margin-bottom: 1.25rem;">
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="clo_plos_json" value='{{ draft_course.clo_plos_json|default("{}", true) }}'>
+            <input type="hidden" name="extraction_metadata_json" value='{{ draft_course.extraction_metadata_json|default("{}", true)|e }}'>
             <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; align-items: start;">
                 <section style="border: 1px solid var(--border-color); border-radius: 8px; background: #fff; padding: 1rem;">
                     <div class="form-group">

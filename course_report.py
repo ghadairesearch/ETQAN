@@ -20,6 +20,7 @@ import difflib
 import unicodedata
 import smtplib
 import ssl
+import time
 from email.message import EmailMessage
 from datetime import datetime, timedelta
 import pandas as pd
@@ -2133,6 +2134,7 @@ def init_postgres_db(conn):
             target_percentages_json TEXT NOT NULL,
             topics_json TEXT DEFAULT '[]',
             clo_plos_json TEXT DEFAULT '{}',
+            extraction_metadata_json TEXT DEFAULT '{}',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
             UNIQUE(user_id, display_name)
@@ -2142,7 +2144,8 @@ def init_postgres_db(conn):
         'college': "TEXT DEFAULT ''",
         'program': "TEXT DEFAULT ''",
         'topics_json': "TEXT DEFAULT '[]'",
-        'clo_plos_json': "TEXT DEFAULT '{}'"
+        'clo_plos_json': "TEXT DEFAULT '{}'",
+        'extraction_metadata_json': "TEXT DEFAULT '{}'"
     })
     conn.execute("""
         CREATE TABLE IF NOT EXISTS user_programs (
@@ -5677,15 +5680,30 @@ def extract_course_spec_from_pdf_layout(filepath, text=''):
 
 
 def extract_course_spec_document(filepath, filename=''):
+    extraction_start = time.perf_counter()
     file_ext = os.path.splitext(filename or filepath)[1].lower()
     if file_ext == '.docx':
         text = extract_docx_text(filepath)
         extracted = extract_course_spec_metadata(text, filename)
         extracted['extraction_method'] = 'local'
+        extracted['extraction_metadata'] = {
+            'task': 'course_specification_extraction',
+            'source': 'local',
+            'model': 'local-docx-parser',
+            'duration_seconds': elapsed_seconds(extraction_start),
+            'filename': filename or os.path.basename(filepath),
+        }
         return text, extracted
 
     gemini_extracted = extract_course_spec_with_gemini(filepath, filename)
     if gemini_extracted:
+        gemini_extracted.setdefault('extraction_metadata', {
+            'task': 'course_specification_extraction',
+            'source': 'gemini',
+            'model': GEMINI_MODEL,
+            'duration_seconds': elapsed_seconds(extraction_start),
+            'filename': filename or os.path.basename(filepath),
+        })
         return '', gemini_extracted
 
     text = extract_pdf_text(filepath, allow_ocr=False)
@@ -5700,6 +5718,13 @@ def extract_course_spec_document(filepath, filename=''):
     if course_spec_extraction_score(layout_extracted) > course_spec_extraction_score(extracted):
         extracted = layout_extracted
     extracted['extraction_method'] = 'local'
+    extracted['extraction_metadata'] = {
+        'task': 'course_specification_extraction',
+        'source': 'local',
+        'model': 'local-pdf-parser',
+        'duration_seconds': elapsed_seconds(extraction_start),
+        'filename': filename or os.path.basename(filepath),
+    }
     if extracted.get('course_name') and extracted.get('course_code') and extracted.get('clos'):
         return text, extracted
 
@@ -5707,9 +5732,24 @@ def extract_course_spec_document(filepath, filename=''):
     if compact_text(targeted_text):
         targeted_extracted = extract_course_spec_metadata(targeted_text, filename)
         targeted_extracted['extraction_method'] = 'local'
+        targeted_extracted['extraction_metadata'] = {
+            'task': 'course_specification_extraction',
+            'source': 'local',
+            'model': 'local-targeted-ocr-parser',
+            'duration_seconds': elapsed_seconds(extraction_start),
+            'filename': filename or os.path.basename(filepath),
+        }
         targeted_layout_extracted = extract_course_spec_from_pdf_layout(filepath, targeted_text)
         if course_spec_extraction_score(targeted_layout_extracted) > course_spec_extraction_score(targeted_extracted):
             targeted_extracted = targeted_layout_extracted
+            targeted_extracted['extraction_method'] = 'local'
+            targeted_extracted['extraction_metadata'] = {
+                'task': 'course_specification_extraction',
+                'source': 'local',
+                'model': 'local-targeted-layout-parser',
+                'duration_seconds': elapsed_seconds(extraction_start),
+                'filename': filename or os.path.basename(filepath),
+            }
         if course_spec_extraction_score(targeted_extracted) > course_spec_extraction_score(extracted):
             return targeted_text, targeted_extracted
     return text, extracted
@@ -5940,6 +5980,9 @@ def add_question_clo_diagnostic(metrics, provider, status, message):
     metrics['question_clo_diagnostics'] = diagnostics
     return metrics
 
+def elapsed_seconds(start_time):
+    return round(max(time.perf_counter() - start_time, 0), 3)
+
 def build_smart_clo_suggestions(metrics, clos, only_unmapped=False):
     metrics = metrics or {}
     clos = list(clos or [])
@@ -5947,12 +5990,14 @@ def build_smart_clo_suggestions(metrics, clos, only_unmapped=False):
     explicit_mappings = metrics.get('detected_clo_mappings') or {}
     suggestions = {}
     detected = dict(explicit_mappings)
+    mapping_metadata = dict(metrics.get('question_clo_mapping_metadata') or {})
     attempted = 0
 
     for question in metrics.get('questions') or []:
         if only_unmapped and detected.get(question):
             continue
         attempted += 1
+        question_start = time.perf_counter()
         question_text = question_texts.get(question) or question
         explicit_clos = set(resolve_detected_clos_to_course_list(explicit_mappings.get(question, []), clos))
         ranked = []
@@ -5975,9 +6020,16 @@ def build_smart_clo_suggestions(metrics, clos, only_unmapped=False):
             if chosen:
                 detected[question] = chosen
             suggestions[question] = ranked[:3]
+            mapping_metadata[question] = {
+                'source': 'local',
+                'model': 'local-semantic',
+                'duration_seconds': elapsed_seconds(question_start),
+                'confidence': ranked[0].get('score'),
+            }
 
     metrics['smart_clo_suggestions'] = suggestions
     metrics['detected_clo_mappings'] = detected
+    metrics['question_clo_mapping_metadata'] = mapping_metadata
     if suggestions and not metrics.get('question_clo_suggestion_source'):
         metrics['question_clo_suggestion_source'] = 'local'
     if attempted:
@@ -6072,6 +6124,7 @@ def parse_exam_paper_with_gemini(filepath):
     text = extract_exam_text_for_ai(filepath)
     if not compact_text(text):
         return {}
+    extraction_start = time.perf_counter()
     payload = {
         'exam_text': text[:60000],
     }
@@ -6082,6 +6135,8 @@ def parse_exam_paper_with_gemini(filepath):
     )
     metrics = normalize_gemini_exam_metrics(parsed)
     if metrics:
+        metrics['question_extraction_model'] = GEMINI_MODEL
+        metrics['question_extraction_duration_seconds'] = elapsed_seconds(extraction_start)
         return metrics
     return {}
 
@@ -6091,6 +6146,7 @@ def parse_exam_paper_with_qwen(filepath):
     text = extract_exam_text_for_ai(filepath)
     if not compact_text(text):
         return {}
+    extraction_start = time.perf_counter()
     parsed, error = call_groq_json_with_error(
         "You extract exam questions from exam papers. Return valid JSON only.",
         gemini_exam_question_extraction_prompt()
@@ -6103,6 +6159,8 @@ def parse_exam_paper_with_qwen(filepath):
         return {}
     metrics = normalize_gemini_exam_metrics(parsed, source='qwen', confidence='Qwen')
     if metrics:
+        metrics['question_extraction_model'] = GROQ_MODEL
+        metrics['question_extraction_duration_seconds'] = elapsed_seconds(extraction_start)
         return metrics
     return {}
 
@@ -6119,7 +6177,7 @@ def gemini_question_clo_prompt():
     )
 
 
-def apply_llm_question_clo_mappings(metrics, clos, parsed, source, reason_fallback):
+def apply_llm_question_clo_mappings(metrics, clos, parsed, source, reason_fallback, source_model=None, duration_seconds=None):
     metrics = dict(metrics or {})
     questions = list(metrics.get('questions') or [])
     mappings = parsed.get('mappings') if isinstance(parsed, dict) else []
@@ -6128,6 +6186,7 @@ def apply_llm_question_clo_mappings(metrics, clos, parsed, source, reason_fallba
 
     detected = dict(metrics.get('detected_clo_mappings') or {})
     suggestions = dict(metrics.get('smart_clo_suggestions') or {})
+    mapping_metadata = dict(metrics.get('question_clo_mapping_metadata') or {})
     mapped_count = 0
     question_lookup = {str(question): str(question) for question in questions}
     question_lookup.update({str(question).upper(): str(question) for question in questions})
@@ -6163,11 +6222,18 @@ def apply_llm_question_clo_mappings(metrics, clos, parsed, source, reason_fallba
             }
             for clo in resolved[:3]
         ]
+        mapping_metadata[question] = {
+            'source': source,
+            'model': source_model or source,
+            'duration_seconds': duration_seconds,
+            'confidence': round(max(0, min(confidence_score, 100)), 2),
+        }
         mapped_count += 1
 
     if mapped_count:
         metrics['detected_clo_mappings'] = detected
         metrics['smart_clo_suggestions'] = suggestions
+        metrics['question_clo_mapping_metadata'] = mapping_metadata
         metrics['question_clo_suggestion_source'] = source
     return metrics
 
@@ -6199,6 +6265,7 @@ def build_qwen_question_clo_suggestions(metrics, clos):
     if not question_items or not clo_items:
         metrics = add_question_clo_diagnostic(metrics, 'Qwen', 'skipped', 'No question text or valid CLO codes were available for Qwen.')
         return metrics
+    provider_start = time.perf_counter()
     parsed, error = call_groq_json_with_error(
         "You map exam questions to Course Learning Outcomes. Return valid JSON only.",
         gemini_question_clo_prompt()
@@ -6211,13 +6278,14 @@ def build_qwen_question_clo_suggestions(metrics, clos):
             ensure_ascii=False
         )
     )
+    duration = elapsed_seconds(provider_start)
     if error:
-        return add_question_clo_diagnostic(metrics, 'Qwen', 'failed', error)
-    mapped_metrics = apply_llm_question_clo_mappings(metrics, clos, parsed, 'qwen', 'Qwen via Groq')
+        return add_question_clo_diagnostic(metrics, 'Qwen', 'failed', f"{error} ({duration}s)")
+    mapped_metrics = apply_llm_question_clo_mappings(metrics, clos, parsed, 'qwen', 'Qwen via Groq', GROQ_MODEL, duration)
     if mapped_metrics.get('question_clo_suggestion_source') == 'qwen':
         mapped_count = len(mapped_metrics.get('smart_clo_suggestions') or {})
-        return add_question_clo_diagnostic(mapped_metrics, 'Qwen', 'success', f"Qwen produced valid CLO suggestions for {mapped_count} question(s).")
-    return add_question_clo_diagnostic(metrics, 'Qwen', 'failed', 'Qwen returned JSON, but no mappings matched the available course CLOs.')
+        return add_question_clo_diagnostic(mapped_metrics, 'Qwen', 'success', f"Qwen produced valid CLO suggestions for {mapped_count} question(s) using {GROQ_MODEL} in {duration}s.")
+    return add_question_clo_diagnostic(metrics, 'Qwen', 'failed', f"Qwen returned JSON, but no mappings matched the available course CLOs. ({duration}s)")
 
 
 def build_gemini_question_clo_suggestions(metrics, clos):
@@ -6236,6 +6304,7 @@ def build_gemini_question_clo_suggestions(metrics, clos):
         metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'skipped', 'No question text or valid CLO codes were available for Gemini.')
         return metrics
 
+    provider_start = time.perf_counter()
     try:
         payload = {
             'contents': [
@@ -6277,14 +6346,17 @@ def build_gemini_question_clo_suggestions(metrics, clos):
         with urllib.request.urlopen(gemini_request, timeout=90) as response:
             gemini_payload = json.loads(response.read().decode('utf-8'))
     except urllib.error.HTTPError as exc:
+        duration = elapsed_seconds(provider_start)
         body = exc.read().decode('utf-8', errors='replace')
         app.logger.warning("Gemini question-CLO mapping failed with HTTP %s: %s", exc.code, body[:800])
-        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', f"HTTP {exc.code}: {body[:500]}")
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', f"HTTP {exc.code}: {body[:500]} ({duration}s)")
         return build_qwen_question_clo_suggestions(metrics, clos)
     except Exception as exc:
+        duration = elapsed_seconds(provider_start)
         app.logger.warning("Gemini question-CLO mapping failed: %s", exc)
-        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', str(exc))
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', f"{exc} ({duration}s)")
         return build_qwen_question_clo_suggestions(metrics, clos)
+    duration = elapsed_seconds(provider_start)
 
     response_text = ''
     for candidate in gemini_payload.get('candidates') or []:
@@ -6294,21 +6366,22 @@ def build_gemini_question_clo_suggestions(metrics, clos):
 
     parsed = parse_gemini_json_response(response_text)
     if not isinstance(parsed, dict):
-        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', 'Gemini returned a response, but it was not valid JSON.')
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', f"Gemini returned a response, but it was not valid JSON. ({duration}s)")
         return build_qwen_question_clo_suggestions(metrics, clos)
     mappings = parsed.get('mappings')
     if not isinstance(mappings, list):
-        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', 'Gemini returned a response, but it did not contain a valid mappings list.')
+        metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', f"Gemini returned a response, but it did not contain a valid mappings list. ({duration}s)")
         return build_qwen_question_clo_suggestions(metrics, clos)
-    mapped_metrics = apply_llm_question_clo_mappings(metrics, clos, parsed, 'gemini', 'Gemini Flash')
+    mapped_metrics = apply_llm_question_clo_mappings(metrics, clos, parsed, 'gemini', 'Gemini Flash', GEMINI_MODEL, duration)
     if mapped_metrics.get('question_clo_suggestion_source') == 'gemini':
         mapped_count = len(mapped_metrics.get('smart_clo_suggestions') or {})
-        mapped_metrics = add_question_clo_diagnostic(mapped_metrics, 'Gemini', 'success', f"Gemini produced valid CLO suggestions for {mapped_count} question(s).")
+        mapped_metrics = add_question_clo_diagnostic(mapped_metrics, 'Gemini', 'success', f"Gemini produced valid CLO suggestions for {mapped_count} question(s) using {GEMINI_MODEL} in {duration}s.")
         return mapped_metrics
-    metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', 'Gemini returned JSON, but no mappings matched the available course CLOs.')
+    metrics = add_question_clo_diagnostic(metrics, 'Gemini', 'failed', f"Gemini returned JSON, but no mappings matched the available course CLOs. ({duration}s)")
     return build_qwen_question_clo_suggestions(metrics, clos)
 
 def parse_exam_paper_with_module(filepath):
+    extraction_start = time.perf_counter()
     try:
         from exam_parser import ExamParser
         parser = ExamParser(filepath)
@@ -6340,7 +6413,10 @@ def parse_exam_paper_with_module(filepath):
             'text_sample': (parser.raw_text[:150] + '...') if hasattr(parser, 'raw_text') else '',
             'question_texts': question_texts,
             'question_types': question_types,
-            'detected_clo_mappings': detected_clo_mappings
+            'detected_clo_mappings': detected_clo_mappings,
+            'question_extraction_source': 'local',
+            'question_extraction_model': 'ExamParser',
+            'question_extraction_duration_seconds': elapsed_seconds(extraction_start)
         }
     except Exception as e:
         import traceback
@@ -6517,6 +6593,7 @@ def build_ai_suggestions_for_unmapped(metrics, clos, review_summary):
 
     merged = dict(metrics)
     merged['smart_clo_suggestions'] = dict(ai_metrics.get('smart_clo_suggestions') or {})
+    merged['question_clo_mapping_metadata'] = dict(ai_metrics.get('question_clo_mapping_metadata') or {})
     merged['question_clo_diagnostics'] = list(ai_metrics.get('question_clo_diagnostics') or [])
     if ai_metrics.get('question_clo_suggestion_source'):
         merged['question_clo_suggestion_source'] = ai_metrics.get('question_clo_suggestion_source')
@@ -12375,6 +12452,7 @@ def new_course():
         clos = parse_pasted_clos(request.form.get('clos'))
         topics = parse_course_topic_lines(request.form.get('topics'))
         clo_plos = parse_clo_plos_json(request.form.get('clo_plos_json'))
+        extraction_metadata = safe_json_loads(request.form.get('extraction_metadata_json'), {}) or {}
         row_clos, row_clo_plos = parse_course_clo_rows(request.form)
         if row_clos:
             clos = row_clos
@@ -12391,6 +12469,13 @@ def new_course():
             spec_file.save(spec_filepath)
             try:
                 spec_text, extracted = extract_course_spec_document(spec_filepath, spec_file.filename)
+                extraction_metadata = extracted.get('extraction_metadata') or {
+                    'task': 'course_specification_extraction',
+                    'source': extracted.get('extraction_method') or 'unknown',
+                    'model': '',
+                    'duration_seconds': None,
+                    'filename': spec_file.filename,
+                }
             except Exception as e:
                 flash(f"Could not read course specification: {e}", "error")
                 return redirect(request.url)
@@ -12440,6 +12525,7 @@ def new_course():
                 'clos_text': "\n".join(clos),
                 'topics_text': format_course_topics_text(topics),
                 'clo_plos_json': json.dumps(clo_plos, ensure_ascii=False),
+                'extraction_metadata_json': json.dumps(extraction_metadata, ensure_ascii=False),
                 'clo_rows': build_course_clo_rows(clos, clo_plos)
             }
             return render_template(
@@ -12483,6 +12569,7 @@ def new_course():
                            target_percentages_json = ?,
                            topics_json = ?,
                            clo_plos_json = ?,
+                           extraction_metadata_json = ?,
                            updated_at = ?
                      WHERE id = ? AND user_id = ?
                     """,
@@ -12496,6 +12583,7 @@ def new_course():
                         json.dumps(target_percentages, ensure_ascii=False),
                         json.dumps(topics, ensure_ascii=False),
                         json.dumps(clo_plos, ensure_ascii=False),
+                        json.dumps(extraction_metadata, ensure_ascii=False),
                         now,
                         existing['id'],
                         user['id']
@@ -12505,8 +12593,8 @@ def new_course():
                 conn.execute(
                     """
                     INSERT INTO user_courses
-                        (user_id, display_name, course_name, course_code, college, department, program, clos_json, target_percentages_json, topics_json, clo_plos_json, created_at, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        (user_id, display_name, course_name, course_code, college, department, program, clos_json, target_percentages_json, topics_json, clo_plos_json, extraction_metadata_json, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         user['id'],
@@ -12520,6 +12608,7 @@ def new_course():
                         json.dumps(target_percentages, ensure_ascii=False),
                         json.dumps(topics, ensure_ascii=False),
                         json.dumps(clo_plos, ensure_ascii=False),
+                        json.dumps(extraction_metadata, ensure_ascii=False),
                         now,
                         now
                     )
@@ -12556,6 +12645,7 @@ def edit_course(course_id):
         'department': existing['department'] or '',
         'program': existing['program'] or '',
     }
+    draft_course['extraction_metadata_json'] = row_get(existing, 'extraction_metadata_json') or '{}'
 
     existing_clo_plos = {}
     try:
@@ -12596,6 +12686,7 @@ def edit_course(course_id):
         clos = parse_pasted_clos(request.form.get('clos'))
         topics = parse_course_topic_lines(request.form.get('topics'))
         clo_plos = parse_clo_plos_json(request.form.get('clo_plos_json'))
+        extraction_metadata = safe_json_loads(request.form.get('extraction_metadata_json'), {}) or {}
         row_clos, row_clo_plos = parse_course_clo_rows(request.form)
         if row_clos:
             clos = row_clos
@@ -12612,6 +12703,13 @@ def edit_course(course_id):
             spec_file.save(spec_filepath)
             try:
                 spec_text, extracted = extract_course_spec_document(spec_filepath, spec_file.filename)
+                extraction_metadata = extracted.get('extraction_metadata') or {
+                    'task': 'course_specification_extraction',
+                    'source': extracted.get('extraction_method') or 'unknown',
+                    'model': '',
+                    'duration_seconds': None,
+                    'filename': spec_file.filename,
+                }
             except Exception as e:
                 flash(f"Could not read course specification: {e}", "error")
                 return redirect(request.url)
@@ -12661,6 +12759,7 @@ def edit_course(course_id):
                 'clos_text': "\n".join(clos),
                 'topics_text': format_course_topics_text(topics),
                 'clo_plos_json': json.dumps(clo_plos, ensure_ascii=False),
+                'extraction_metadata_json': json.dumps(extraction_metadata, ensure_ascii=False),
                 'clo_rows': build_course_clo_rows(clos, clo_plos)
             }
             return render_template('course_edit.html', draft_course=draft_course)
@@ -12684,6 +12783,7 @@ def edit_course(course_id):
                        clos_json = ?,
                        topics_json = ?,
                        clo_plos_json = ?,
+                       extraction_metadata_json = ?,
                        updated_at = ?
                  WHERE id = ? AND user_id = ?
                 """,
@@ -12697,6 +12797,7 @@ def edit_course(course_id):
                     json.dumps(clos, ensure_ascii=False),
                     json.dumps(topics, ensure_ascii=False),
                     json.dumps(clo_plos, ensure_ascii=False),
+                    json.dumps(extraction_metadata, ensure_ascii=False),
                     now,
                     course_id,
                     user['id']
@@ -13284,6 +13385,11 @@ def save_question_clos():
             'text': (request.form.get(f'question_text_{question}') or '').strip(),
             'type': (request.form.get(f'question_type_{question}') or '').strip(),
             'clos': clos,
+            'mapping_source': 'manual',
+            'mapping_model': '',
+            'mapping_duration_seconds': None,
+            'mapping_confidence': None,
+            'mapping_metadata': {'source': 'manual'},
         })
 
     created_at = datetime.now().strftime('%Y-%m-%d %H:%M')
@@ -13292,6 +13398,8 @@ def save_question_clos():
         'course_name': course_name,
         'filename': filename,
         'questions': cleaned_questions,
+        'question_extraction': {},
+        'ai_mapping': {'source': 'manual', 'diagnostics': []},
         'created_at': created_at,
     }
     with get_db() as conn:
@@ -14009,12 +14117,37 @@ def question_clo_mapping_final():
         flash("No CLOs were found for the selected course. Add or update the course through My Courses.", "error")
         return redirect(url_for('question_clo_mapping_service'))
 
+    draft_metrics = draft.get('metrics') or {}
     metrics = build_question_final_metrics_from_form(clos)
     if not metrics.get('questions'):
         flash(translate('question_mapping.no_questions'), "error")
         return redirect(url_for('question_clo_mapping_service'))
 
     filename = draft.get('filename') or ''
+    question_mapping_metadata = draft_metrics.get('question_clo_mapping_metadata') or {}
+    question_suggestions = draft_metrics.get('smart_clo_suggestions') or {}
+    extraction_metadata = {
+        'source': draft_metrics.get('question_extraction_source') or '',
+        'model': draft_metrics.get('question_extraction_model') or '',
+        'duration_seconds': draft_metrics.get('question_extraction_duration_seconds'),
+    }
+    mapping_source = draft_metrics.get('question_clo_suggestion_source') or ''
+    mapping_model = {
+        'gemini': GEMINI_MODEL,
+        'qwen': GROQ_MODEL,
+        'local': 'local-semantic',
+    }.get(mapping_source, '')
+    mapping_durations = [
+        item.get('duration_seconds')
+        for item in question_mapping_metadata.values()
+        if isinstance(item, dict) and item.get('duration_seconds') is not None
+    ]
+    ai_mapping_summary = {
+        'source': mapping_source,
+        'model': mapping_model,
+        'duration_seconds': round(sum(float(value or 0) for value in mapping_durations), 3) if mapping_durations else None,
+        'diagnostics': draft_metrics.get('question_clo_diagnostics') or [],
+    }
     cleaned_questions = []
     seen_questions = set()
     for question in metrics.get('questions', []):
@@ -14027,6 +14160,21 @@ def question_clo_mapping_final():
         q_text = metrics.get('question_texts', {}).get(question, '')
         q_type = metrics.get('question_types', {}).get(question, '')
         q_ai_suggested = metrics.get('ai_suggested_clos', {}).get(question)
+        mapping_meta = dict(question_mapping_metadata.get(question) or {})
+        if q_ai_suggested and not mapping_meta:
+            suggested_item = next(
+                (
+                    item for item in question_suggestions.get(question, [])
+                    if item.get('clo') == q_ai_suggested
+                ),
+                {}
+            )
+            mapping_meta = {
+                'source': draft_metrics.get('question_clo_suggestion_source') or '',
+                'model': '',
+                'duration_seconds': None,
+                'confidence': suggested_item.get('score'),
+            }
         
         cleaned_questions.append({
             'question': question,
@@ -14034,6 +14182,11 @@ def question_clo_mapping_final():
             'type': q_type,
             'clos': q_clos,
             'ai_suggested_clo': q_ai_suggested,
+            'mapping_source': mapping_meta.get('source') or ('manual' if q_clos else ''),
+            'mapping_model': mapping_meta.get('model') or '',
+            'mapping_duration_seconds': mapping_meta.get('duration_seconds'),
+            'mapping_confidence': mapping_meta.get('confidence'),
+            'mapping_metadata': mapping_meta,
         })
 
     created_at = datetime.now().strftime('%Y-%m-%d %H:%M')
@@ -14042,6 +14195,8 @@ def question_clo_mapping_final():
         'course_name': course_name,
         'filename': filename,
         'questions': cleaned_questions,
+        'question_extraction': extraction_metadata,
+        'ai_mapping': ai_mapping_summary,
         'created_at': created_at,
     }
 
