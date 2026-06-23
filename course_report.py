@@ -6663,6 +6663,40 @@ def merge_ai_default_clo_selections_from_form(metrics, clos):
         metrics['ai_removed_clos'] = removed
     return metrics
 
+def ensure_final_review_clo_selections(metrics, draft_metrics, clos):
+    metrics = dict(metrics or {})
+    draft_metrics = dict(draft_metrics or {})
+    mappings = {
+        question: list(values or [])
+        for question, values in (metrics.get('detected_clo_mappings') or {}).items()
+    }
+    suggested = dict(draft_metrics.get('ai_suggested_clos') or {})
+    suggested.update(metrics.get('ai_suggested_clos') or {})
+    removed = dict(draft_metrics.get('ai_removed_clos') or {})
+    removed.update(metrics.get('ai_removed_clos') or {})
+    draft_selections = draft_metrics.get('ai_draft_clo_selections') or {}
+    draft_detected = draft_metrics.get('detected_clo_mappings') or {}
+
+    for question in metrics.get('questions') or []:
+        current = list(resolve_detected_clos_to_course_list(mappings.get(question, []), clos))
+        fallback_values = []
+        fallback_values.extend(draft_selections.get(question) or [])
+        fallback_values.extend(draft_detected.get(question) or [])
+        if not removed.get(question) and suggested.get(question):
+            fallback_values.append(suggested.get(question))
+        for clo in resolve_detected_clos_to_course_list(fallback_values, clos):
+            if clo not in current:
+                current.append(clo)
+        if current:
+            mappings[question] = current
+
+    metrics['detected_clo_mappings'] = mappings
+    if suggested:
+        metrics['ai_suggested_clos'] = suggested
+    if removed:
+        metrics['ai_removed_clos'] = removed
+    return metrics
+
 def build_ai_suggestions_for_unmapped(metrics, clos, review_summary):
     metrics = dict(metrics or {})
     unmapped_questions = list((review_summary or {}).get('needs_ai_questions') or [])
@@ -14373,6 +14407,7 @@ def question_clo_mapping_final_review_get(draft_id):
     metrics = draft_metrics.get('final_review_metrics') or {}
     if not metrics.get('questions'):
         return redirect(url_for('question_clo_mapping_ai_get', draft_id=draft_id))
+    metrics = ensure_final_review_clo_selections(metrics, draft_metrics, clos)
 
     return render_template(
         'question_clo_final_review.html',

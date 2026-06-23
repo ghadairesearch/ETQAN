@@ -56,7 +56,7 @@
                         <td>
                             {% if selected_clos %}
                                 {% for clo in selected_clos %}
-                                    <span class="clo-review-badge">{{ clo.split(' ')[0] }}</span>
+                                    <span class="clo-review-badge">{{ clo }}</span>
                                 {% endfor %}
                             {% else %}
                                 <span style="color: var(--text-muted);">-</span>
