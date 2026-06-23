@@ -11418,6 +11418,76 @@ def build_generated_course_report_docx(stats, course_report_inputs=None, course_
     output.seek(0)
     return output.getvalue()
 
+def build_simple_word_document(body_elements):
+    root = word_element('document')
+    body = word_element('body')
+    root.append(body)
+    for element in body_elements:
+        body.append(element)
+    body.append(word_element('sectPr'))
+    document_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
+
+    output = io.BytesIO()
+    with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED) as docx:
+        docx.writestr('[Content_Types].xml', '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>''')
+        docx.writestr('_rels/.rels', '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>''')
+        docx.writestr('word/document.xml', document_xml)
+    output.seek(0)
+    return output.getvalue()
+
+def build_clo_results_docx(stats, total_students=0, course_info=None, student_achievement_matrix=None):
+    language = get_export_report_language() if has_request_context() else 'en'
+    course_info = course_info or {}
+    title = '\u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645' if language == 'ar' else 'CLO Attainment Report'
+    course_label = '\u0627\u0644\u0645\u0642\u0631\u0631' if language == 'ar' else 'Course'
+    total_label = '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0637\u0644\u0627\u0628' if language == 'ar' else 'Total Students'
+    course_name = course_info.get('course_name') or course_info.get('raw_name') or ''
+    course_id = course_info.get('course_id') or course_info.get('course_code') or ''
+    course_text = f"{course_name} ({course_id})" if course_name and course_id else (course_name or course_id or '-')
+    elements = [
+        word_paragraph(title, bold=True),
+        word_paragraph(f"{course_label}: {course_text}"),
+        word_paragraph(f"{total_label}: {total_students or 0}"),
+        build_clo_assessment_word_table(stats or {}, course_info, language),
+    ]
+    return build_simple_word_document(elements)
+
+def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
+    payload = payload or {}
+    language = get_export_report_language() if has_request_context() else 'en'
+    report_title = title or ('\u062a\u0642\u0631\u064a\u0631 \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629' if language == 'ar' else 'Question CLO Mapping')
+    course_label = '\u0627\u0644\u0645\u0642\u0631\u0631' if language == 'ar' else 'Course'
+    source_label = '\u0627\u0644\u0645\u0635\u062f\u0631' if language == 'ar' else 'Source'
+    type_label = '\u0646\u0648\u0639 \u0627\u0644\u0633\u0624\u0627\u0644' if language == 'ar' else 'Question Type'
+    question_label = '\u0627\u0644\u0633\u0624\u0627\u0644' if language == 'ar' else 'Question'
+    text_label = '\u0646\u0635 \u0627\u0644\u0633\u0624\u0627\u0644' if language == 'ar' else 'Question Text'
+    clo_label = '\u0646\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645' if language == 'ar' else 'Mapped CLOs'
+    elements = [word_paragraph(report_title, bold=True)]
+    if course_name:
+        elements.append(word_paragraph(f"{course_label}: {course_name}"))
+    if filename:
+        elements.append(word_paragraph(f"{source_label}: {filename}"))
+    table = word_element('tbl')
+    table.append(word_row([question_label, type_label, text_label, clo_label], header=True))
+    for index, item in enumerate(payload.get('questions') or [], start=1):
+        clos = ', '.join(clo_number(clo) or str(clo or '') for clo in item.get('clos') or [])
+        table.append(word_row([
+            f"{question_label} {index}",
+            item.get('type') or '-',
+            item.get('text') or '',
+            clos or '-',
+        ]))
+    elements.append(table)
+    return build_simple_word_document(elements)
+
 def build_course_report_docx(stats, course_report_inputs=None, course_info=None, total_students=None):
     template_path = COURSE_REPORT_TEMPLATE_PATH_AR if get_export_report_language() == 'ar' else COURSE_REPORT_TEMPLATE_PATH_EN
     if os.path.exists(template_path):
@@ -11491,13 +11561,19 @@ def read_course_report_export_inputs(redirect_url, stats=None, course_info=None,
     course_report_inputs['ai_source'] = ai_insights.get('source') or 'fallback'
     return course_report_inputs, None
 
-def course_report_docx_response(docx_bytes):
+def docx_response(docx_bytes, filename="report.docx"):
     response = Response(
         docx_bytes,
         mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
-    response.headers["Content-Disposition"] = 'attachment; filename="course_report_filled.docx"'
+    safe_name = secure_filename(filename) or "report.docx"
+    if not safe_name.lower().endswith('.docx'):
+        safe_name += '.docx'
+    response.headers["Content-Disposition"] = f'attachment; filename="{safe_name}"'
     return response
+
+def course_report_docx_response(docx_bytes):
+    return docx_response(docx_bytes, "course_report_filled.docx")
 
 def build_course_report_pdf(stats, course_report_inputs=None, course_info=None, total_students=None):
     from xml.sax.saxutils import escape
@@ -13072,7 +13148,7 @@ def report_detail(report_id):
         saved_report_view=True,
         is_saved=True,
         show_course_report_export=False,
-        export_csv_url=url_for('export_saved_report_csv', report_id=report_id),
+        export_word_url=url_for('export_saved_course_report_word', report_id=report_id),
         export_pdf_url=url_for('export_saved_report_pdf', report_id=report_id),
         delete_report_url=url_for('delete_saved_report', report_id=report_id),
         clo_definitions=build_clo_definitions((payload.get('stats') or {}).keys()),
@@ -13134,20 +13210,26 @@ def export_saved_course_report_word(report_id):
     if not row:
         flash("Report not found.", "error")
         return redirect(url_for('reports'))
-    if payload.get('report_type') != 'course_report':
-        flash("This report is not a course report.", "error")
-        return redirect(url_for('reports'))
-    try:
-        docx_bytes = build_course_report_docx(
-            payload.get('stats') or {},
-            payload.get('course_report_inputs') or {},
-            payload.get('course_info') or {},
-            payload.get('total_students') or None
-        )
-    except ValueError as e:
-        flash(str(e), "error")
-        return redirect(url_for('reports'))
-    return course_report_docx_response(docx_bytes)
+    if payload.get('report_type') == 'course_report':
+        try:
+            docx_bytes = build_course_report_docx(
+                payload.get('stats') or {},
+                payload.get('course_report_inputs') or {},
+                payload.get('course_info') or {},
+                payload.get('total_students') or None
+            )
+        except ValueError as e:
+            flash(str(e), "error")
+            return redirect(url_for('reports'))
+        return course_report_docx_response(docx_bytes)
+
+    docx_bytes = build_clo_results_docx(
+        payload.get('stats') or {},
+        payload.get('total_students') or 0,
+        payload.get('course_info') or {},
+        payload.get('student_achievement_matrix') or {}
+    )
+    return docx_response(docx_bytes, "clo_attainment_report.docx")
 
 @app.route('/reports/<int:report_id>/export/course-report/pdf')
 def export_saved_course_report_pdf(report_id):
@@ -13633,6 +13715,30 @@ def export_exam_pdf(exam_id):
     filename = secure_filename(f"{exam['title']}_mapping.pdf")
     response.headers["Content-Disposition"] = f"attachment; filename={filename}"
     return response
+
+@app.route('/account/exams/<int:exam_id>/export/docx')
+def export_exam_docx(exam_id):
+    user = current_user()
+    if not user:
+        flash(translate('courses.login_required'), "error")
+        return redirect(url_for('login'))
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT id, title, course_name, filename, payload_json, created_at FROM saved_exams WHERE id = ? AND user_id = ?",
+            (exam_id, user['id'])
+        ).fetchone()
+    if not row:
+        flash("Exam not found.", "error")
+        return redirect(url_for('my_exams'))
+
+    payload = safe_json_loads(row_get(row, 'payload_json'), {}) or {}
+    docx_bytes = build_exam_mapping_docx(
+        payload,
+        title=row_get(row, 'title'),
+        course_name=row_get(row, 'course_name'),
+        filename=row_get(row, 'filename')
+    )
+    return docx_response(docx_bytes, f"{row_get(row, 'title')}_mapping.docx")
 
 SERVICE_PLACEHOLDERS = {
     'review-course-report': ('home.reviewer_course_report_title', 'home.reviewer_course_report_description'),
@@ -14439,6 +14545,8 @@ def question_clo_mapping_final():
         pass
 
     flash(translate('exams.saved'))
+    if request.form.get('final_action') == 'export_word':
+        return redirect(url_for('export_exam_docx', exam_id=new_exam_id))
     if request.form.get('final_action') == 'export_pdf':
         return redirect(url_for('export_exam_pdf', exam_id=new_exam_id))
     return redirect(url_for('exam_view', exam_id=new_exam_id))
@@ -14731,6 +14839,27 @@ def export_course_report_draft_pdf(draft_id):
         return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
 
     return course_report_pdf_response(pdf_bytes)
+
+@app.route('/course-report-service/preview/draft/<draft_id>/export/docx')
+def export_course_report_draft_docx(draft_id):
+    user = current_user()
+    if not user:
+        return redirect(url_for('login'))
+
+    try:
+        draft = load_course_report_draft(draft_id)
+        docx_bytes = build_course_report_docx(
+            draft.get('stats') or {},
+            draft.get('course_report_inputs') or {},
+            draft.get('course_info') or {},
+            draft.get('total_students') or None
+        )
+    except Exception as exc:
+        app.logger.exception("Failed to export draft course report Word: %s", exc)
+        flash(f"Failed to generate Word: {exc}", "error")
+        return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
+
+    return course_report_docx_response(docx_bytes)
 
 @app.route('/course-report-service/preview/draft/<draft_id>/save', methods=['POST'])
 def save_course_report_draft_action(draft_id):
@@ -15198,6 +15327,24 @@ def export_results_pdf():
     response = Response(pdf_bytes, mimetype="application/pdf")
     response.headers["Content-Disposition"] = 'attachment; filename="clo_achievement_report.pdf"'
     return response
+
+@app.route('/export-results/docx')
+def export_results_docx():
+    if not require_export_profile():
+        return redirect(url_for('results'))
+    try:
+        stats, total_students, student_achievement_rows, error = calculate_clo_results()
+    except Exception as e:
+        flash(f"Error exporting Word: {e}")
+        return redirect(url_for('clo_attainment'))
+
+    if error:
+        flash(error)
+        return redirect(url_for('clo_attainment'))
+
+    student_achievement_matrix = build_student_achievement_matrix(student_achievement_rows, stats.keys())
+    docx_bytes = build_clo_results_docx(stats, total_students, get_course_report_info(), student_achievement_matrix)
+    return docx_response(docx_bytes, "clo_attainment_report.docx")
 
 @app.route('/export-course-report/docx', methods=['POST'])
 def export_course_report_docx():

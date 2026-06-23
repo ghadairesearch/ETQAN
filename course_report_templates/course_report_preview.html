@@ -15,27 +15,37 @@
                         {{ _('question_mapping.save_mapping') }}
                     </button>
                 </form>
-                <button class="btn" style="opacity: 0.5; cursor: not-allowed; display: inline-flex; align-items: center; gap: 0.4rem; background-color: var(--border-color); color: var(--text-main);" disabled>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    {{ _('course_report.export_word') }}
-                </button>
-                <a href="{{ url_for('export_course_report_draft_pdf', draft_id=report_id) }}" class="btn" style="display: inline-flex; align-items: center; gap: 0.4rem;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15h6"></path><path d="M9 18h6"></path><path d="M9 12h1"></path></svg>
-                    {{ _('course_report.export_pdf') }}
-                </a>
+                <div class="report-action-menu" data-auto-menu>
+                    <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
+                    </button>
+                    <div class="report-action-panel">
+                        <a href="{{ url_for('export_course_report_draft_docx', draft_id=report_id) }}">{{ _('course_report.export_word') }}</a>
+                        <a href="{{ url_for('export_course_report_draft_pdf', draft_id=report_id) }}">{{ _('course_report.export_pdf') }}</a>
+                    </div>
+                </div>
             {% else %}
                 <button type="button" class="btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; opacity: 0.8; cursor: default;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                     {{ _('question_mapping.save_mapping') }}
                 </button>
-                <a href="{{ url_for('export_saved_course_report_word', report_id=report_id) }}" class="btn" style="display: inline-flex; align-items: center; gap: 0.4rem;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    {{ _('course_report.export_word') }}
-                </a>
-                <a href="{{ url_for('export_saved_course_report_pdf', report_id=report_id) }}" class="btn" style="display: inline-flex; align-items: center; gap: 0.4rem;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15h6"></path><path d="M9 18h6"></path><path d="M9 12h1"></path></svg>
-                    {{ _('course_report.export_pdf') }}
-                </a>
+                <div class="report-action-menu" data-auto-menu>
+                    <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
+                    </button>
+                    <div class="report-action-panel">
+                        <a href="{{ url_for('export_saved_course_report_word', report_id=report_id) }}">{{ _('course_report.export_word') }}</a>
+                        <a href="{{ url_for('export_saved_course_report_pdf', report_id=report_id) }}">{{ _('course_report.export_pdf') }}</a>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>

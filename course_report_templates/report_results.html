@@ -3,7 +3,7 @@
 {% block content %}
 {% set active_branding = display_branding if display_branding is defined else report_branding %}
 {% set can_export = show_exports if show_exports is defined else true %}
-{% set export_csv_url = export_csv_url if export_csv_url is defined else '/export-results/csv' %}
+{% set export_word_url = export_word_url if export_word_url is defined else '/export-results/docx' %}
 {% set export_pdf_url = export_pdf_url if export_pdf_url is defined else '/export-results/pdf' %}
 {% set delete_report_url = delete_report_url if delete_report_url is defined else '' %}
 {% set saved_report_view = saved_report_view if saved_report_view is defined else false %}
@@ -15,8 +15,8 @@
 
     .result-export-button,
     .result-delete-button {
-        width: 2.6rem;
-        height: 2.6rem;
+        width: 2.45rem;
+        height: 2.45rem;
         padding: 0;
         display: inline-flex;
         align-items: center;
@@ -34,8 +34,8 @@
 
     .result-export-button svg,
     .result-delete-button svg {
-        width: 1.1rem;
-        height: 1.1rem;
+        width: 1.05rem;
+        height: 1.05rem;
         stroke: currentColor;
         stroke-width: 2;
         fill: none;
@@ -174,7 +174,7 @@
                         </button>
                         {% if is_saved %}
                         <div class="result-export-panel" aria-labelledby="result_export_button">
-                            <a href="{{ export_csv_url }}">{{ _('results.export_csv') }}</a>
+                            <a href="{{ export_word_url }}">{{ _('results.export_word') }}</a>
                             <a href="{{ export_pdf_url }}">{{ _('results.export_pdf') }}</a>
                         </div>
                         {% endif %}

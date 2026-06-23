@@ -609,7 +609,38 @@
                         pair[0].classList.remove('open');
                         pair[1].setAttribute('aria-expanded', 'false');
                     });
+                    document.querySelectorAll('[data-auto-menu].open').forEach(function(menu) {
+                        menu.classList.remove('open');
+                        const button = menu.querySelector('[aria-haspopup="true"]');
+                        if (button) button.setAttribute('aria-expanded', 'false');
+                    });
                 }
+            });
+
+            const autoActionMenus = Array.from(document.querySelectorAll('[data-auto-menu]'));
+            autoActionMenus.forEach(function(menu) {
+                const button = menu.querySelector('[aria-haspopup="true"]');
+                if (!button) return;
+                button.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    autoActionMenus.forEach(function(other) {
+                        if (other !== menu) {
+                            other.classList.remove('open');
+                            const otherButton = other.querySelector('[aria-haspopup="true"]');
+                            if (otherButton) otherButton.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                    const isOpen = menu.classList.toggle('open');
+                    button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
+            });
+
+            document.addEventListener('click', function() {
+                autoActionMenus.forEach(function(menu) {
+                    menu.classList.remove('open');
+                    const button = menu.querySelector('[aria-haspopup="true"]');
+                    if (button) button.setAttribute('aria-expanded', 'false');
+                });
             });
 
             document.querySelectorAll('[data-extract-progress-button]').forEach(function(button) {

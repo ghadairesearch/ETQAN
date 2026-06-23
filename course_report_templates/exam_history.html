@@ -48,7 +48,7 @@
                         <td>{{ exam.created_at }}</td>
                         <td>
                             <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
-                                <div class="report-action-menu">
+                                <div class="report-action-menu" data-auto-menu>
                                     <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
                                         <svg viewBox="0 0 24 24" aria-hidden="true">
                                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -57,6 +57,7 @@
                                         </svg>
                                     </button>
                                     <div class="report-action-panel">
+                                        <a href="/account/exams/{{ exam.id }}/export/docx">{{ _('results.export_word') }}</a>
                                         <a href="/account/exams/{{ exam.id }}/export/pdf">{{ _('results.export_pdf') }}</a>
                                     </div>
                                 </div>
