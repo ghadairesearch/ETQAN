@@ -44,7 +44,8 @@
     .result-export-panel {
         display: none;
         position: absolute;
-        top: calc(100% + 0.35rem);
+        bottom: calc(100% + 0.35rem);
+        top: auto;
         right: 0;
         min-width: 135px;
         background: var(--bg-card);
@@ -148,65 +149,6 @@
             </p>
             </div>
             </div>
-        <div class="icon-action-row" style="gap: 0.5rem;">
-        {% if saved_report_view or not can_export %}
-            <a href="/reports" class="btn back-action" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_reports') }}</a>
-        {% endif %}
-        {% if can_export %}
-            {% if current_user and current_user.university_name %}
-            <div class="icon-action-row">
-                {% if not saved_report_view %}
-                    <form method="POST" action="/save-report" style="margin: 0;">
-                        <button type="submit" class="btn save-icon-button" aria-label="{{ _('question_mapping.save_mapping') }}" title="{{ _('question_mapping.save_mapping') }}">
-                            {% include "save_icon.html" %}
-                        </button>
-                    </form>
-                {% endif %}
-                <div style="display: flex; align-items: center;">
-                    <div class="result-export-menu" id="result_export_menu">
-                        <button type="button" class="result-export-button" id="result_export_button" aria-label="Export" aria-haspopup="true" aria-expanded="false" {% if not is_saved %}disabled style="opacity: 0.5; cursor: not-allowed;" title="يجب حفظ التقرير قبل التصدير"{% endif %}>
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <path d="M7 10l5 5 5-5"></path>
-                                <path d="M12 15V3"></path>
-                            </svg>
-                        </button>
-                        {% if is_saved %}
-                        <div class="result-export-panel" aria-labelledby="result_export_button">
-                            <a href="{{ export_word_url }}">{{ _('results.export_word') }}</a>
-                            <a href="{{ export_pdf_url }}">{{ _('results.export_pdf') }}</a>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% if not is_saved %}
-                        <div class="i-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 0.75rem; font-style: italic; font-weight: bold; cursor: help; margin-inline-start: 0.4rem;" title="يجب حفظ التقرير قبل التصدير">i</div>
-                    {% endif %}
-                </div>
-                {% if delete_report_url %}
-                <form method="POST" action="{{ delete_report_url }}" onsubmit="return confirm('{{ _('history.delete_confirm') }}');" style="margin: 0;">
-                    <button type="submit" class="result-delete-button" aria-label="{{ _('history.delete') }}">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M3 6h18"></path>
-                            <path d="M8 6V4h8v2"></path>
-                            <path d="M19 6l-1 16H6L5 6"></path>
-                            <path d="M10 11v6"></path>
-                            <path d="M14 11v6"></path>
-                        </svg>
-                    </button>
-                </form>
-                {% endif %}
-            </div>
-            {% elif current_user %}
-            <div class="form-action-row">
-                <a href="/account/organization" class="btn">{{ _('results.complete_org') }}</a>
-            </div>
-            {% else %}
-            <div class="form-action-row">
-                <a href="/login" class="btn">{{ _('results.login_export') }}</a>
-                <a href="/register" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.create_account') }}</a>
-            </div>
-            {% endif %}
-        {% endif %}
         </div>
     </div>
 
@@ -320,9 +262,55 @@
     {% endif %}
 
     {% if saved_report_view %}
+        <div class="form-action-row" style="margin-top: 1rem; justify-content: {{ 'flex-start' if language == 'ar' else 'flex-end' }};">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <div class="result-export-menu" id="result_export_menu">
+                    <button type="button" class="btn" id="result_export_button" aria-haspopup="true" aria-expanded="false" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 1.05rem; height: 1.05rem; stroke: currentColor; stroke-width: 2; fill: none;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
+                        {% if language == 'ar' %}تصدير{% else %}Export{% endif %}
+                    </button>
+                    <div class="result-export-panel" aria-labelledby="result_export_button">
+                        <a href="{{ export_word_url }}">{{ _('results.export_word') }}</a>
+                        <a href="{{ export_pdf_url }}">{{ _('results.export_pdf') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% elif can_export %}
-        <div class="form-action-row" style="margin-top: 1rem;">
+        <div class="form-action-row" style="margin-top: 1rem; justify-content: {{ 'flex-start' if language == 'ar' else 'flex-end' }}; gap: 0.5rem;">
             <a href="/mapping" class="btn back-action" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.back_mapping') }}</a>
+            
+            {% if current_user and current_user.university_name %}
+                <form method="POST" action="/save-report" style="margin: 0;">
+                    <button type="submit" class="btn save-icon-button" aria-label="{{ _('question_mapping.save_mapping') }}" title="{{ _('question_mapping.save_mapping') }}">
+                        {% include "save_icon.html" %}
+                    </button>
+                </form>
+
+                <div class="result-export-menu" id="result_export_menu">
+                    <button type="button" class="btn" id="result_export_button" aria-haspopup="true" aria-expanded="false" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 1.05rem; height: 1.05rem; stroke: currentColor; stroke-width: 2; fill: none;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
+                        {% if language == 'ar' %}تصدير{% else %}Export{% endif %}
+                    </button>
+                    <div class="result-export-panel" aria-labelledby="result_export_button">
+                        <a href="{{ export_word_url }}">{{ _('results.export_word') }}</a>
+                        <a href="{{ export_pdf_url }}">{{ _('results.export_pdf') }}</a>
+                    </div>
+                </div>
+            {% elif current_user %}
+                <a href="/account/organization" class="btn">{{ _('results.complete_org') }}</a>
+            {% else %}
+                <a href="/login" class="btn">{{ _('results.login_export') }}</a>
+                <a href="/register" class="btn" style="background-color: var(--border-color); color: var(--text-main);">{{ _('results.create_account') }}</a>
+            {% endif %}
         </div>
     {% else %}
         <div class="form-action-row" style="margin-top: 1rem;">
