@@ -11599,10 +11599,14 @@ def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
     clo_label = 'ناتج التعلم' if language == 'ar' else 'Mapped CLOs'
     elements = []
     
-    if has_request_context() and current_user():
-        user = current_user()
-        if user.get('university'):
-            elements.append(word_paragraph(user['university'], bold=True))
+    branding = apply_university_identity_colors(get_report_branding())
+    labels = pdf_report_labels(language)
+    organization_display_name = localized_university_name(branding.get('organization_name'), language) or labels['na']
+    
+    if organization_display_name and organization_display_name != labels['na']:
+        elements.append(word_paragraph(f"{labels['university']}: {organization_display_name}", bold=True))
+    if branding.get('department'):
+        elements.append(word_paragraph(f"{labels['department']}: {branding.get('department')}"))
             
     elements.append(word_paragraph(report_title, bold=True))
     if course_name:
