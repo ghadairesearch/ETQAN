@@ -13786,7 +13786,6 @@ def export_exam_pdf(exam_id):
 
     html = render_template('exam_view_pdf.html', exam=exam, payload=payload, user=user)
     
-    import pdfkit
     options = {
         'page-size': 'A4',
         'orientation': 'Portrait',
@@ -13798,9 +13797,10 @@ def export_exam_pdf(exam_id):
         'enable-local-file-access': None
     }
     try:
+        import pdfkit
         pdf_bytes = pdfkit.from_string(html, False, options=options)
     except Exception as exc:
-        flash(f"Failed to generate PDF: {exc}", "error")
+        flash(f"Failed to generate PDF. Make sure pdfkit and wkhtmltopdf are installed. Error: {exc}", "error")
         return redirect(url_for('exam_view', exam_id=exam_id))
     
     response = Response(pdf_bytes, mimetype="application/pdf")
