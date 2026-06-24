@@ -14623,10 +14623,11 @@ def question_clo_mapping_final():
             """
             INSERT INTO saved_exams (user_id, title, course_name, filename, payload_json, created_at)
             VALUES (?, ?, ?, ?, ?, ?)
+            RETURNING id
             """,
             (user['id'], title, course_name, filename, json.dumps(payload, ensure_ascii=False), created_at)
         )
-        new_exam_id = cursor.lastrowid
+        new_exam_id = cursor.fetchone()[0]
 
     if request.form.get('final_action') == 'export_word':
         return redirect(url_for('export_exam_docx', exam_id=new_exam_id))
