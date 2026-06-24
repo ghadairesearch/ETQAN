@@ -4,47 +4,8 @@
 <div class="card" style="max-width: 1080px; margin: 0 auto;">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
         <div>
-            <h2 style="margin: 0 0 0.35rem;">{{ _('course_report.preview_title') }}</h2>
+            <h2 style="margin: 0 0 0.35rem;">{% if request.cookies.get('lang', 'ar') == 'ar' %}الخطوة 3: {% else %}Step 3: {% endif %}{{ _('course_report.preview_title') }}</h2>
             <p style="color: var(--text-muted); margin: 0;">{{ _('course_report.preview_description') }}</p>
-        </div>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
-            {% if is_draft %}
-                <form id="draft_save_form" method="POST" action="{{ url_for('save_course_report_draft_action', draft_id=report_id) }}" style="margin: 0;">
-                    <button type="submit" class="btn save-icon-button" aria-label="{{ _('question_mapping.save_mapping') }}" title="{{ _('question_mapping.save_mapping') }}">
-                        {% include "save_icon.html" %}
-                    </button>
-                </form>
-                <div class="report-action-menu" data-auto-menu>
-                    <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <path d="M7 10l5 5 5-5"></path>
-                            <path d="M12 15V3"></path>
-                        </svg>
-                    </button>
-                    <div class="report-action-panel">
-                        <a href="{{ url_for('export_course_report_draft_docx', draft_id=report_id) }}">{{ _('course_report.export_word') }}</a>
-                        <a href="{{ url_for('export_course_report_draft_pdf', draft_id=report_id) }}">{{ _('course_report.export_pdf') }}</a>
-                    </div>
-                </div>
-            {% else %}
-                <button type="button" class="btn save-icon-button" aria-label="{{ _('question_mapping.save_mapping') }}" title="{{ _('question_mapping.save_mapping') }}" style="opacity: 0.8; cursor: default;">
-                    {% include "save_icon.html" %}
-                </button>
-                <div class="report-action-menu" data-auto-menu>
-                    <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <path d="M7 10l5 5 5-5"></path>
-                            <path d="M12 15V3"></path>
-                        </svg>
-                    </button>
-                    <div class="report-action-panel">
-                        <a href="{{ url_for('export_saved_course_report_word', report_id=report_id) }}">{{ _('course_report.export_word') }}</a>
-                        <a href="{{ url_for('export_saved_course_report_pdf', report_id=report_id) }}">{{ _('course_report.export_pdf') }}</a>
-                    </div>
-                </div>
-            {% endif %}
         </div>
     </div>
 
@@ -199,10 +160,49 @@
         {% endif %}
     </section>
 
-    <div class="form-action-row" style="margin-top: 1rem;">
+    <div class="form-action-row" style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
         <button type="button" class="btn back-action" style="background-color: var(--border-color); color: var(--text-main);" onclick="history.back()">
             {{ _('mapping.back') }}
         </button>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            {% if is_draft %}
+                <form id="draft_save_form" method="POST" action="{{ url_for('save_course_report_draft_action', draft_id=report_id) }}" style="margin: 0;">
+                    <button type="submit" class="btn save-icon-button" aria-label="{{ _('question_mapping.save_mapping') }}" title="{{ _('question_mapping.save_mapping') }}">
+                        {% include "save_icon.html" %}
+                    </button>
+                </form>
+                <div class="report-action-menu" data-auto-menu>
+                    <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
+                    </button>
+                    <div class="report-action-panel" style="bottom: 100%; top: auto; margin-bottom: 0.25rem;">
+                        <a href="{{ url_for('export_course_report_draft_docx', draft_id=report_id) }}">{{ _('course_report.export_word') }}</a>
+                        <a href="{{ url_for('export_course_report_draft_pdf', draft_id=report_id) }}">{{ _('course_report.export_pdf') }}</a>
+                    </div>
+                </div>
+            {% else %}
+                <button type="button" class="btn save-icon-button" aria-label="{{ _('question_mapping.save_mapping') }}" title="{{ _('question_mapping.save_mapping') }}" style="opacity: 0.8; cursor: default;">
+                    {% include "save_icon.html" %}
+                </button>
+                <div class="report-action-menu" data-auto-menu>
+                    <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
+                    </button>
+                    <div class="report-action-panel" style="bottom: 100%; top: auto; margin-bottom: 0.25rem;">
+                        <a href="{{ url_for('export_saved_course_report_word', report_id=report_id) }}">{{ _('course_report.export_word') }}</a>
+                        <a href="{{ url_for('export_saved_course_report_pdf', report_id=report_id) }}">{{ _('course_report.export_pdf') }}</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
