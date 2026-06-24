@@ -15259,6 +15259,8 @@ def course_report_service_inputs_multi():
                 session.pop('temp_grade_distribution', None)
         else:
             session.pop('temp_grade_distribution', None)
+            
+        return redirect(url_for('course_report_service_inputs_multi'))
     else:
         report_ids = session.get('last_report_ids', [])
         course_name = session.get('last_course_name', '')
