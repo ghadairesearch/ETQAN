@@ -5896,6 +5896,16 @@ def extract_course_spec_document(filepath, filename=''):
     text = extract_pdf_text(filepath, allow_ocr=False)
     if not compact_text(text):
         text = extract_pdf_text(filepath, allow_ocr=True)
+    elif arabic_text_layer_looks_fragmented(text):
+        page_texts = extract_pdf_pages_embedded(filepath)
+        ocr_text = run_pdf_ocr(filepath, page_indexes=targeted_ocr_page_indexes(filepath, page_texts))
+        if compact_text(ocr_text):
+            ai_diagnostics.append({
+                'provider': 'Local text layer',
+                'status': 'replaced',
+                'message': 'Embedded Arabic PDF text looked fragmented, so OCR text was used before AI extraction.',
+            })
+            text = ocr_text
         
     groq_extracted, _groq_error = extract_course_spec_with_groq_text(text, model_name="llama-3.1-8b-instant")
     if _groq_error:
@@ -5905,18 +5915,26 @@ def extract_course_spec_document(filepath, filename=''):
             'message': _groq_error,
         })
     if groq_extracted:
-        groq_extracted['extraction_metadata'] = {
-            'task': 'course_specification_extraction',
-            'source': groq_extracted.get('extraction_method') or 'groq',
-            'model': 'llama-3.1-8b-instant',
-            'duration_seconds': elapsed_seconds(extraction_start),
-            'filename': filename or os.path.basename(filepath),
-        }
-        return text, groq_extracted
-    else:
-        ocr_text = extract_pdf_text(filepath, allow_ocr=True)
-        if len(compact_text(ocr_text)) > len(compact_text(text)):
-            text = ocr_text
+        if course_spec_extracted_arabic_looks_fragmented(groq_extracted):
+            ai_diagnostics.append({
+                'provider': 'Llama via Groq',
+                'status': 'rejected',
+                'message': 'Llama returned fragmented Arabic text from the PDF text layer; using local/OCR extraction instead.',
+            })
+            groq_extracted = None
+        else:
+            groq_extracted['extraction_metadata'] = {
+                'task': 'course_specification_extraction',
+                'source': groq_extracted.get('extraction_method') or 'groq',
+                'model': 'llama-3.1-8b-instant',
+                'duration_seconds': elapsed_seconds(extraction_start),
+                'filename': filename or os.path.basename(filepath),
+                'ai_diagnostics': ai_diagnostics,
+            }
+            return text, groq_extracted
+    ocr_text = extract_pdf_text(filepath, allow_ocr=True)
+    if len(compact_text(ocr_text)) > len(compact_text(text)):
+        text = ocr_text
     extracted = extract_course_spec_metadata(text, filename)
     layout_extracted = extract_course_spec_from_pdf_layout(filepath, text)
     if course_spec_extraction_score(layout_extracted) > course_spec_extraction_score(extracted):
@@ -5976,7 +5994,7 @@ def flash_course_spec_extraction_method(extracted):
         method_label = translate('courses.extraction_method_local')
     message = f"{translate('courses.extraction_method_prefix')} {method_label}"
     diagnostics = ((extracted or {}).get('extraction_metadata') or {}).get('ai_diagnostics') or []
-    if diagnostics and method not in {'gemini', 'qwen', 'llama', 'groq'}:
+    if diagnostics:
         reason_parts = []
         for item in diagnostics:
             provider = compact_text(item.get('provider') or '')
@@ -7018,6 +7036,49 @@ def clean_report_pdf_text(value):
 
 def contains_arabic(text):
     return bool(re.search(r'[\u0600-\u06FF]', text or ''))
+
+def arabic_value_looks_fragmented(value):
+    source = str(value or '')
+    normalized = normalize_course_spec_text(source)
+    if not contains_arabic(normalized):
+        return False
+    if re.search(r'[_\u0640]{3,}', source):
+        return True
+    words = re.findall(r'[\u0600-\u06FF]+', normalized)
+    if len(words) < 6:
+        return False
+    short_ratio = sum(1 for word in words if len(word) <= 2) / len(words)
+    single_ratio = sum(1 for word in words if len(word) == 1) / len(words)
+    return short_ratio > 0.58 or single_ratio > 0.24
+
+def arabic_text_layer_looks_fragmented(text):
+    normalized = normalize_course_spec_text(text or '')
+    if not contains_arabic(normalized):
+        return False
+    words = re.findall(r'[\u0600-\u06FF]+', normalized)
+    if len(words) < 25:
+        return arabic_value_looks_fragmented(text)
+    short_ratio = sum(1 for word in words if len(word) <= 2) / len(words)
+    single_ratio = sum(1 for word in words if len(word) == 1) / len(words)
+    isolated_runs = len(re.findall(r'(?:^|\s)[\u0600-\u06FF](?:\s+[\u0600-\u06FF]){3,}(?=\s|$)', normalized))
+    return bool(re.search(r'[_\u0640]{3,}', str(text or ''))) or short_ratio > 0.52 or single_ratio > 0.18 or isolated_runs >= 2
+
+def course_spec_extracted_arabic_looks_fragmented(extracted):
+    if not isinstance(extracted, dict):
+        return False
+    values = []
+    values.extend(extracted.get('clos') or [])
+    values.extend(extracted.get('topics') or [])
+    values.extend([
+        extracted.get('course_name') or '',
+        extracted.get('college') or '',
+        extracted.get('department') or '',
+        extracted.get('program') or '',
+    ])
+    arabic_values = [value for value in values if contains_arabic(str(value or ''))]
+    if not arabic_values:
+        return False
+    return any(arabic_value_looks_fragmented(value) for value in arabic_values)
 
 def text_direction(text):
     return 'rtl' if contains_arabic(str(text or '')) else 'ltr'
