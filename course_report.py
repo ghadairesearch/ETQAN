@@ -772,7 +772,7 @@ EN_TRANSLATIONS = {
     'programs.plos_help': 'Paste one PLO per line, for example: K1 Demonstrate knowledge, S1 Apply skills, V1 Show values.',
     'programs.save': 'Save Program',
     'programs.invalid': 'Enter a program name and at least one PLO.',
-    'courses.invalid': 'Enter a course name and at least one CLO, or upload a readable course specification PDF.',
+    'courses.invalid': 'Enter a course name, course topics, and at least one CLO, or upload a readable course specification file.',
     'courses.limit': 'Your plan does not allow saving more courses.',
     'courses.login_required': 'Please login to manage saved courses.',
     'index.title': 'Course Information',
@@ -1343,7 +1343,7 @@ TRANSLATIONS = {
         'programs.plos_help': 'اكتب كل ناتج تعلم في سطر مستقل، مثل: K1 المعرفة، S1 المهارات، V1 القيم.',
         'programs.save': 'حفظ البرنامج',
         'programs.invalid': 'أدخل اسم البرنامج وناتج تعلم واحداً على الأقل.',
-        'courses.invalid': 'أدخل اسم المقرر وناتج تعلم واحد على الأقل، أو ارفع ملف توصيف مقرر قابل للقراءة.',
+        'courses.invalid': 'أدخل اسم المقرر وموضوعات المقرر وناتج تعلم واحد على الأقل، أو ارفع ملف توصيف مقرر قابل للقراءة.',
         'courses.limit': 'خطتك لا تسمح بحفظ المزيد من المقررات.',
         'courses.login_required': 'يرجى تسجيل الدخول لإدارة المقررات المحفوظة.',
         'index.title': 'معلومات المقرر',
@@ -5863,7 +5863,7 @@ def extract_course_spec_document(filepath, filename=''):
         }
         return text, extracted
 
-    gemini_extracted = extract_course_spec_with_gemini(filepath, filename)
+    gemini_extracted, _gemini_error = extract_course_spec_with_gemini(filepath, filename)
     if gemini_extracted:
         gemini_extracted.setdefault('extraction_metadata', {
             'task': 'course_specification_extraction',
@@ -5878,7 +5878,7 @@ def extract_course_spec_document(filepath, filename=''):
     if not compact_text(text):
         text = extract_pdf_text(filepath, allow_ocr=True)
         
-    groq_extracted = extract_course_spec_with_groq_text(text, model_name="llama-3.1-8b-instant")
+    groq_extracted, _groq_error = extract_course_spec_with_groq_text(text, model_name="llama-3.1-8b-instant")
     if groq_extracted:
         groq_extracted['extraction_metadata'] = {
             'task': 'course_specification_extraction',
@@ -10878,14 +10878,27 @@ def read_course_report_optional_details():
 
 WORD_W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 WORD_XML_NS = 'http://www.w3.org/XML/1998/namespace'
+WORD_R_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+WORD_WP_NS = 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing'
+WORD_A_NS = 'http://schemas.openxmlformats.org/drawingml/2006/main'
+WORD_PIC_NS = 'http://schemas.openxmlformats.org/drawingml/2006/picture'
+DOCX_RELS_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
+DOCX_CONTENT_TYPES_NS = 'http://schemas.openxmlformats.org/package/2006/content-types'
 
 ET.register_namespace('w', WORD_W_NS)
+ET.register_namespace('r', WORD_R_NS)
+ET.register_namespace('wp', WORD_WP_NS)
+ET.register_namespace('a', WORD_A_NS)
+ET.register_namespace('pic', WORD_PIC_NS)
 
 def word_tag(name):
     return f'{{{WORD_W_NS}}}{name}'
 
 def word_element(name, attributes=None):
     return ET.Element(word_tag(name), attributes or {})
+
+def word_r_tag(name):
+    return f'{{{WORD_R_NS}}}{name}'
 
 def word_block_text(element):
     return ''.join((text_node.text or '') for text_node in element.findall(f'.//{word_tag("t")}'))
@@ -10896,12 +10909,21 @@ def clean_xml_text(text):
     # Remove XML control characters that cause lxml to throw ValueError during tostring
     return re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', str(text))
 
-def word_paragraph(text='', bold=False):
+def word_paragraph(text='', bold=False, color='', size='', alignment=''):
     paragraph = word_element('p')
+    if alignment:
+        paragraph_properties = word_element('pPr')
+        paragraph_properties.append(word_element('jc', {word_tag('val'): alignment}))
+        paragraph.append(paragraph_properties)
     run = word_element('r')
-    if bold:
+    if bold or color or size:
         run_properties = word_element('rPr')
-        run_properties.append(word_element('b'))
+        if bold:
+            run_properties.append(word_element('b'))
+        if color:
+            run_properties.append(word_element('color', {word_tag('val'): str(color).lstrip('#')}))
+        if size:
+            run_properties.append(word_element('sz', {word_tag('val'): str(size)}))
         run.append(run_properties)
     text_node = word_element('t')
     text_node.set(f'{{{WORD_XML_NS}}}space', 'preserve')
@@ -10910,14 +10932,20 @@ def word_paragraph(text='', bold=False):
     paragraph.append(run)
     return paragraph
 
-def word_cell(text='', bold=False):
+def word_cell(text='', bold=False, width='2400', fill='', color='', size=''):
     cell = word_element('tc')
     cell_properties = word_element('tcPr')
-    cell_properties.append(word_element('tcW', {word_tag('w'): '2400', word_tag('type'): 'dxa'}))
+    cell_properties.append(word_element('tcW', {word_tag('w'): str(width), word_tag('type'): 'dxa'}))
+    if fill:
+        cell_properties.append(word_element('shd', {
+            word_tag('val'): 'clear',
+            word_tag('color'): 'auto',
+            word_tag('fill'): str(fill).lstrip('#'),
+        }))
     cell.append(cell_properties)
     parts = str(text or '').split('\n') or ['']
     for part in parts:
-        cell.append(word_paragraph(part, bold=bold))
+        cell.append(word_paragraph(part, bold=bold, color=color, size=size))
     return cell
 
 def word_row(values, header=False):
@@ -10925,6 +10953,170 @@ def word_row(values, header=False):
     for value in values:
         row.append(word_cell(value, bold=header))
     return row
+
+def word_image_paragraph(rel_id, width_emu=1300000, height_emu=850000, alignment='right'):
+    paragraph = word_element('p')
+    paragraph_properties = word_element('pPr')
+    paragraph_properties.append(word_element('jc', {word_tag('val'): alignment}))
+    paragraph.append(paragraph_properties)
+    run = word_element('r')
+    drawing_xml = f'''
+    <w:drawing xmlns:w="{WORD_W_NS}" xmlns:r="{WORD_R_NS}" xmlns:wp="{WORD_WP_NS}" xmlns:a="{WORD_A_NS}" xmlns:pic="{WORD_PIC_NS}">
+      <wp:inline distT="0" distB="0" distL="0" distR="0">
+        <wp:extent cx="{int(width_emu)}" cy="{int(height_emu)}"/>
+        <wp:effectExtent l="0" t="0" r="0" b="0"/>
+        <wp:docPr id="1" name="Organization Logo"/>
+        <wp:cNvGraphicFramePr>
+          <a:graphicFrameLocks noChangeAspect="1"/>
+        </wp:cNvGraphicFramePr>
+        <a:graphic>
+          <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+            <pic:pic>
+              <pic:nvPicPr>
+                <pic:cNvPr id="0" name="Organization Logo"/>
+                <pic:cNvPicPr/>
+              </pic:nvPicPr>
+              <pic:blipFill>
+                <a:blip r:embed="{rel_id}"/>
+                <a:stretch><a:fillRect/></a:stretch>
+              </pic:blipFill>
+              <pic:spPr>
+                <a:xfrm>
+                  <a:off x="0" y="0"/>
+                  <a:ext cx="{int(width_emu)}" cy="{int(height_emu)}"/>
+                </a:xfrm>
+                <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+              </pic:spPr>
+            </pic:pic>
+          </a:graphicData>
+        </a:graphic>
+      </wp:inline>
+    </w:drawing>
+    '''
+    run.append(ET.fromstring(drawing_xml))
+    paragraph.append(run)
+    return paragraph
+
+def docx_hex_color(value, fallback='#26365f'):
+    color = normalize_brand_color(value or fallback)
+    return color.lstrip('#').upper()
+
+def docx_optional_hex_color(value, fallback=''):
+    color = normalize_optional_brand_color(value or fallback)
+    return color.lstrip('#').upper() if color else ''
+
+def build_course_report_word_identity_blocks(course_info=None, branding=None, logo_rel_id=''):
+    language = get_export_report_language() if has_request_context() else 'en'
+    labels = pdf_report_labels(language)
+    branding = apply_university_identity_colors(branding or get_report_branding())
+    course_info = course_info or {}
+    organization_name = localized_university_name(branding.get('organization_name'), language) or ''
+    department = course_info.get('department') or branding.get('department') or ''
+    website = branding.get('organization_website') or ''
+    primary = docx_hex_color(branding.get('primary_color'))
+    secondary = docx_optional_hex_color(branding.get('secondary_color'), branding.get('primary_color')) or primary
+
+    detail_lines = []
+    if organization_name:
+        detail_lines.append(f"{labels['university']}: {organization_name}")
+    if department:
+        detail_lines.append(f"{labels['department']}: {department}")
+    if website:
+        detail_lines.append(("الموقع الرسمي" if language == 'ar' else "Official website") + f": {website}")
+    if not detail_lines and not logo_rel_id:
+        return []
+
+    text_cell = word_cell('\n'.join(detail_lines), bold=True, width='7600', fill=primary, color='FFFFFF', size='22')
+    if logo_rel_id:
+        logo_cell = word_element('tc')
+        logo_cell_properties = word_element('tcPr')
+        logo_cell_properties.append(word_element('tcW', {word_tag('w'): '2000', word_tag('type'): 'dxa'}))
+        logo_cell_properties.append(word_element('shd', {word_tag('val'): 'clear', word_tag('color'): 'auto', word_tag('fill'): primary}))
+        logo_cell.append(logo_cell_properties)
+        logo_cell.append(word_image_paragraph(logo_rel_id, alignment='center'))
+        row_cells = [text_cell, logo_cell] if language != 'ar' else [logo_cell, text_cell]
+    else:
+        row_cells = [text_cell]
+
+    header_table = word_element('tbl')
+    table_properties = word_element('tblPr')
+    table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
+    borders = word_element('tblBorders')
+    for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
+        borders.append(word_element(border_name, {
+            word_tag('val'): 'nil',
+            word_tag('sz'): '0',
+            word_tag('space'): '0',
+            word_tag('color'): 'FFFFFF',
+        }))
+    table_properties.append(borders)
+    header_table.append(table_properties)
+    row = word_element('tr')
+    for cell in row_cells:
+        row.append(cell)
+    header_table.append(row)
+
+    accent_table = word_element('tbl')
+    accent_properties = word_element('tblPr')
+    accent_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
+    accent_table.append(accent_properties)
+    accent_row = word_element('tr')
+    accent_row_properties = word_element('trPr')
+    accent_row_properties.append(word_element('trHeight', {word_tag('val'): '120', word_tag('hRule'): 'exact'}))
+    accent_row.append(accent_row_properties)
+    accent_row.append(word_cell('', width='9600', fill=secondary))
+    accent_table.append(accent_row)
+
+    return [header_table, accent_table, word_paragraph('')]
+
+def insert_course_report_word_identity(body, course_info=None, branding=None, logo_rel_id=''):
+    blocks = build_course_report_word_identity_blocks(course_info, branding, logo_rel_id)
+    if not blocks:
+        return
+    insert_index = 0
+    for block in reversed(blocks):
+        body.insert(insert_index, block)
+
+def get_next_docx_relationship_id(input_docx):
+    rels_path = 'word/_rels/document.xml.rels'
+    try:
+        rels_xml = input_docx.read(rels_path)
+        root = ET.fromstring(rels_xml)
+    except Exception:
+        return 'rId100'
+    max_id = 1
+    for rel in root:
+        rel_id = rel.get('Id') or ''
+        match = re.match(r'rId(\d+)$', rel_id)
+        if match:
+            max_id = max(max_id, int(match.group(1)))
+    return f"rId{max_id + 1}"
+
+def update_docx_relationships_for_image(rels_bytes, rel_id, target):
+    if rels_bytes:
+        root = ET.fromstring(rels_bytes)
+    else:
+        root = ET.Element(f'{{{DOCX_RELS_NS}}}Relationships')
+    relationship = ET.Element(f'{{{DOCX_RELS_NS}}}Relationship', {
+        'Id': rel_id,
+        'Type': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+        'Target': target,
+    })
+    root.append(relationship)
+    return ET.tostring(root, encoding='utf-8', xml_declaration=True)
+
+def update_docx_content_types_for_image(content_types_bytes, ext):
+    if not content_types_bytes:
+        return content_types_bytes
+    ext = ext.lower().lstrip('.')
+    content_type = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png'}.get(ext)
+    if not content_type:
+        return content_types_bytes
+    root = ET.fromstring(content_types_bytes)
+    default_tag = f'{{{DOCX_CONTENT_TYPES_NS}}}Default'
+    if not any((item.get('Extension') or '').lower() == ext for item in root.findall(default_tag)):
+        root.append(ET.Element(default_tag, {'Extension': ext, 'ContentType': content_type}))
+    return ET.tostring(root, encoding='utf-8', xml_declaration=True)
 
 def format_plo_value(value):
     if isinstance(value, (list, tuple)):
@@ -11474,6 +11666,28 @@ def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, co
     output = io.BytesIO()
     try:
         with zipfile.ZipFile(source, 'r') as input_docx:
+            branding = apply_university_identity_colors(get_report_branding()) if has_request_context() else {}
+            logo_path = resolve_branding_logo_path(branding, report_ready=True) if branding else ''
+            logo_rel_id = ''
+            logo_media_zip_path = ''
+            logo_media_target = ''
+            logo_bytes = b''
+            if logo_path and os.path.exists(logo_path):
+                logo_ext = os.path.splitext(logo_path)[1].lower()
+                if logo_ext in {'.jpg', '.jpeg', '.png'}:
+                    logo_rel_id = get_next_docx_relationship_id(input_docx)
+                    base_media_name = f'organization_identity_logo{logo_ext}'
+                    logo_media_zip_path = f'word/media/{base_media_name}'
+                    existing_names = set(input_docx.namelist())
+                    suffix = 1
+                    while logo_media_zip_path in existing_names:
+                        base_media_name = f'organization_identity_logo_{suffix}{logo_ext}'
+                        logo_media_zip_path = f'word/media/{base_media_name}'
+                        suffix += 1
+                    logo_media_target = f'media/{base_media_name}'
+                    with open(logo_path, 'rb') as logo_file:
+                        logo_bytes = logo_file.read()
+
             document_xml = input_docx.read('word/document.xml')
             root = ET.fromstring(document_xml)
             body = root.find(word_tag('body'))
@@ -11481,6 +11695,7 @@ def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, co
                 raise ValueError("The Word template does not contain a document body.")
 
             replace_word_text(root, course_report_template_replacements(course_info, course_report_inputs, total_students))
+            insert_course_report_word_identity(body, course_info, branding, logo_rel_id)
             report_language = get_export_report_language()
             grade_distribution = (course_report_inputs or {}).get('grade_distribution') or {}
             replace_next_table_after_heading(
@@ -11513,11 +11728,39 @@ def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, co
             updated_document_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
 
             with zipfile.ZipFile(output, 'w') as output_docx:
+                rels_written = False
+                content_types_written = False
+                rels_path = 'word/_rels/document.xml.rels'
+                content_types_path = '[Content_Types].xml'
                 for item in input_docx.infolist():
                     if item.filename == 'word/document.xml':
                         output_docx.writestr(item, updated_document_xml)
+                    elif logo_rel_id and item.filename == rels_path:
+                        output_docx.writestr(
+                            item,
+                            update_docx_relationships_for_image(input_docx.read(item.filename), logo_rel_id, logo_media_target)
+                        )
+                        rels_written = True
+                    elif logo_rel_id and item.filename == content_types_path:
+                        output_docx.writestr(
+                            item,
+                            update_docx_content_types_for_image(input_docx.read(item.filename), os.path.splitext(logo_media_zip_path)[1])
+                        )
+                        content_types_written = True
                     else:
                         output_docx.writestr(item, input_docx.read(item.filename))
+                if logo_rel_id and not rels_written:
+                    output_docx.writestr(
+                        rels_path,
+                        update_docx_relationships_for_image(b'', logo_rel_id, logo_media_target)
+                    )
+                if logo_rel_id and not content_types_written:
+                    output_docx.writestr(
+                        content_types_path,
+                        update_docx_content_types_for_image(b'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>''', os.path.splitext(logo_media_zip_path)[1])
+                    )
+                if logo_rel_id and logo_bytes:
+                    output_docx.writestr(logo_media_zip_path, logo_bytes)
     except zipfile.BadZipFile as exc:
         raise ValueError("Please upload a valid DOCX Word template.") from exc
 
@@ -11530,6 +11773,7 @@ def build_generated_course_report_docx(stats, course_report_inputs=None, course_
     root.append(body)
 
     course_info = course_info or {}
+    insert_course_report_word_identity(body, course_info, apply_university_identity_colors(get_report_branding()) if has_request_context() else {}, '')
     body.append(word_paragraph('Course Report', bold=True))
     course_name = course_info.get('course_name') or course_info.get('raw_name') or ''
     course_id = course_info.get('course_id') or ''
