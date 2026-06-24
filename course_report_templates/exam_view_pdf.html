@@ -52,6 +52,17 @@
     </style>
 </head>
 <body dir="{{ 'rtl' if text_direction(exam.title) == 'rtl' else 'ltr' }}">
+    {% if user and (user.university or user.brand_logo_base64) %}
+    <div style="margin-bottom: 20px; border-bottom: 1px solid #cbd5e1; padding-bottom: 10px; display: flex; align-items: center; gap: 15px;">
+        {% if user.brand_logo_base64 %}
+            <img src="{{ user.brand_logo_base64 }}" alt="Logo" style="max-height: 50px;">
+        {% endif %}
+        {% if user.university %}
+            <h3 style="margin: 0; color: {{ user.brand_color or '#1e293b' }};">{{ user.university }}</h3>
+        {% endif %}
+    </div>
+    {% endif %}
+
     <h2>{{ exam.title }}</h2>
     <div class="meta">
         {{ _('mapping.course') if _('mapping.course') != 'mapping.course' else 'Course:' }} <strong>{{ exam.course_name }}</strong><br>
@@ -71,12 +82,12 @@
             {% for item in payload.questions %}
                 <tr>
                     <td><strong>{{ _('mapping.question') if _('mapping.question') != 'mapping.question' else 'Question' }} {{ loop.index }}</strong></td>
-                    <td>{{ item.type or '-' }}</td>
-                    <td dir="{{ text_direction(item.text) }}">{{ item.text }}</td>
+                    <td>{{ item.question_type or item.type or '-' }}</td>
+                    <td dir="{{ text_direction(item.question_text or item.text) }}">{{ item.question_text or item.text }}</td>
                     <td>
                         {% if item.clos %}
                             {% for clo in item.clos %}
-                                <span class="clo-badge">{{ clo.split(' ')[0] }}</span>
+                                <span>{{ clo }}</span>{% if not loop.last %}<br><br>{% endif %}
                             {% endfor %}
                         {% else %}
                             <span style="color: #94a3b8;">-</span>

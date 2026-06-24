@@ -55,7 +55,9 @@
                         <td dir="{{ text_direction(question_text) }}" style="white-space: pre-wrap; text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</td>
                         <td>
                             {% if selected_clos %}
-                                {{ selected_clos | join(', ') }}
+                                {% for clo in selected_clos %}
+                                    {{ clo }}{% if not loop.last %}<br><br>{% endif %}
+                                {% endfor %}
                             {% else %}
                                 <span style="color: var(--text-muted);">-</span>
                             {% endif %}

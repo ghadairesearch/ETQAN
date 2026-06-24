@@ -11559,6 +11559,10 @@ def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
     text_label = '\u0646\u0635 \u0627\u0644\u0633\u0624\u0627\u0644' if language == 'ar' else 'Question Text'
     clo_label = '\u0646\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645' if language == 'ar' else 'Mapped CLOs'
     elements = [word_paragraph(report_title, bold=True)]
+    if has_request_context() and current_user():
+        user = current_user()
+        if user.get('university'):
+            elements.insert(0, word_paragraph(user['university'], bold=True))
     if course_name:
         elements.append(word_paragraph(f"{course_label}: {course_name}"))
     if filename:
@@ -11566,7 +11570,7 @@ def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
     table = word_element('tbl')
     table.append(word_row([question_label, type_label, text_label, clo_label], header=True))
     for index, item in enumerate(payload.get('questions') or [], start=1):
-        clos = ', '.join(clo_number(clo) or str(clo or '') for clo in item.get('clos') or [])
+        clos = '\n'.join(clo_number(clo) or str(clo or '') for clo in item.get('clos') or [])
         table.append(word_row([
             f"{question_label} {index}",
             item.get('question_type') or item.get('type') or '-',
@@ -13780,7 +13784,7 @@ def export_exam_pdf(exam_id):
     }
     payload = safe_json_loads(row_get(row, 'payload_json'), {}) or {}
 
-    html = render_template('exam_view_pdf.html', exam=exam, payload=payload)
+    html = render_template('exam_view_pdf.html', exam=exam, payload=payload, user=user)
     
     import pdfkit
     options = {
