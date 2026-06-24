@@ -11585,9 +11585,14 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     ]
     return build_simple_word_document(elements)
 
-def compute_exam_alignment_matrix(payload):
+def compute_exam_alignment_matrix(payload, all_course_clos=None):
     questions = payload.get('questions') or []
     unique_clos = set()
+    
+    if all_course_clos:
+        for c in all_course_clos:
+            unique_clos.add(clo_number(c) or str(c or '').strip())
+            
     for item in questions:
         for clo in item.get('clos') or []:
             unique_clos.add(clo_number(clo) or str(clo or '').strip())
@@ -11624,27 +11629,28 @@ def compute_exam_alignment_matrix(payload):
         'total_questions': num_questions
     }
 
-def generate_assessment_coverage_summary_text(matrix_data, all_course_clos, language='en'):
+def generate_assessment_coverage_summary(matrix_data, all_course_clos, language='en'):
     totals = matrix_data.get('totals') or {}
     percentages = matrix_data.get('percentages') or {}
-    unique_clos = matrix_data.get('unique_clos') or []
     
-    assessed_count = len(unique_clos)
+    all_clo_numbers = [clo_number(c) or str(c or '').strip() for c in all_course_clos]
+    
+    # Low or zero coverage
+    zero_coverage = [c for c in all_clo_numbers if totals.get(c, 0) == 0]
+    covered_clos = [c for c in all_clo_numbers if totals.get(c, 0) > 0]
     
     # Most frequently assessed
     most_frequent = []
-    if totals:
-        max_val = max(totals.values())
-        most_frequent = [clo for clo, count in totals.items() if count == max_val]
-        
-    # Low or zero coverage
-    all_clo_numbers = [clo_number(c) or str(c or '').strip() for c in all_course_clos]
-    zero_coverage = [c for c in all_clo_numbers if c not in unique_clos or totals.get(c, 0) == 0]
-    
+    max_val = 0
+    if totals and covered_clos:
+        max_val = max(totals.get(c, 0) for c in covered_clos)
+        if max_val > 0:
+            most_frequent = [c for c in covered_clos if totals.get(c, 0) == max_val]
+            
     # Balance
     balance_comment = ""
-    if percentages:
-        vals = list(percentages.values())
+    if covered_clos:
+        vals = [percentages.get(c, 0) for c in covered_clos]
         avg = sum(vals) / len(vals)
         std_dev = (sum((v - avg) ** 2 for v in vals) / len(vals)) ** 0.5
         
@@ -11663,26 +11669,16 @@ def generate_assessment_coverage_summary_text(matrix_data, all_course_clos, lang
             else:
                 balance_comment = "There is significant variance in CLO coverage, indicating potential overrepresentation of certain CLOs."
 
-    if language == 'ar':
-        summary = f"إجمالي عدد نواتج التعلم التي تم تقييمها هو {assessed_count}. "
-        if most_frequent:
-            summary += f"ناتج التعلم الأكثر تقييماً هو ({', '.join(most_frequent)}). "
-        if zero_coverage:
-            summary += f"هناك نواتج تعلم لم يتم تغطيتها في هذا التقييم: ({', '.join(zero_coverage)}). "
-        else:
-            summary += "تمت تغطية جميع نواتج تعلم المقرر في هذا التقييم. "
-        summary += balance_comment
-    else:
-        summary = f"The total number of assessed CLOs is {assessed_count}. "
-        if most_frequent:
-            summary += f"The most frequently assessed CLO is ({', '.join(most_frequent)}). "
-        if zero_coverage:
-            summary += f"The following CLOs have zero coverage in this assessment: ({', '.join(zero_coverage)}). "
-        else:
-            summary += "All course CLOs are covered in this assessment. "
-        summary += balance_comment
-        
-    return summary
+    return {
+        'total_clos': len(all_clo_numbers),
+        'covered_count': len(covered_clos),
+        'uncovered_count': len(zero_coverage),
+        'most_frequent': most_frequent,
+        'most_frequent_count': max_val,
+        'most_frequent_pct': percentages.get(most_frequent[0], 0) if most_frequent else 0,
+        'zero_coverage': zero_coverage,
+        'balance_comment': balance_comment
+    }
 
 def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
     payload = payload or {}
@@ -14946,9 +14942,9 @@ def question_clo_mapping_final_review_get(draft_id):
     matrix_payload = {'questions': []}
     for q_id in metrics.get('questions') or []:
         matrix_payload['questions'].append({'clos': metrics.get('detected_clo_mappings', {}).get(q_id, [])})
-    matrix_data = compute_exam_alignment_matrix(matrix_payload)
+    matrix_data = compute_exam_alignment_matrix(matrix_payload, clos)
     language = get_export_report_language() if has_request_context() else 'en'
-    coverage_summary = generate_assessment_coverage_summary_text(matrix_data, clos, language)
+    coverage_summary = generate_assessment_coverage_summary(matrix_data, clos, language)
 
     return render_template(
         'question_clo_final_review.html',
