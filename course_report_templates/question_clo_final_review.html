@@ -55,9 +55,7 @@
                         <td dir="{{ text_direction(question_text) }}" style="white-space: pre-wrap; text-align: {{ 'right' if text_direction(question_text) == 'rtl' else 'left' }};">{{ question_text }}</td>
                         <td>
                             {% if selected_clos %}
-                                {% for clo in selected_clos %}
-                                    <span class="clo-review-badge">{{ clo }}</span>
-                                {% endfor %}
+                                {{ selected_clos | join(', ') }}
                             {% else %}
                                 <span style="color: var(--text-muted);">-</span>
                             {% endif %}
