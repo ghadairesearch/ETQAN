@@ -590,7 +590,7 @@ EN_TRANSLATIONS = {
     'question_mapping.select_at_least_one': 'Please select at least one CLO for:',
     'exams.title': 'My Exams',
     'exams.empty': 'No saved exams yet.',
-    'exams.saved': 'Exam saved successfully.',
+    'exams.saved': 'Assessment Alignment Report saved successfully.',
     'exams.exam': 'Exam',
     'exams.course': 'Course',
     'exams.questions': 'Questions',
@@ -1691,7 +1691,7 @@ TRANSLATIONS['ar'].update({
     'question_mapping.review_saved': 'تم الحفظ بنجاح.',
     'exams.title': '\u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a\u064a',
     'exams.empty': '\u0644\u0627 \u062a\u0648\u062c\u062f \u0627\u062e\u062a\u0628\u0627\u0631\u0627\u062a \u0645\u062d\u0641\u0648\u0638\u0629 \u0628\u0639\u062f.',
-    'exams.saved': 'تم الحفظ بنجاح.',
+    'exams.saved': 'تم حفظ تقرير الموائمة بنجاح.',
     'exams.exam': '\u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631',
     'exams.course': '\u0627\u0644\u0645\u0642\u0631\u0631',
     'exams.questions': '\u0627\u0644\u0623\u0633\u0626\u0644\u0629',
@@ -11548,26 +11548,81 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     ]
     return build_simple_word_document(elements)
 
+def compute_exam_alignment_matrix(payload):
+    questions = payload.get('questions') or []
+    unique_clos = set()
+    for item in questions:
+        for clo in item.get('clos') or []:
+            unique_clos.add(clo_number(clo) or str(clo or '').strip())
+    
+    unique_clos = sorted(list(unique_clos))
+    num_questions = len(questions)
+    
+    matrix_rows = []
+    clo_counts = {clo: 0 for clo in unique_clos}
+    
+    for index, item in enumerate(questions, start=1):
+        q_clos = [clo_number(c) or str(c or '').strip() for c in item.get('clos') or []]
+        row_clos = {}
+        for clo in unique_clos:
+            is_mapped = clo in q_clos
+            row_clos[clo] = is_mapped
+            if is_mapped:
+                clo_counts[clo] += 1
+        matrix_rows.append({
+            'index': index,
+            'clos': row_clos
+        })
+        
+    percentages = {
+        clo: round((clo_counts[clo] / num_questions * 100), 1) if num_questions > 0 else 0
+        for clo in unique_clos
+    }
+    
+    return {
+        'unique_clos': unique_clos,
+        'rows': matrix_rows,
+        'totals': clo_counts,
+        'percentages': percentages,
+        'total_questions': num_questions
+    }
+
 def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
     payload = payload or {}
     language = get_export_report_language() if has_request_context() else 'en'
-    report_title = title or ('\u062a\u0642\u0631\u064a\u0631 \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629' if language == 'ar' else 'Question CLO Mapping')
-    course_label = '\u0627\u0644\u0645\u0642\u0631\u0631' if language == 'ar' else 'Course'
-    source_label = '\u0627\u0644\u0645\u0635\u062f\u0631' if language == 'ar' else 'Source'
-    type_label = '\u0646\u0648\u0639 \u0627\u0644\u0633\u0624\u0627\u0644' if language == 'ar' else 'Question Type'
-    question_label = '\u0627\u0644\u0633\u0624\u0627\u0644' if language == 'ar' else 'Question'
-    text_label = '\u0646\u0635 \u0627\u0644\u0633\u0624\u0627\u0644' if language == 'ar' else 'Question Text'
-    clo_label = '\u0646\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645' if language == 'ar' else 'Mapped CLOs'
-    elements = [word_paragraph(report_title, bold=True)]
+    report_title = title or ('تقرير موائمة التقييم' if language == 'ar' else 'Assessment Alignment Report')
+    course_label = 'المقرر' if language == 'ar' else 'Course'
+    source_label = 'المصدر' if language == 'ar' else 'Source'
+    type_label = 'نوع السؤال' if language == 'ar' else 'Question Type'
+    question_label = 'السؤال' if language == 'ar' else 'Question'
+    text_label = 'نص السؤال' if language == 'ar' else 'Question Text'
+    clo_label = 'ناتج التعلم' if language == 'ar' else 'Mapped CLOs'
+    elements = []
+    
     if has_request_context() and current_user():
         user = current_user()
         if user.get('university'):
-            elements.insert(0, word_paragraph(user['university'], bold=True))
+            elements.append(word_paragraph(user['university'], bold=True))
+            
+    elements.append(word_paragraph(report_title, bold=True))
     if course_name:
         elements.append(word_paragraph(f"{course_label}: {course_name}"))
     if filename:
         elements.append(word_paragraph(f"{source_label}: {filename}"))
+    elements.append(word_paragraph(''))
     table = word_element('tbl')
+    table_properties = word_element('tblPr')
+    table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
+    borders = word_element('tblBorders')
+    for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
+        borders.append(word_element(border_name, {
+            word_tag('val'): 'single',
+            word_tag('sz'): '6',
+            word_tag('space'): '0',
+            word_tag('color'): 'cbd5e1',
+        }))
+    table_properties.append(borders)
+    table.append(table_properties)
     table.append(word_row([question_label, type_label, text_label, clo_label], header=True))
     for index, item in enumerate(payload.get('questions') or [], start=1):
         clos = '\n'.join(clo_number(clo) or str(clo or '') for clo in item.get('clos') or [])
@@ -11578,6 +11633,50 @@ def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
             clos or '-',
         ]))
     elements.append(table)
+    
+    # --- Matrix Generation ---
+    matrix_data = compute_exam_alignment_matrix(payload)
+    unique_clos = matrix_data['unique_clos']
+    
+    if unique_clos:
+        elements.append(word_paragraph(''))
+        matrix_title = 'مصفوفة الموائمة' if language == 'ar' else 'Alignment Matrix'
+        elements.append(word_paragraph(matrix_title, bold=True))
+        
+        m_table = word_element('tbl')
+        m_table_properties = word_element('tblPr')
+        m_table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
+        m_borders = word_element('tblBorders')
+        for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
+            m_borders.append(word_element(border_name, {
+                word_tag('val'): 'single', word_tag('sz'): '6', word_tag('space'): '0', word_tag('color'): 'cbd5e1'
+            }))
+        m_table_properties.append(m_borders)
+        m_table.append(m_table_properties)
+        
+        m_header = [question_label] + unique_clos
+        m_table.append(word_row(m_header, header=True))
+        
+        for row_info in matrix_data['rows']:
+            m_row = [f"{question_label} {row_info['index']}"]
+            for clo in unique_clos:
+                m_row.append("✓" if row_info['clos'].get(clo) else "")
+            m_table.append(word_row(m_row))
+            
+        count_label = 'الإجمالي' if language == 'ar' else 'Total Count'
+        count_row = [count_label]
+        for clo in unique_clos:
+            count_row.append(str(matrix_data['totals'].get(clo, 0)))
+        m_table.append(word_row(count_row, header=True))
+        
+        perc_label = 'النسبة من الإجمالي' if language == 'ar' else 'Percentage'
+        perc_row = [perc_label]
+        for clo in unique_clos:
+            perc_row.append(f"{matrix_data['percentages'].get(clo, 0)}%")
+        m_table.append(word_row(perc_row, header=True))
+        
+        elements.append(m_table)
+
     return build_simple_word_document(elements)
 
 def build_course_report_docx(stats, course_report_inputs=None, course_info=None, total_students=None):
@@ -12793,7 +12892,7 @@ def new_course():
             )
 
         display_name = build_course_display_name(course_name, course_code)
-        if not display_name or not clos:
+        if not display_name or not clos or not topics:
             flash(translate('courses.invalid'), "error")
             return redirect(request.url)
 
@@ -13024,7 +13123,7 @@ def edit_course(course_id):
             return render_template('course_edit.html', draft_course=draft_course)
 
         display_name = build_course_display_name(course_name, course_code)
-        if not display_name or not clos:
+        if not display_name or not clos or not topics:
             flash(translate('courses.invalid'), "error")
             return redirect(request.url)
 
@@ -13842,13 +13941,21 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
     if user and user.get('university'):
         elements.append(paragraph(user['university'], title_style))
     
-    report_title = title or ('تقرير ربط الأسئلة' if is_arabic else 'Question CLO Mapping')
+    report_title = 'تقرير موائمة التقييم' if is_arabic else 'Assessment Alignment Report'
     elements.append(paragraph(report_title, title_style))
+    
+    if title:
+        subtitle_style = ParagraphStyle(
+            'SubtitleStyle', parent=styles['Normal'], fontName=bold_font, fontSize=12,
+            alignment=TA_RIGHT if is_arabic else TA_LEFT, textColor=colors.HexColor('#64748b'),
+            spaceAfter=12
+        )
+        elements.append(paragraph(title, subtitle_style))
     
     course_label = 'المقرر' if is_arabic else 'Course'
     source_label = 'المصدر' if is_arabic else 'Source'
     
-    meta_text = f"<b>{course_label}:</b> {course_name or '-'}<br/><b>{source_label}:</b> {filename or '-'}"
+    meta_text = f"{course_label}: {course_name or '-'}\n{source_label}: {filename or '-'}"
     elements.append(paragraph(meta_text, meta_style))
 
     type_label = 'نوع السؤال' if is_arabic else 'Question Type'
@@ -13872,7 +13979,6 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
         ])
 
     if is_arabic:
-        # RTL tables: reverse column order for ReportLab
         for row in data:
             row.reverse()
         colWidths = [1.5*inch, 3.5*inch, 1*inch, 1*inch]
@@ -13889,6 +13995,65 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
         ('FONTNAME', (0, 0), (-1, -1), regular_font),
     ]))
     elements.append(table)
+    
+    # --- Matrix Generation ---
+    from reportlab.platypus import Spacer
+    elements.append(Spacer(1, 0.4 * inch))
+    
+    matrix_title = 'مصفوفة الموائمة' if is_arabic else 'Alignment Matrix'
+    elements.append(paragraph(matrix_title, title_style))
+    
+    matrix_data = compute_exam_alignment_matrix(payload)
+    unique_clos = matrix_data['unique_clos']
+    
+    if unique_clos:
+        m_header = [paragraph(question_label, table_header)]
+        for clo in unique_clos:
+            m_header.append(paragraph(clo, table_header))
+        m_table_data = [m_header]
+        
+        for row_info in matrix_data['rows']:
+            m_row = [paragraph(f"{question_label} {row_info['index']}", table_text)]
+            for clo in unique_clos:
+                if row_info['clos'].get(clo):
+                    m_row.append(paragraph("✓", table_text))
+                else:
+                    m_row.append(paragraph("", table_text))
+            m_table_data.append(m_row)
+            
+        count_label = 'الإجمالي' if is_arabic else 'Total Count'
+        count_row = [paragraph(count_label, table_header)]
+        for clo in unique_clos:
+            count_row.append(paragraph(str(matrix_data['totals'].get(clo, 0)), table_header))
+        m_table_data.append(count_row)
+        
+        perc_label = 'النسبة من الإجمالي' if is_arabic else 'Percentage'
+        perc_row = [paragraph(perc_label, table_header)]
+        for clo in unique_clos:
+            perc = matrix_data['percentages'].get(clo, 0)
+            perc_row.append(paragraph(f"{perc}%", table_header))
+        m_table_data.append(perc_row)
+        
+        if is_arabic:
+            for row in m_table_data:
+                row.reverse()
+                
+        # Calculate matrix column widths dynamically
+        num_cols = len(unique_clos) + 1
+        available_width = letter[0] - 1 * inch
+        col_width = available_width / num_cols
+        
+        m_table = Table(m_table_data, colWidths=[col_width] * num_cols)
+        m_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f8fafc')),
+            ('BACKGROUND', (0, -2), (-1, -1), colors.HexColor('#f1f5f9')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cbd5e1')),
+            ('FONTNAME', (0, 0), (-1, -1), regular_font),
+        ]))
+        elements.append(m_table)
 
     doc.build(elements)
     return buffer.getvalue()
@@ -14598,13 +14763,20 @@ def question_clo_mapping_final_review_get(draft_id):
     with open(question_mapping_draft_path(draft_id), 'w', encoding='utf-8') as f:
         json.dump(draft, f, ensure_ascii=False)
 
+    # Prepare matrix_data
+    matrix_payload = {'questions': []}
+    for q_id in metrics.get('questions') or []:
+        matrix_payload['questions'].append({'clos': metrics.get('selections', {}).get(q_id, [])})
+    matrix_data = compute_exam_alignment_matrix(matrix_payload)
+
     return render_template(
         'question_clo_final_review.html',
         course_name=course_name,
         clos=clos,
         metrics=metrics,
         filename=draft.get('filename') or '',
-        draft_id=draft_id
+        draft_id=draft_id,
+        matrix_data=matrix_data
     )
 
 

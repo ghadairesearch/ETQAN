@@ -40,7 +40,7 @@
             fill: none;
         }
     </style>
-    <label class="form-label">{{ _('courses.clos') }}</label>
+    <label class="form-label">{{ _('courses.clos') }} <span style="color: red;">*</span></label>
     {% set clo_rows = draft_course.clo_rows|default([], true) %}
     <div style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 6px; background: #fff;">
         <table style="width: 100%; border-collapse: collapse; min-width: 820px;">

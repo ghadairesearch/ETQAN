@@ -39,7 +39,7 @@
                         <div style="border-top: 1px solid var(--border-color); margin-top: 1rem; padding-top: 1rem;">
                             <div style="display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 1rem;">
                                 <div class="form-group">
-                                    <label class="form-label">{{ _('courses.course_name') }}</label>
+                                    <label class="form-label">{{ _('courses.course_name') }} <span style="color: red;">*</span></label>
                                     <input type="text" name="course_name" class="form-control" value="{{ draft_course.course_name|default('', true) }}">
                                 </div>
                                 <div class="form-group">
@@ -63,7 +63,7 @@
                             </div>
                             {% include "course_clo_table.html" %}
                             <div class="form-group" style="margin-top: 1rem;">
-                                <label class="form-label">{{ _('courses.topics') }}</label>
+                                <label class="form-label">{{ _('courses.topics') }} <span style="color: red;">*</span></label>
                                 <textarea name="topics" class="form-control" rows="8" placeholder="{{ _('courses.topics_placeholder') }}">{{ draft_course.topics_text|default('', true) }}</textarea>
                             </div>
                         </div>
@@ -81,7 +81,7 @@
                         <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0 0 0.9rem;">{{ _('courses.manual_help') }}</p>
                         <div style="display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 1rem;">
                             <div class="form-group">
-                                <label class="form-label">{{ _('courses.course_name') }}</label>
+                                <label class="form-label">{{ _('courses.course_name') }} <span style="color: red;">*</span></label>
                                 <input type="text" name="course_name" class="form-control" value="{{ draft_course.course_name|default('', true) }}">
                             </div>
                             <div class="form-group">
@@ -105,7 +105,7 @@
                         </div>
                         {% include "course_clo_table.html" %}
                         <div class="form-group" style="margin-top: 1rem;">
-                            <label class="form-label">{{ _('courses.topics') }}</label>
+                            <label class="form-label">{{ _('courses.topics') }} <span style="color: red;">*</span></label>
                             <textarea name="topics" class="form-control" rows="8" placeholder="{{ _('courses.topics_placeholder') }}">{{ draft_course.topics_text|default('', true) }}</textarea>
                         </div>
                     </section>

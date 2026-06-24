@@ -66,6 +66,43 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% if matrix_data and matrix_data.unique_clos %}
+            <h3 style="margin-top: 2rem;">{% if language == 'ar' %}مصفوفة الموائمة{% else %}Alignment Matrix{% endif %}</h3>
+            <div style="overflow-x: auto;">
+                <table style="margin-top: 0.5rem; text-align: center;">
+                    <thead>
+                        <tr>
+                            <th style="width: 140px; text-align: {{ 'right' if language == 'ar' else 'left' }};">{% if language == 'ar' %}السؤال{% else %}Question{% endif %}</th>
+                            {% for clo in matrix_data.unique_clos %}
+                                <th style="text-align: center;">{{ clo }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row_info in matrix_data.rows %}
+                            <tr>
+                                <td style="text-align: {{ 'right' if language == 'ar' else 'left' }}; font-weight: 500;">{% if language == 'ar' %}السؤال{% else %}Question{% endif %} {{ row_info.index }}</td>
+                                {% for clo in matrix_data.unique_clos %}
+                                    <td>{% if row_info.clos[clo] %}&#10003;{% endif %}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        <tr style="background-color: var(--border-color); font-weight: bold;">
+                            <td style="text-align: {{ 'right' if language == 'ar' else 'left' }};">{% if language == 'ar' %}الإجمالي{% else %}Total Count{% endif %}</td>
+                            {% for clo in matrix_data.unique_clos %}
+                                <td>{{ matrix_data.totals.get(clo, 0) }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr style="background-color: var(--border-color); font-weight: bold;">
+                            <td style="text-align: {{ 'right' if language == 'ar' else 'left' }};">{% if language == 'ar' %}النسبة من الإجمالي{% else %}Percentage{% endif %}</td>
+                            {% for clo in matrix_data.unique_clos %}
+                                <td>{{ matrix_data.percentages.get(clo, 0) }}%</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
 
         <div class="form-action-row" style="margin-top: 1.1rem;">
             <a href="{{ url_for('question_clo_mapping_ai_get', draft_id=draft_id) }}" class="btn back-action" style="background-color: var(--border-color); color: var(--text-main);">{{ _('question_mapping.back') }}</a>
