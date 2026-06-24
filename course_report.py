@@ -13760,6 +13760,139 @@ def exam_delete(exam_id):
     flash("Exam deleted successfully.")
     return redirect(url_for('my_exams'))
 
+def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename='', user=None):
+    from xml.sax.saxutils import escape
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import inch
+    from reportlab.platypus import BaseDocTemplate, Frame, PageTemplate, Paragraph, Table, TableStyle
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    import io
+
+    try:
+        import arabic_reshaper
+        from bidi.algorithm import get_display
+    except Exception:
+        arabic_reshaper = None
+        get_display = None
+
+    regular_font_path, bold_font_path = get_report_pdf_font_paths()
+    if not regular_font_path:
+        raise RuntimeError("No Unicode PDF font found.")
+
+    regular_font = 'CLOReportRegular'
+    bold_font = 'CLOReportBold'
+    if regular_font not in pdfmetrics.getRegisteredFontNames():
+        pdfmetrics.registerFont(TTFont(regular_font, regular_font_path))
+    if bold_font not in pdfmetrics.getRegisteredFontNames():
+        pdfmetrics.registerFont(TTFont(bold_font, bold_font_path or regular_font_path))
+
+    language = get_export_report_language() if has_request_context() else 'en'
+    is_arabic = language == 'ar'
+
+    def display_text(value, reorder_arabic=True):
+        text = clean_report_pdf_text(value)
+        if contains_arabic(text) and arabic_reshaper:
+            reshaped = arabic_reshaper.reshape(text)
+            if reorder_arabic and get_display:
+                return get_display(reshaped)
+            return reshaped
+        return text
+
+    def paragraph(value, style, reorder_arabic=True):
+        lines = str(value or '').split('\n')
+        text = '<br/>'.join(
+            escape(display_text(line, reorder_arabic=reorder_arabic))
+            for line in lines
+        )
+        return Paragraph(text or '&nbsp;', style)
+
+    buffer = io.BytesIO()
+    doc = BaseDocTemplate(
+        buffer, pagesize=letter,
+        leftMargin=0.5*inch, rightMargin=0.5*inch,
+        topMargin=0.5*inch, bottomMargin=0.5*inch
+    )
+    frame = Frame(0.5*inch, 0.5*inch, letter[0]-1*inch, letter[1]-1*inch)
+    doc.addPageTemplates([PageTemplate(id='First', frames=frame)])
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'TitleStyle', parent=styles['Title'], fontName=bold_font, fontSize=16,
+        alignment=TA_RIGHT if is_arabic else TA_LEFT, textColor=colors.HexColor(user.get('brand_color', '#26365f') if user else '#26365f'),
+        spaceAfter=12
+    )
+    meta_style = ParagraphStyle(
+        'MetaStyle', parent=styles['Normal'], fontName=regular_font, fontSize=10,
+        alignment=TA_RIGHT if is_arabic else TA_LEFT, spaceAfter=12
+    )
+    table_header = ParagraphStyle(
+        'TableHeader', parent=styles['Normal'], fontName=bold_font, fontSize=10,
+        alignment=TA_RIGHT if is_arabic else TA_LEFT
+    )
+    table_text = ParagraphStyle(
+        'TableText', parent=styles['Normal'], fontName=regular_font, fontSize=10,
+        alignment=TA_RIGHT if is_arabic else TA_LEFT
+    )
+
+    elements = []
+    if user and user.get('university'):
+        elements.append(paragraph(user['university'], title_style))
+    
+    report_title = title or ('تقرير ربط الأسئلة' if is_arabic else 'Question CLO Mapping')
+    elements.append(paragraph(report_title, title_style))
+    
+    course_label = 'المقرر' if is_arabic else 'Course'
+    source_label = 'المصدر' if is_arabic else 'Source'
+    
+    meta_text = f"<b>{course_label}:</b> {course_name or '-'}<br/><b>{source_label}:</b> {filename or '-'}"
+    elements.append(paragraph(meta_text, meta_style))
+
+    type_label = 'نوع السؤال' if is_arabic else 'Question Type'
+    question_label = 'السؤال' if is_arabic else 'Question'
+    text_label = 'نص السؤال' if is_arabic else 'Question Text'
+    clo_label = 'ناتج التعلم' if is_arabic else 'Mapped CLOs'
+
+    data = [
+        [paragraph(question_label, table_header), paragraph(type_label, table_header), paragraph(text_label, table_header), paragraph(clo_label, table_header)]
+    ]
+    
+    for index, item in enumerate(payload.get('questions') or [], start=1):
+        clos = '\n'.join(clo_number(clo) or str(clo or '') for clo in item.get('clos') or [])
+        q_type = item.get('question_type') or item.get('type') or '-'
+        q_text = item.get('question_text') or item.get('text') or ''
+        data.append([
+            paragraph(f"{question_label} {index}", table_text),
+            paragraph(q_type, table_text),
+            paragraph(q_text, table_text),
+            paragraph(clos, table_text)
+        ])
+
+    if is_arabic:
+        # RTL tables: reverse column order for ReportLab
+        for row in data:
+            row.reverse()
+        colWidths = [1.5*inch, 3.5*inch, 1*inch, 1*inch]
+    else:
+        colWidths = [1*inch, 1*inch, 3.5*inch, 1.5*inch]
+
+    table = Table(data, colWidths=colWidths)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f8fafc')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT' if is_arabic else 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cbd5e1')),
+        ('FONTNAME', (0, 0), (-1, -1), regular_font),
+    ]))
+    elements.append(table)
+
+    doc.build(elements)
+    return buffer.getvalue()
+
 @app.route('/account/exams/<int:exam_id>/export/pdf')
 def export_exam_pdf(exam_id):
     user = current_user()
@@ -13784,23 +13917,16 @@ def export_exam_pdf(exam_id):
     }
     payload = safe_json_loads(row_get(row, 'payload_json'), {}) or {}
 
-    html = render_template('exam_view_pdf.html', exam=exam, payload=payload, user=user)
-    
-    options = {
-        'page-size': 'A4',
-        'orientation': 'Portrait',
-        'margin-top': '0.5in',
-        'margin-right': '0.5in',
-        'margin-bottom': '0.5in',
-        'margin-left': '0.5in',
-        'encoding': "UTF-8",
-        'enable-local-file-access': None
-    }
     try:
-        import pdfkit
-        pdf_bytes = pdfkit.from_string(html, False, options=options)
+        pdf_bytes = build_exam_mapping_pdf_reportlab(
+            payload=payload,
+            title=exam['title'],
+            course_name=exam['course_name'],
+            filename=exam['filename'],
+            user=user
+        )
     except Exception as exc:
-        flash(f"Failed to generate PDF. Make sure pdfkit and wkhtmltopdf are installed. Error: {exc}", "error")
+        flash(f"Failed to generate PDF. Error: {exc}", "error")
         return redirect(url_for('exam_view', exam_id=exam_id))
     
     response = Response(pdf_bytes, mimetype="application/pdf")
