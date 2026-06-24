@@ -147,6 +147,14 @@
                 </a>
 
                 {% if current_user and saved_course_count == 0 %}
+                    <a href="/question-clo-mapping" class="service-card service-card-disabled">
+                        <div>
+                            <h3>{{ _('home.question_mapping_title') }}</h3>
+                            <p>{{ _('home.question_mapping_description') }}</p>
+                            <div class="service-card-note">{{ _('home.requires_course') }}</div>
+                        </div>
+                    </a>
+
                     <a href="/clo-attainment?fresh=1" class="service-card service-card-disabled">
                         <div>
                             <h3>{{ _('home.clo_title') }}</h3>
@@ -162,15 +170,14 @@
                             <div class="service-card-note">{{ _('home.requires_course') }}</div>
                         </div>
                     </a>
-
-                    <a href="/question-clo-mapping" class="service-card service-card-disabled">
+                {% else %}
+                    <a href="/question-clo-mapping" class="service-card">
                         <div>
                             <h3>{{ _('home.question_mapping_title') }}</h3>
                             <p>{{ _('home.question_mapping_description') }}</p>
-                            <div class="service-card-note">{{ _('home.requires_course') }}</div>
                         </div>
                     </a>
-                {% else %}
+
                     <a href="/clo-attainment?fresh=1" class="service-card">
                         <div>
                             <h3>{{ _('home.clo_title') }}</h3>
@@ -182,13 +189,6 @@
                         <div>
                             <h3>{{ _('home.course_report_title') }}</h3>
                             <p>{{ _('home.course_report_description') }}</p>
-                        </div>
-                    </a>
-
-                    <a href="/question-clo-mapping" class="service-card">
-                        <div>
-                            <h3>{{ _('home.question_mapping_title') }}</h3>
-                            <p>{{ _('home.question_mapping_description') }}</p>
                         </div>
                     </a>
                 {% endif %}
