@@ -741,7 +741,7 @@ EN_TRANSLATIONS = {
     'courses.clo': 'CLO',
     'courses.associated_plo': 'Associated PLO',
     'courses.actions': 'Actions',
-    'courses.add_clo_row': 'Add CLO row',
+    'courses.add_clo_row': 'Add CLO',
     'courses.remove_clo': 'Remove',
     'courses.topics': 'Course Topics',
     'courses.topics_placeholder': 'Enter course topics, one per line',
@@ -5305,12 +5305,12 @@ def parse_gemini_json_response(text):
     return None
 
 
-def call_groq_json_with_error(system_prompt, user_payload, timeout=90):
+def call_groq_json_with_error(system_prompt, user_payload, timeout=90, model_name=None):
     if not GROQ_KEY:
         return None, "GROQ_KEY is not configured."
     try:
         payload = {
-            'model': GROQ_MODEL,
+            'model': model_name or GROQ_MODEL,
             'temperature': 0,
             'response_format': {'type': 'json_object'},
             'messages': [
@@ -5348,8 +5348,8 @@ def call_groq_json_with_error(system_prompt, user_payload, timeout=90):
     return parsed, ''
 
 
-def call_groq_json(system_prompt, user_payload, timeout=90):
-    parsed, _error = call_groq_json_with_error(system_prompt, user_payload, timeout)
+def call_groq_json(system_prompt, user_payload, timeout=90, model_name=None):
+    parsed, _error = call_groq_json_with_error(system_prompt, user_payload, timeout, model_name=model_name)
     return parsed
 
 
@@ -5575,7 +5575,7 @@ def extract_course_spec_with_gemini(filepath, filename=''):
     return set_gemini_spec_cache(file_hash, False) or None
 
 
-def extract_course_spec_with_groq_text(text):
+def extract_course_spec_with_groq_text(text, model_name=None):
     if not GROQ_KEY or not compact_text(text):
         return None
     user_payload = (
@@ -5585,11 +5585,12 @@ def extract_course_spec_with_groq_text(text):
     )
     parsed = call_groq_json(
         "You extract structured course specification data. Return valid JSON only.",
-        user_payload
+        user_payload,
+        model_name=model_name
     )
     extracted = normalize_gemini_course_spec(parsed)
     if course_spec_extraction_is_usable(extracted):
-        extracted['extraction_method'] = 'qwen'
+        extracted['extraction_method'] = 'groq'
         return extracted
     return None
 
@@ -5868,6 +5869,17 @@ def extract_course_spec_document(filepath, filename=''):
     text = extract_pdf_text(filepath, allow_ocr=False)
     if not compact_text(text):
         text = extract_pdf_text(filepath, allow_ocr=True)
+        
+    groq_extracted = extract_course_spec_with_groq_text(text, model_name="llama-3.1-8b-instant")
+    if groq_extracted:
+        groq_extracted['extraction_metadata'] = {
+            'task': 'course_specification_extraction',
+            'source': 'groq',
+            'model': 'llama-3.1-8b-instant',
+            'duration_seconds': elapsed_seconds(extraction_start),
+            'filename': filename or os.path.basename(filepath),
+        }
+        return text, groq_extracted
     else:
         ocr_text = extract_pdf_text(filepath, allow_ocr=True)
         if len(compact_text(ocr_text)) > len(compact_text(text)):
@@ -15499,10 +15511,17 @@ def save_course_report_draft_action(draft_id):
     
     save_result = save_course_report_snapshot(combined_stats, course_report_inputs, course_info, total_students, source_report_ids)
     if not save_result.get('allowed'):
-        flash("Please upgrade or add report credits to save more reports.", "error")
+        flash(translate('billing.limit_message') if translate('billing.limit_message') != 'billing.limit_message' else "Please upgrade or add report credits to save more reports.", "error")
         return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
         
     saved_id = save_result.get('id')
+    
+    final_action = request.form.get('final_action')
+    if final_action == 'export_word':
+        return redirect(url_for('export_saved_course_report_word', report_id=saved_id))
+    elif final_action == 'export_pdf':
+        return redirect(url_for('export_saved_course_report_pdf', report_id=saved_id))
+        
     return redirect(url_for('report_detail', report_id=saved_id))
 
 @app.route('/clo-attainment', methods=['GET', 'POST'])
