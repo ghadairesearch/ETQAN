@@ -2822,6 +2822,99 @@ def apply_university_identity_colors(branding=None):
         branding['organization_website'] = identity.get('resolved_website') or identity.get('website') or branding.get('organization_website', '')
     return branding
 
+def compute_color_luminance(hex_color):
+    hex_color = str(hex_color or '#FFFFFF').lstrip('#')
+    if len(hex_color) == 3:
+        hex_color = ''.join([c*2 for c in hex_color])
+    try:
+        r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    except ValueError:
+        return 1.0
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255.0
+
+def get_contrast_text_color(hex_color):
+    return '#FFFFFF' if compute_color_luminance(hex_color) < 0.6 else '#000000'
+
+def get_standard_table_style(primary_color_hex, is_arabic, num_rows, header_rows=1):
+    from reportlab.lib import colors
+    from reportlab.platypus import TableStyle
+    
+    header_text_color_hex = get_contrast_text_color(primary_color_hex)
+    try:
+        primary_color = colors.HexColor(primary_color_hex)
+    except Exception:
+        primary_color = colors.HexColor('#26365f')
+    try:
+        header_text_color = colors.HexColor(header_text_color_hex)
+    except Exception:
+        header_text_color = colors.white
+        
+    style_commands = [
+        ('BACKGROUND', (0, 0), (-1, header_rows - 1), primary_color),
+        ('TEXTCOLOR', (0, 0), (-1, header_rows - 1), header_text_color),
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT' if is_arabic else 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 0.45, colors.HexColor('#cbd5e1')),
+        ('LEFTPADDING', (0, 0), (-1, -1), 4),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+    ]
+    
+    for row in range(header_rows, num_rows):
+        bg_color = colors.HexColor('#f8fafc') if (row - header_rows) % 2 == 1 else colors.white
+        style_commands.append(('BACKGROUND', (0, row), (-1, row), bg_color))
+        
+    return TableStyle(style_commands)
+
+def get_standard_paragraph_styles(primary_color_hex, is_arabic, regular_font, bold_font):
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+    from reportlab.lib import colors
+    
+    try:
+        primary_color = colors.HexColor(primary_color_hex)
+    except Exception:
+        primary_color = colors.HexColor('#26365f')
+        
+    header_text_color_hex = get_contrast_text_color(primary_color_hex)
+    try:
+        header_text_color = colors.HexColor(header_text_color_hex)
+    except Exception:
+        header_text_color = colors.white
+
+    base_styles = getSampleStyleSheet()
+    
+    title_style = ParagraphStyle(
+        'ReportTitle', parent=base_styles['Title'], fontName=bold_font, fontSize=17,
+        leading=21, textColor=primary_color, alignment=TA_RIGHT if is_arabic else TA_LEFT,
+        spaceAfter=12
+    )
+    meta_style = ParagraphStyle(
+        'ReportMeta', parent=base_styles['Normal'], fontName=regular_font, fontSize=10,
+        leading=13, textColor=colors.black, alignment=TA_RIGHT if is_arabic else TA_LEFT, spaceAfter=2
+    )
+    section_style = ParagraphStyle(
+        'ReportSection', parent=base_styles['Heading2'], fontName=bold_font, fontSize=12,
+        leading=15, textColor=primary_color, alignment=TA_RIGHT if is_arabic else TA_LEFT,
+        spaceBefore=12, spaceAfter=6
+    )
+    table_header = ParagraphStyle(
+        'TableHeader', parent=base_styles['Normal'], fontName=bold_font, fontSize=10,
+        textColor=header_text_color, alignment=TA_RIGHT if is_arabic else TA_LEFT
+    )
+    table_text = ParagraphStyle(
+        'TableText', parent=base_styles['Normal'], fontName=regular_font, fontSize=10,
+        textColor=colors.black, alignment=TA_RIGHT if is_arabic else TA_LEFT
+    )
+    
+    return {
+        'title': title_style,
+        'meta': meta_style,
+        'section': section_style,
+        'table_header': table_header,
+        'table_text': table_text
+    }
 def get_saved_report_count(user_id):
     with get_db() as conn:
         return conn.execute(
@@ -9963,57 +10056,22 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
         id='landscape_frame'
     )
 
-    base_styles = getSampleStyleSheet()
-    title_style = ParagraphStyle(
-        'ReportTitle',
-        parent=base_styles['Title'],
-        fontName=bold_font,
-        fontSize=17,
-        leading=21,
-        textColor=primary_color,
-        alignment=TA_RIGHT if is_arabic_report else TA_LEFT,
-        spaceAfter=8,
-    )
-    meta_style = ParagraphStyle(
-        'ReportMeta',
-        parent=base_styles['Normal'],
-        fontName=regular_font,
-        fontSize=10,
-        leading=13,
-        textColor=body_text_color,
-        alignment=TA_RIGHT if is_arabic_report else TA_LEFT,
-    )
-    section_style = ParagraphStyle(
-        'ReportSection',
-        parent=base_styles['Heading2'],
-        fontName=bold_font,
-        fontSize=12,
-        leading=15,
-        textColor=primary_color,
-        alignment=TA_RIGHT if is_arabic_report else TA_LEFT,
-        spaceBefore=12,
-        spaceAfter=6,
-    )
+    std_styles = get_standard_paragraph_styles(branding.get('primary_color'), is_arabic_report, regular_font, bold_font)
+    title_style = std_styles['title']
+    meta_style = std_styles['meta']
+    section_style = std_styles['section']
+    table_header = std_styles['table_header']
+    
     table_text = ParagraphStyle(
         'ReportTableText',
-        parent=base_styles['Normal'],
-        fontName=regular_font,
+        parent=std_styles['table_text'],
         fontSize=7.4,
         leading=9.2,
-        alignment=TA_RIGHT if is_arabic_report else TA_LEFT,
-        textColor=body_text_color,
     )
     table_text_ar = ParagraphStyle(
         'ReportTableTextArabic',
         parent=table_text,
         alignment=TA_RIGHT,
-    )
-    table_header = ParagraphStyle(
-        'ReportTableHeader',
-        parent=table_text,
-        fontName=bold_font,
-        textColor=colors.white,
-        alignment=TA_RIGHT if is_arabic_report else TA_LEFT,
     )
     student_table_text = ParagraphStyle(
         'StudentReportTableText',
@@ -10025,10 +10083,11 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
     )
     student_table_header = ParagraphStyle(
         'StudentReportTableHeader',
-        parent=student_table_text,
-        fontName=bold_font,
-        textColor=colors.white,
-        alignment=TA_RIGHT if is_arabic_report else TA_LEFT,
+        parent=table_header,
+        fontSize=5.6,
+        leading=6.6,
+        alignment=TA_CENTER,
+        splitLongWords=0,
     )
 
     def table_paragraph(value):
@@ -10110,15 +10169,7 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
         ])
     definition_rows, definition_widths = rtl_table(definition_rows, [1.15 * inch, 0.75 * inch, 5.0 * inch])
     definition_table = Table(definition_rows, colWidths=definition_widths, repeatRows=1)
-    definition_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), primary_color),
-        ('GRID', (0, 0), (-1, -1), 0.45, colors.HexColor('#cbd5e1')),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 4),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 4),
-        ('TOPPADDING', (0, 0), (-1, -1), 5),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-    ]))
+    definition_table.setStyle(get_standard_table_style(branding.get('primary_color'), is_arabic_report, len(definition_rows)))
     elements.append(definition_table)
     elements.append(Spacer(1, 12))
 
@@ -10136,15 +10187,7 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
         ])
     rows, summary_result_widths = rtl_table(rows, [0.62 * inch, 2.55 * inch, 0.78 * inch, 1.03 * inch, 1.12 * inch, 0.80 * inch])
     summary_results = Table(rows, colWidths=summary_result_widths, repeatRows=1)
-    summary_results.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), primary_color),
-        ('GRID', (0, 0), (-1, -1), 0.45, colors.HexColor('#cbd5e1')),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 4),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 4),
-        ('TOPPADDING', (0, 0), (-1, -1), 5),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-    ]))
+    summary_results.setStyle(get_standard_table_style(branding.get('primary_color'), is_arabic_report, len(rows)))
     elements.append(summary_results)
 
     student_achievement_matrix = build_student_achievement_matrix(student_achievement_rows, stats.keys())
@@ -10175,15 +10218,7 @@ def build_results_pdf_reportlab(stats, total_students, course_info, student_achi
             colWidths=student_widths,
             repeatRows=1
         )
-        student_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), primary_color),
-            ('GRID', (0, 0), (-1, -1), 0.4, colors.HexColor('#cbd5e1')),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 2.5),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 2.5),
-            ('TOPPADDING', (0, 0), (-1, -1), 4),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-        ]))
+        student_table.setStyle(get_standard_table_style(branding.get('primary_color'), is_arabic_report, len(student_rows)))
         elements.append(student_table)
 
     def footer(canvas, _doc):
@@ -13953,25 +13988,6 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
     frame = Frame(0.5*inch, 0.5*inch, letter[0]-1*inch, letter[1]-1*inch)
     doc.addPageTemplates([PageTemplate(id='First', frames=frame)])
 
-    styles = getSampleStyleSheet()
-    title_style = ParagraphStyle(
-        'TitleStyle', parent=styles['Title'], fontName=bold_font, fontSize=16,
-        alignment=TA_RIGHT if is_arabic else TA_LEFT, textColor=colors.HexColor(user.get('brand_color', '#26365f') if user else '#26365f'),
-        spaceAfter=12
-    )
-    meta_style = ParagraphStyle(
-        'MetaStyle', parent=styles['Normal'], fontName=regular_font, fontSize=10,
-        alignment=TA_RIGHT if is_arabic else TA_LEFT, spaceAfter=12
-    )
-    table_header = ParagraphStyle(
-        'TableHeader', parent=styles['Normal'], fontName=bold_font, fontSize=10,
-        alignment=TA_RIGHT if is_arabic else TA_LEFT
-    )
-    table_text = ParagraphStyle(
-        'TableText', parent=styles['Normal'], fontName=regular_font, fontSize=10,
-        alignment=TA_RIGHT if is_arabic else TA_LEFT
-    )
-
     branding = apply_university_identity_colors(get_report_branding())
     labels = pdf_report_labels(language)
     organization_display_name = localized_university_name(branding.get('organization_name'), language) or labels['na']
@@ -13986,6 +14002,13 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
     accent_color = hex_color(branding.get('secondary_color') or branding.get('primary_color'))
     body_text_color = colors.black
     logo_path = resolve_branding_logo_path(branding, report_ready=True)
+
+    std_styles = get_standard_paragraph_styles(branding.get('primary_color'), is_arabic, regular_font, bold_font)
+    title_style = std_styles['title']
+    meta_style = std_styles['meta']
+    section_style = std_styles['section']
+    table_header = std_styles['table_header']
+    table_text = std_styles['table_text']
 
     elements = []
     
@@ -14034,11 +14057,6 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
     # Add CLO definitions table
     clos = get_course_clos(course_name)
     if clos:
-        section_style = ParagraphStyle(
-            'ReportSection', parent=styles['Heading2'], fontName=bold_font, fontSize=12,
-            alignment=TA_RIGHT if is_arabic else TA_LEFT, textColor=primary_color,
-            spaceBefore=12, spaceAfter=6
-        )
         clo_definitions = build_clo_definitions(clos)
         elements.append(paragraph(labels['clo_definitions'], section_style))
         definition_rows = [[
@@ -14061,20 +14079,11 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
             def_widths = [1.15 * inch, 0.75 * inch, 5.0 * inch]
             
         definition_table = Table(definition_rows, colWidths=def_widths, repeatRows=1)
-        definition_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), primary_color),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('GRID', (0, 0), (-1, -1), 0.45, colors.HexColor('#cbd5e1')),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('ALIGN', (0, 0), (-1, -1), 'RIGHT' if is_arabic else 'LEFT'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 4),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 4),
-            ('TOPPADDING', (0, 0), (-1, -1), 5),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-        ]))
+        definition_table.setStyle(get_standard_table_style(branding.get('primary_color'), is_arabic, len(definition_rows)))
         elements.append(definition_table)
         elements.append(Spacer(1, 12))
         elements.append(paragraph('تفاصيل الموائمة' if is_arabic else 'Alignment Details', section_style))
+        
     type_label = 'نوع السؤال' if is_arabic else 'Question Type'
     question_label = 'السؤال' if is_arabic else 'Question'
     text_label = 'نص السؤال' if is_arabic else 'Question Text'
@@ -14103,14 +14112,7 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
         colWidths = [1*inch, 1*inch, 3.5*inch, 1.5*inch]
 
     table = Table(data, colWidths=colWidths)
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f8fafc')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'RIGHT' if is_arabic else 'LEFT'),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cbd5e1')),
-        ('FONTNAME', (0, 0), (-1, -1), regular_font),
-    ]))
+    table.setStyle(get_standard_table_style(branding.get('primary_color'), is_arabic, len(data)))
     elements.append(table)
     
     # --- Matrix Generation ---
@@ -14161,15 +14163,10 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
         col_width = available_width / num_cols
         
         m_table = Table(m_table_data, colWidths=[col_width] * num_cols)
-        m_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f8fafc')),
-            ('BACKGROUND', (0, -2), (-1, -1), colors.HexColor('#f1f5f9')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cbd5e1')),
-            ('FONTNAME', (0, 0), (-1, -1), regular_font),
-        ]))
+        m_style = get_standard_table_style(branding.get('primary_color'), is_arabic, len(m_table_data))
+        m_style.add('BACKGROUND', (0, -2), (-1, -1), colors.HexColor('#e2e8f0'))
+        m_style.add('ALIGN', (0, 0), (-1, -1), 'CENTER')
+        m_table.setStyle(m_style)
         elements.append(m_table)
 
     doc.build(elements)
