@@ -83,7 +83,7 @@
                             <tr>
                                 <td style="text-align: {{ 'right' if language == 'ar' else 'left' }}; font-weight: 500;">{% if language == 'ar' %}السؤال{% else %}Question{% endif %} {{ row_info.index }}</td>
                                 {% for clo in matrix_data.unique_clos %}
-                                    <td style="text-align: center; vertical-align: middle;">{% if row_info.clos[clo] %}<span style="color: var(--primary); font-size: 1.2rem;">●</span>{% endif %}</td>
+                                    <td style="text-align: center; vertical-align: middle;">{% if row_info.clos[clo] %}<span style="color: var(--accent-primary); font-size: 1.2rem;">●</span>{% endif %}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
@@ -109,7 +109,7 @@
                                 <td style="padding: 0.75rem 0.5rem;">
                                     <div style="display: flex; align-items: center; gap: 1rem;">
                                         <div style="flex: 1; background-color: #e5e7eb; height: 16px; border-radius: 4px; overflow: hidden; max-width: 300px;">
-                                            <div style="background-color: var(--primary); height: 100%; width: {{ pct }}%; transition: width 0.3s ease;"></div>
+                                            <div style="background-color: var(--accent-primary); height: 100%; width: {{ pct }}%; transition: width 0.3s ease;"></div>
                                         </div>
                                         <span style="min-width: 150px; font-size: 0.95rem;">
                                             {{ pct }}% 
