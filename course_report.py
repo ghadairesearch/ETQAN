@@ -11590,7 +11590,7 @@ def compute_exam_alignment_matrix(payload):
 def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
     payload = payload or {}
     language = get_export_report_language() if has_request_context() else 'en'
-    report_title = title or ('تقرير موائمة التقييم' if language == 'ar' else 'Assessment Alignment Report')
+    report_title = 'تقرير موائمة التقييم' if language == 'ar' else 'Assessment Alignment Report'
     course_label = 'المقرر' if language == 'ar' else 'Course'
     source_label = 'المصدر' if language == 'ar' else 'Source'
     type_label = 'نوع السؤال' if language == 'ar' else 'Question Type'
@@ -11610,6 +11610,37 @@ def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
     if filename:
         elements.append(word_paragraph(f"{source_label}: {filename}"))
     elements.append(word_paragraph(''))
+    
+    # Add CLO definitions table
+    clos = get_course_clos(course_name)
+    if clos:
+        clo_defs = build_clo_definitions(clos)
+        labels = pdf_report_labels(language)
+        elements.append(word_paragraph(labels['clo_definitions'], bold=True))
+        def_table = word_element('tbl')
+        def_table_props = word_element('tblPr')
+        def_table_props.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
+        def_borders = word_element('tblBorders')
+        for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
+            def_borders.append(word_element(border_name, {
+                word_tag('val'): 'single',
+                word_tag('sz'): '6',
+                word_tag('space'): '0',
+                word_tag('color'): 'cbd5e1',
+            }))
+        def_table_props.append(def_borders)
+        def_table.append(def_table_props)
+        def_table.append(word_row([labels['domain'], labels['clo'], labels['wording']], header=True))
+        for item in clo_defs:
+            def_table.append(word_row([
+                localized_clo_domain(item['domain'], language),
+                item['number'],
+                item['wording']
+            ]))
+        elements.append(def_table)
+        elements.append(word_paragraph(''))
+        elements.append(word_paragraph('تفاصيل الموائمة' if language == 'ar' else 'Alignment Details', bold=True))
+
     table = word_element('tbl')
     table_properties = word_element('tblPr')
     table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
@@ -13937,27 +13968,109 @@ def build_exam_mapping_pdf_reportlab(payload, title='', course_name='', filename
         alignment=TA_RIGHT if is_arabic else TA_LEFT
     )
 
+    branding = apply_university_identity_colors(get_report_branding())
+    labels = pdf_report_labels(language)
+    organization_display_name = localized_university_name(branding.get('organization_name'), language) or labels['na']
+
+    def hex_color(value, fallback='#26365f'):
+        try:
+            return colors.HexColor(value or fallback)
+        except Exception:
+            return colors.HexColor(fallback)
+
+    primary_color = hex_color(branding.get('primary_color'))
+    accent_color = hex_color(branding.get('secondary_color') or branding.get('primary_color'))
+    body_text_color = colors.black
+    logo_path = resolve_branding_logo_path(branding, report_ready=True)
+
     elements = []
-    if user and user.get('university'):
-        elements.append(paragraph(user['university'], title_style))
+    
+    # Organization Header
+    from reportlab.platypus import Image, Spacer
+    import os
+    heading_cells = []
+    if logo_path and os.path.exists(logo_path):
+        try:
+            logo = Image(logo_path)
+            logo._restrictSize(1.2 * inch, 0.8 * inch)
+            logo.hAlign = 'LEFT' if is_arabic else 'RIGHT'
+            heading_cells.append(logo)
+        except Exception:
+            heading_cells.append('')
     
     report_title = 'تقرير موائمة التقييم' if is_arabic else 'Assessment Alignment Report'
-    elements.append(paragraph(report_title, title_style))
+    heading_text = [
+        paragraph(report_title, title_style),
+        paragraph(f"{labels['university']}: {organization_display_name}", meta_style),
+    ]
+    if branding.get('department'):
+        heading_text.append(paragraph(f"{labels['department']}: {branding.get('department')}", meta_style))
+    heading_text.extend([
+        paragraph(f"{labels['course_name']}: {course_name or '-'}", meta_style),
+        paragraph(f"{'المصدر' if is_arabic else 'Source'}: {filename or '-'}", meta_style),
+    ])
     
-    if title:
-        subtitle_style = ParagraphStyle(
-            'SubtitleStyle', parent=styles['Normal'], fontName=bold_font, fontSize=12,
-            alignment=TA_RIGHT if is_arabic else TA_LEFT, textColor=colors.HexColor('#64748b'),
-            spaceAfter=12
-        )
-        elements.append(paragraph(title, subtitle_style))
-    
-    course_label = 'المقرر' if is_arabic else 'Course'
-    source_label = 'المصدر' if is_arabic else 'Source'
-    
-    meta_text = f"{course_label}: {course_name or '-'}\n{source_label}: {filename or '-'}"
-    elements.append(paragraph(meta_text, meta_style))
+    if heading_cells:
+        if is_arabic:
+            header_table = Table([[heading_text, heading_cells[0]]], colWidths=[5.45 * inch, 1.35 * inch])
+        else:
+            heading_cells.append(heading_text)
+            header_table = Table([heading_cells], colWidths=[1.35 * inch, 5.45 * inch])
+    else:
+        header_table = Table([[heading_text]], colWidths=[6.8 * inch])
+        
+    header_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('LINEBELOW', (0, 0), (-1, -1), 1, accent_color),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+    ]))
+    elements.append(header_table)
+    elements.append(Spacer(1, 10))
 
+    # Add CLO definitions table
+    clos = get_course_clos(course_name)
+    if clos:
+        section_style = ParagraphStyle(
+            'ReportSection', parent=styles['Heading2'], fontName=bold_font, fontSize=12,
+            alignment=TA_RIGHT if is_arabic else TA_LEFT, textColor=primary_color,
+            spaceBefore=12, spaceAfter=6
+        )
+        clo_definitions = build_clo_definitions(clos)
+        elements.append(paragraph(labels['clo_definitions'], section_style))
+        definition_rows = [[
+            paragraph(labels['domain'], table_header),
+            paragraph(labels['clo'], table_header),
+            paragraph(labels['wording'], table_header)
+        ]]
+        for item in clo_definitions:
+            definition_rows.append([
+                paragraph(localized_clo_domain(item['domain'], language), table_text),
+                paragraph(item['number'], table_text),
+                paragraph(item['wording'], table_text),
+            ])
+        
+        if is_arabic:
+            for row in definition_rows:
+                row.reverse()
+            def_widths = [5.0 * inch, 0.75 * inch, 1.15 * inch]
+        else:
+            def_widths = [1.15 * inch, 0.75 * inch, 5.0 * inch]
+            
+        definition_table = Table(definition_rows, colWidths=def_widths, repeatRows=1)
+        definition_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), primary_color),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('GRID', (0, 0), (-1, -1), 0.45, colors.HexColor('#cbd5e1')),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('ALIGN', (0, 0), (-1, -1), 'RIGHT' if is_arabic else 'LEFT'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 4),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 4),
+            ('TOPPADDING', (0, 0), (-1, -1), 5),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ]))
+        elements.append(definition_table)
+        elements.append(Spacer(1, 12))
+        elements.append(paragraph('تفاصيل الموائمة' if is_arabic else 'Alignment Details', section_style))
     type_label = 'نوع السؤال' if is_arabic else 'Question Type'
     question_label = 'السؤال' if is_arabic else 'Question'
     text_label = 'نص السؤال' if is_arabic else 'Question Text'
@@ -14766,7 +14879,7 @@ def question_clo_mapping_final_review_get(draft_id):
     # Prepare matrix_data
     matrix_payload = {'questions': []}
     for q_id in metrics.get('questions') or []:
-        matrix_payload['questions'].append({'clos': metrics.get('selections', {}).get(q_id, [])})
+        matrix_payload['questions'].append({'clos': metrics.get('detected_clo_mappings', {}).get(q_id, [])})
     matrix_data = compute_exam_alignment_matrix(matrix_payload)
 
     return render_template(
