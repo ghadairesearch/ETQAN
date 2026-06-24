@@ -755,6 +755,8 @@ EN_TRANSLATIONS = {
     'courses.extraction_method_prefix': 'Extraction method:',
     'courses.extraction_method_gemini': 'Gemini Flash',
     'courses.extraction_method_qwen': 'Qwen via Groq',
+    'courses.extraction_method_llama': 'Llama via Groq',
+    'courses.extraction_method_groq': 'Groq AI',
     'courses.extraction_method_local': 'Local text/OCR',
     'courses.save': 'Save Course',
     'courses.empty': 'No saved courses yet. Add a course from the home page.',
@@ -1318,6 +1320,8 @@ TRANSLATIONS = {
         'courses.extraction_method_prefix': 'طريقة الاستخراج:',
         'courses.extraction_method_gemini': 'Gemini Flash',
         'courses.extraction_method_qwen': 'Qwen via Groq',
+        'courses.extraction_method_llama': 'Llama عبر Groq',
+        'courses.extraction_method_groq': 'Groq AI',
         'courses.extraction_method_local': 'النص المحلي / OCR',
         'courses.clos': 'نواتج التعلم للمقرر',
         'courses.clo': '\u0646\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
@@ -5352,6 +5356,14 @@ def call_groq_json(system_prompt, user_payload, timeout=90, model_name=None):
     parsed, _error = call_groq_json_with_error(system_prompt, user_payload, timeout, model_name=model_name)
     return parsed
 
+def groq_extraction_method_for_model(model_name=None):
+    model = str(model_name or GROQ_MODEL or '').lower()
+    if 'qwen' in model:
+        return 'qwen'
+    if 'llama' in model:
+        return 'llama'
+    return 'groq'
+
 
 def call_gemini_json(system_prompt, user_payload, timeout=90):
     if not GEMINI_API_KEY:
@@ -5598,7 +5610,7 @@ def extract_course_spec_with_groq_text(text, model_name=None):
         return None, error
     extracted = normalize_gemini_course_spec(parsed)
     if course_spec_extraction_is_usable(extracted):
-        extracted['extraction_method'] = 'groq'
+        extracted['extraction_method'] = groq_extraction_method_for_model(model_name)
         return extracted, ""
     return None, "Groq did not return complete course data."
 
@@ -5850,6 +5862,7 @@ def extract_course_spec_from_pdf_layout(filepath, text=''):
 def extract_course_spec_document(filepath, filename=''):
     extraction_start = time.perf_counter()
     file_ext = os.path.splitext(filename or filepath)[1].lower()
+    ai_diagnostics = []
     if file_ext == '.docx':
         text = extract_docx_text(filepath)
         extracted = extract_course_spec_metadata(text, filename)
@@ -5864,6 +5877,12 @@ def extract_course_spec_document(filepath, filename=''):
         return text, extracted
 
     gemini_extracted, _gemini_error = extract_course_spec_with_gemini(filepath, filename)
+    if _gemini_error:
+        ai_diagnostics.append({
+            'provider': 'Gemini',
+            'status': 'skipped_or_failed',
+            'message': _gemini_error,
+        })
     if gemini_extracted:
         gemini_extracted.setdefault('extraction_metadata', {
             'task': 'course_specification_extraction',
@@ -5879,10 +5898,16 @@ def extract_course_spec_document(filepath, filename=''):
         text = extract_pdf_text(filepath, allow_ocr=True)
         
     groq_extracted, _groq_error = extract_course_spec_with_groq_text(text, model_name="llama-3.1-8b-instant")
+    if _groq_error:
+        ai_diagnostics.append({
+            'provider': 'Llama via Groq',
+            'status': 'skipped_or_failed',
+            'message': _groq_error,
+        })
     if groq_extracted:
         groq_extracted['extraction_metadata'] = {
             'task': 'course_specification_extraction',
-            'source': 'groq',
+            'source': groq_extracted.get('extraction_method') or 'groq',
             'model': 'llama-3.1-8b-instant',
             'duration_seconds': elapsed_seconds(extraction_start),
             'filename': filename or os.path.basename(filepath),
@@ -5903,6 +5928,7 @@ def extract_course_spec_document(filepath, filename=''):
         'model': 'local-pdf-parser',
         'duration_seconds': elapsed_seconds(extraction_start),
         'filename': filename or os.path.basename(filepath),
+        'ai_diagnostics': ai_diagnostics,
     }
     if extracted.get('course_name') and extracted.get('course_code') and extracted.get('clos'):
         return text, extracted
@@ -5917,6 +5943,7 @@ def extract_course_spec_document(filepath, filename=''):
             'model': 'local-targeted-ocr-parser',
             'duration_seconds': elapsed_seconds(extraction_start),
             'filename': filename or os.path.basename(filepath),
+            'ai_diagnostics': ai_diagnostics,
         }
         targeted_layout_extracted = extract_course_spec_from_pdf_layout(filepath, targeted_text)
         if course_spec_extraction_score(targeted_layout_extracted) > course_spec_extraction_score(targeted_extracted):
@@ -5928,6 +5955,7 @@ def extract_course_spec_document(filepath, filename=''):
                 'model': 'local-targeted-layout-parser',
                 'duration_seconds': elapsed_seconds(extraction_start),
                 'filename': filename or os.path.basename(filepath),
+                'ai_diagnostics': ai_diagnostics,
             }
         if course_spec_extraction_score(targeted_extracted) > course_spec_extraction_score(extracted):
             return targeted_text, targeted_extracted
@@ -5940,9 +5968,27 @@ def flash_course_spec_extraction_method(extracted):
         method_label = translate('courses.extraction_method_gemini')
     elif method == 'qwen':
         method_label = translate('courses.extraction_method_qwen')
+    elif method == 'llama':
+        method_label = translate('courses.extraction_method_llama')
+    elif method == 'groq':
+        method_label = translate('courses.extraction_method_groq')
     else:
         method_label = translate('courses.extraction_method_local')
-    flash(f"{translate('courses.extraction_method_prefix')} {method_label}", "info")
+    message = f"{translate('courses.extraction_method_prefix')} {method_label}"
+    diagnostics = ((extracted or {}).get('extraction_metadata') or {}).get('ai_diagnostics') or []
+    if diagnostics and method not in {'gemini', 'qwen', 'llama', 'groq'}:
+        reason_parts = []
+        for item in diagnostics:
+            provider = compact_text(item.get('provider') or '')
+            reason = compact_text(item.get('message') or '')
+            if not provider or not reason:
+                continue
+            if len(reason) > 180:
+                reason = reason[:177].rstrip() + '...'
+            reason_parts.append(f"{provider}: {reason}")
+        if reason_parts:
+            message += " — " + ("؛ ".join(reason_parts) if get_language() == 'ar' else "; ".join(reason_parts))
+    flash(message, "info")
 
 
 def extract_exam_paper_text(filepath, file_ext):
