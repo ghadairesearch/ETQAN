@@ -6626,6 +6626,16 @@ def build_question_final_metrics_from_form(clos):
         )
         selected_clos = request.form.getlist(f'question_clo_{question}')
         resolved = resolve_detected_clos_to_course_list(selected_clos, clos)
+        if not resolved and selected_clos:
+            resolved = [str(c).strip() for c in selected_clos if str(c).strip()]
+        if not selected_clos:
+            for k in request.form.keys():
+                if k.strip().endswith(f'_{question}') and 'question_clo' in k:
+                    alt = request.form.getlist(k)
+                    resolved = resolve_detected_clos_to_course_list(alt, clos)
+                    if not resolved:
+                        resolved = [str(c).strip() for c in alt if str(c).strip()]
+                    break
         if resolved:
             metrics['detected_clo_mappings'][question] = resolved
             
@@ -6651,7 +6661,7 @@ def merge_ai_default_clo_selections_from_form(metrics, clos):
             continue
         resolved_default = resolve_detected_clos_to_course_list([default_clo], clos)
         if not resolved_default:
-            continue
+            resolved_default = [default_clo]
         current = list(mappings.get(question) or [])
         for clo in resolved_default:
             if clo not in current:
@@ -6718,7 +6728,10 @@ def ensure_final_review_clo_selections(metrics, draft_metrics, clos):
         suggested_values = question_mapping_values_for_key(suggested, question)
         if not removed_values:
             fallback_values.extend(suggested_values)
-        for clo in resolve_detected_clos_to_course_list(fallback_values, clos):
+        resolved_fallbacks = resolve_detected_clos_to_course_list(fallback_values, clos)
+        if not resolved_fallbacks:
+            resolved_fallbacks = [str(c).strip() for c in fallback_values if str(c).strip()]
+        for clo in resolved_fallbacks:
             if clo not in current:
                 current.append(clo)
         if current:
