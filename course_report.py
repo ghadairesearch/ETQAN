@@ -10833,6 +10833,12 @@ def word_element(name, attributes=None):
 def word_block_text(element):
     return ''.join((text_node.text or '') for text_node in element.findall(f'.//{word_tag("t")}'))
 
+def clean_xml_text(text):
+    if not text:
+        return ''
+    # Remove XML control characters that cause lxml to throw ValueError during tostring
+    return re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', str(text))
+
 def word_paragraph(text='', bold=False):
     paragraph = word_element('p')
     run = word_element('r')
@@ -10842,7 +10848,7 @@ def word_paragraph(text='', bold=False):
         run.append(run_properties)
     text_node = word_element('t')
     text_node.set(f'{{{WORD_XML_NS}}}space', 'preserve')
-    text_node.text = str(text or '')
+    text_node.text = clean_xml_text(text or '')
     run.append(text_node)
     paragraph.append(run)
     return paragraph
@@ -11563,8 +11569,8 @@ def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
         clos = ', '.join(clo_number(clo) or str(clo or '') for clo in item.get('clos') or [])
         table.append(word_row([
             f"{question_label} {index}",
-            item.get('type') or '-',
-            item.get('text') or '',
+            item.get('question_type') or item.get('type') or '-',
+            item.get('question_text') or item.get('text') or '',
             clos or '-',
         ]))
     elements.append(table)
