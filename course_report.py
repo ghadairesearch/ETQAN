@@ -5277,15 +5277,36 @@ def set_gemini_spec_cache(file_hash, extracted):
 
 def gemini_course_spec_prompt():
     return (
-        "Extract course specification information from this document. "
-        "The document may be Arabic or English, scanned or text-based. "
-        "Return JSON only, with no markdown. Preserve Arabic text exactly when present. "
-        "Do not infer the course code from the file name and do not invent missing values. "
-        "Extract only Course Learning Outcomes under Knowledge/Knowledge and Understanding, "
-        "Skills, and Values. Use this exact JSON schema: "
+        "Extract course specification information from this document and return valid JSON only "
+        "(no markdown, explanations, comments, or code fences).\n\n"
+        "The document may be in Arabic or English.\n\n"
+        "General Rules:\n\n"
+        "* Extract information only from the document content.\n"
+        "* Do not infer, guess, or generate missing values.\n"
+        "* Do not infer the course code, course title, or any field from the file name.\n"
+        "* If a value cannot be reliably identified, return an empty string (\"\").\n"
+        "* Preserve the original wording whenever possible.\n"
+        "* Preserve Arabic text exactly when it is readable.\n"
+        "* If Arabic text is corrupted by PDF extraction (fragmented letters, isolated characters, "
+        "excessive spaces, repeated underscores, broken RTL ordering, or unreadable OCR output), "
+        "do not return the corrupted text.\n"
+        "* Reconstruct Arabic text only when the intended wording is clearly recoverable from context; "
+        "otherwise return an empty string.\n"
+        "* Remove obvious OCR artifacts, page headers/footers, page numbers, and duplicated extraction noise.\n\n"
+        "Specific Extraction Rules:\n\n"
+        "* Extract Course Learning Outcomes (CLOs).\n"
+        "* Extract course topics from the Course Content/List of Topics section as separate ordered items.\n"
+        "* Extract all associated Program Learning Outcome (PLO) codes from the corresponding "
+        "PLO/program outcome column.\n"
+        "* Do not merge multiple topics into one item unless they appear as a single topic in the specification.\n\n"
+        "Output Requirements:\n\n"
+        "* Return JSON only.\n"
+        "* Ensure the JSON is valid and parseable.\n"
+        "* Do not include explanatory text before or after the JSON.\n\n"
+        "Required JSON format:\n"
         '{"course_name":"","course_code":"","college":"","department":"","program":"",'
         '"clos":["1.1 outcome text","1.2 outcome text","2.1 outcome text","3.1 outcome text"],'
-        '"topics":[],"clo_plos":{}}'
+        '"topics":["topic 1","topic 2"],"clo_plos":{"1.1":"K1","2.1":"S2"}}'
     )
 
 
@@ -5774,6 +5795,61 @@ def extract_ncaaa_pdf_layout_clos(doc):
     return final_clean_clo_map(clos)
 
 
+def extract_ncaaa_pdf_layout_clo_plos(doc, clos=None):
+    mapping = {}
+    if not doc:
+        return mapping
+
+    clo_lookup = {
+        clo_number_key(clo) or clo_number(clo): clo
+        for clo in (clos or [])
+        if clo_number_key(clo) or clo_number(clo)
+    }
+
+    for page_index in range(len(doc)):
+        try:
+            page = doc[page_index]
+            words = page.get_text('words')
+        except Exception:
+            continue
+
+        page_width = float(page.rect.width or 595)
+        code_x_min = page_width * 0.84
+        plo_x_min = page_width * 0.42
+        plo_x_max = page_width * 0.63
+        codes = []
+        for word in words:
+            x0, y0, _x1, _y1, text = word[:5]
+            if x0 >= code_x_min and re.fullmatch(r'[123]\.\d+', str(text or '')):
+                codes.append((str(text), y0))
+        codes = sorted(codes, key=lambda item: item[1])
+        if not codes:
+            continue
+
+        for index, (code, y0) in enumerate(codes):
+            if code.endswith('.0'):
+                continue
+            previous_y = codes[index - 1][1] if index else y0 - 44
+            next_y = codes[index + 1][1] if index + 1 < len(codes) else y0 + 110
+            top = (previous_y + y0) / 2 if index else y0 - 22
+            bottom = (y0 + next_y) / 2 if index + 1 < len(codes) else y0 + 55
+
+            plo_words = [
+                word for word in words
+                if plo_x_min <= word[0] <= plo_x_max
+                and top - 5 <= word[1] <= bottom + 5
+            ]
+            plo_text = join_pdf_words_rtl(plo_words)
+            extracted_codes = extract_plo_codes(plo_text)
+            if not extracted_codes:
+                extracted_code = extract_noisy_arabic_plo_code(plo_text, clo_lookup.get(code, code))
+                extracted_codes = [extracted_code] if extracted_code else []
+            if extracted_codes:
+                mapping[code] = ', '.join(extracted_codes)
+
+    return mapping
+
+
 def extract_ncaaa_pdf_layout_topics(doc):
     if not doc:
         return []
@@ -5827,6 +5903,7 @@ def extract_course_spec_from_pdf_layout(filepath, text=''):
         with fitz.open(filepath) as doc:
             metadata = extract_ncaaa_pdf_cover_metadata(doc)
             clo_map = extract_ncaaa_pdf_layout_clos(doc)
+            clo_plos = extract_ncaaa_pdf_layout_clo_plos(doc, list(clo_map.values()))
             topics = extract_ncaaa_pdf_layout_topics(doc)
     except Exception:
         return None
@@ -5853,7 +5930,7 @@ def extract_course_spec_from_pdf_layout(filepath, text=''):
         'program': metadata.get('program', ''),
         'clos': clos,
         'topics': topics or (extract_course_topics(text) if compact_text(text) else []),
-        'clo_plos': {},
+        'clo_plos': clo_plos or (extract_clo_plo_mapping(text, clos) if compact_text(text) else {}),
         'grouped_clos': group_clos_by_domain(clos),
         'extraction_method': 'local'
     }
