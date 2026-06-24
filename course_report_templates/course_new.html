@@ -37,6 +37,25 @@
 
                     {% if draft_course.source|default('', true) == 'spec' %}
                         <div style="border-top: 1px solid var(--border-color); margin-top: 1rem; padding-top: 1rem;">
+                            
+                            {% if draft_course.extraction_metadata and draft_course.extraction_metadata.diagnostics %}
+                            <div style="border: 1px solid var(--border-color); border-radius: 8px; background: #f9fafb; padding: 1rem; margin-bottom: 1.25rem;">
+                                <h3 style="margin: 0 0 0.35rem; font-size: 1rem; color: var(--accent-primary);">تشخيص اقتراحات الاستخراج</h3>
+                                <p style="margin: 0 0 0.75rem; color: var(--text-muted); font-size: 0.9rem;">يوضح هذا السجل النماذج وطرق الاستخراج التي حاول النظام استخدامها لقراءة هذا التوصيف.</p>
+                                {% for diag in draft_course.extraction_metadata.diagnostics %}
+                                    <div style="border-top: {% if not loop.first %}1px solid var(--border-color){% else %}0{% endif %}; padding-top: {% if not loop.first %}0.65rem{% else %}0{% endif %}; margin-top: {% if not loop.first %}0.65rem{% else %}0{% endif %}; color: var(--text-muted); font-size: 0.9rem; overflow-wrap: anywhere;">
+                                        <strong>{{ diag.model }}</strong>
+                                        {% if diag.status == 'success' %}
+                                            <span style="display: inline-flex; border-radius: 999px; padding: 0.12rem 0.45rem; margin: 0 0.25rem; background: #dcfce7; color: #166534; font-size: 0.78rem; font-weight: 700;">success</span>
+                                        {% else %}
+                                            <span style="display: inline-flex; border-radius: 999px; padding: 0.12rem 0.45rem; margin: 0 0.25rem; background: #fee2e2; color: #991b1b; font-size: 0.78rem; font-weight: 700;">failed</span>
+                                        {% endif %}
+                                        {{ diag.message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
                             <div style="display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 1rem;">
                                 <div class="form-group">
                                     <label class="form-label">{{ _('courses.course_name') }} <span style="color: red;">*</span></label>

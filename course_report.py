@@ -5502,17 +5502,19 @@ def normalize_gemini_course_spec(payload):
 def extract_course_spec_with_gemini(filepath, filename=''):
     file_ext = os.path.splitext(filename or filepath)[1].lower()
     if not GEMINI_API_KEY or file_ext != '.pdf':
-        return None
+        return None, "GEMINI_API_KEY is not configured or file is not PDF."
     try:
         if os.path.getsize(filepath) > GEMINI_MAX_INLINE_BYTES:
             app.logger.info("Skipping Gemini course specification extraction because file is larger than GEMINI_MAX_INLINE_BYTES.")
-            return None
-    except OSError:
-        return None
+            return None, "File is larger than GEMINI_MAX_INLINE_BYTES."
+    except OSError as e:
+        return None, str(e)
 
     file_hash, cached = get_gemini_spec_cache(filepath)
     if cached is not None:
-        return cached or None
+        if cached is False:
+            return None, "Using cached failure."
+        return cached, ""
 
     try:
         with open(filepath, 'rb') as file:
@@ -5557,10 +5559,12 @@ def extract_course_spec_with_gemini(filepath, filename=''):
     except urllib.error.HTTPError as exc:
         body = exc.read().decode('utf-8', errors='replace')
         app.logger.warning("Gemini course specification extraction failed with HTTP %s: %s", exc.code, body[:800])
-        return set_gemini_spec_cache(file_hash, False) or None
+        set_gemini_spec_cache(file_hash, False)
+        return None, f"HTTP {exc.code}: {body[:200]}"
     except Exception as exc:
         app.logger.warning("Gemini course specification extraction failed: %s", exc)
-        return set_gemini_spec_cache(file_hash, False) or None
+        set_gemini_spec_cache(file_hash, False)
+        return None, str(exc)
 
     response_text = ''
     for candidate in gemini_payload.get('candidates') or []:
@@ -5570,29 +5574,33 @@ def extract_course_spec_with_gemini(filepath, filename=''):
 
     extracted = normalize_gemini_course_spec(parse_gemini_json_response(response_text))
     if course_spec_extraction_is_usable(extracted):
-        return set_gemini_spec_cache(file_hash, extracted)
+        set_gemini_spec_cache(file_hash, extracted)
+        return extracted, ""
     app.logger.info("Gemini course specification extraction did not return complete course data; falling back to local parser/OCR.")
-    return set_gemini_spec_cache(file_hash, False) or None
+    set_gemini_spec_cache(file_hash, False)
+    return None, "Gemini did not return complete course data (missing Name, Code, or CLOs)."
 
 
 def extract_course_spec_with_groq_text(text, model_name=None):
     if not GROQ_KEY or not compact_text(text):
-        return None
+        return None, "GROQ_KEY is not configured or no text extracted."
     user_payload = (
         gemini_course_spec_prompt()
         + "\n\nCourse specification text:\n"
         + compact_text(text)[:60000]
     )
-    parsed = call_groq_json(
+    parsed, error = call_groq_json_with_error(
         "You extract structured course specification data. Return valid JSON only.",
         user_payload,
         model_name=model_name
     )
+    if error:
+        return None, error
     extracted = normalize_gemini_course_spec(parsed)
     if course_spec_extraction_is_usable(extracted):
         extracted['extraction_method'] = 'groq'
-        return extracted
-    return None
+        return extracted, ""
+    return None, "Groq did not return complete course data."
 
 
 def clean_ncaaa_pdf_layout_text(value):
@@ -13027,6 +13035,7 @@ def new_course():
                 'topics_text': format_course_topics_text(topics),
                 'clo_plos_json': json.dumps(clo_plos, ensure_ascii=False),
                 'extraction_metadata_json': json.dumps(extraction_metadata, ensure_ascii=False),
+                'extraction_metadata': extraction_metadata,
                 'clo_rows': build_course_clo_rows(clos, clo_plos)
             }
             return render_template(
@@ -13147,6 +13156,7 @@ def edit_course(course_id):
         'program': existing['program'] or '',
     }
     draft_course['extraction_metadata_json'] = row_get(existing, 'extraction_metadata_json') or '{}'
+    draft_course['extraction_metadata'] = safe_json_loads(draft_course['extraction_metadata_json'], {})
 
     existing_clo_plos = {}
     try:
@@ -13261,6 +13271,7 @@ def edit_course(course_id):
                 'topics_text': format_course_topics_text(topics),
                 'clo_plos_json': json.dumps(clo_plos, ensure_ascii=False),
                 'extraction_metadata_json': json.dumps(extraction_metadata, ensure_ascii=False),
+                'extraction_metadata': extraction_metadata,
                 'clo_rows': build_course_clo_rows(clos, clo_plos)
             }
             return render_template('course_edit.html', draft_course=draft_course)
