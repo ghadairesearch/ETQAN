@@ -61,7 +61,7 @@
             </div>
             {% if course_report_inputs.student_results_comment %}
                 {% if is_draft %}
-                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block; margin-top: 1rem;">{{ _('course_report.student_results_comment_edit') | default('AI Grade Analysis') }}</label>
+                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block; margin-top: 1rem;">{{ _('course_report.student_results_comment_edit') | default('Comment on Student Grades') }}</label>
                     <textarea name="student_results_comment" form="draft_save_form" class="form-control" rows="4" style="width: 100%; margin-top: 0.25rem;">{{ course_report_inputs.student_results_comment }}</textarea>
                 {% else %}
                     <p style="margin-top: 1rem; margin-bottom: 0; color: var(--text-muted);">{{ course_report_inputs.student_results_comment }}</p>
