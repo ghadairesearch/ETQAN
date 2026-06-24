@@ -164,13 +164,15 @@
             {% endif %}
         </div>
 
-        <div class="form-group">
-            <label class="form-label" style="display: inline-flex; align-items: center; gap: 0.35rem;">
-                <span>{{ _('results.final_grades_file') }} <span style="color: var(--danger);">*</span></span>
-                <span title="{{ _('results.final_grades_help') }}" aria-label="{{ _('results.final_grades_help') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: help;">i</span>
-            </label>
-            <input type="file" name="final_grades_file" class="form-control" accept=".csv,.xlsx,.xls,.pdf" required style="padding: 0.5rem;">
-        </div>
+        {% if not grade_distribution_provided %}
+            <div class="form-group">
+                <label class="form-label" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <span>{{ _('results.final_grades_file') }} <span style="color: var(--danger);">*</span></span>
+                    <span title="{{ _('results.final_grades_help') }}" aria-label="{{ _('results.final_grades_help') }}" style="display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: help;">i</span>
+                </label>
+                <input type="file" name="final_grades_file" class="form-control" accept=".csv,.xlsx,.xls,.pdf" required style="padding: 0.5rem;">
+            </div>
+        {% endif %}
 
         <div class="form-group">
             <label class="form-label">{{ _('results.course_improvement_plan') }}</label>

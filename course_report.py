@@ -3353,7 +3353,7 @@ def build_course_report_context_from_records(records, export_action, selected_co
     })
     return context
 
-def render_course_report_inputs_from_records(records, export_action, selected_course_name=''):
+def render_course_report_inputs_from_records(records, export_action, selected_course_name='', grade_distribution_provided=False):
     context = build_course_report_context_from_records(records, export_action, selected_course_name)
     if not context.get('selected_report_ids'):
         raise ValueError("No saved CLO attainment report was selected.")
@@ -3362,7 +3362,7 @@ def render_course_report_inputs_from_records(records, export_action, selected_co
             "The selected CLO attainment report does not contain readable CLO summary data. "
             "Create a new CLO Attainment Analysis report, then select it for the course report."
         )
-    return render_template('course_report_inputs.html', **context)
+    return render_template('course_report_inputs.html', grade_distribution_provided=grade_distribution_provided, **context)
 
 def display_saved_report_title(row):
     title = str(row_get(row, 'title') or '').strip()
@@ -11765,32 +11765,35 @@ def build_course_report_docx(stats, course_report_inputs=None, course_info=None,
     return build_generated_course_report_docx(stats, course_report_inputs, course_info)
 
 def read_course_report_export_inputs(redirect_url, stats=None, course_info=None, total_students=None):
+    grade_distribution = None
     final_grades_file = request.files.get('final_grades_file')
-    if not final_grades_file or not final_grades_file.filename:
-        flash("Please upload the final grades file as CSV, Excel, or PDF.", "error")
-        return None, redirect(redirect_url)
-    final_grades_ext = os.path.splitext(final_grades_file.filename)[1].lower()
-    if final_grades_ext not in {'.csv', '.xlsx', '.xls', '.pdf'}:
-        flash("Final grades file must be CSV, Excel, or PDF.", "error")
-        return None, redirect(redirect_url)
+    if final_grades_file and final_grades_file.filename:
+        final_grades_ext = os.path.splitext(final_grades_file.filename)[1].lower()
+        if final_grades_ext not in {'.csv', '.xlsx', '.xls', '.pdf'}:
+            flash("Final grades file must be CSV, Excel, or PDF.", "error")
+            return None, redirect(redirect_url)
+        grade_filepath = get_upload_path(f"{uuid.uuid4()}{final_grades_ext}")
+        final_grades_file.save(grade_filepath)
+        try:
+            grade_distribution = parse_final_grade_distribution(grade_filepath, final_grades_ext)
+        except Exception as e:
+            app.logger.warning("Could not read final grades file: %s", e)
+            grade_distribution = {}
+        finally:
+            try:
+                os.remove(grade_filepath)
+            except OSError:
+                pass
+    else:
+        grade_distribution = session.get('temp_grade_distribution')
+        if grade_distribution is None:
+            flash("Please upload the final grades file as CSV, Excel, or PDF.", "error")
+            return None, redirect(redirect_url)
 
     topics_covered = (request.form.get('topics_covered') or '').strip()
     if topics_covered not in {'yes', 'no'}:
         flash("Please answer whether all course topics were covered.", "error")
         return None, redirect(redirect_url)
-
-    grade_filepath = get_upload_path(f"{uuid.uuid4()}{final_grades_ext}")
-    final_grades_file.save(grade_filepath)
-    try:
-        grade_distribution = parse_final_grade_distribution(grade_filepath, final_grades_ext)
-    except Exception as e:
-        app.logger.warning("Could not read final grades file: %s", e)
-        grade_distribution = {}
-    finally:
-        try:
-            os.remove(grade_filepath)
-        except OSError:
-            pass
 
     if not grade_distribution.get('total'):
         grade_distribution = {}
@@ -15166,6 +15169,33 @@ def course_report_service_inputs_multi():
         course_name = request.form.get('course_name')
         session['last_report_ids'] = report_ids
         session['last_course_name'] = course_name
+        
+        final_grades_file = request.files.get('final_grades_file')
+        if final_grades_file and final_grades_file.filename:
+            final_grades_ext = os.path.splitext(final_grades_file.filename)[1].lower()
+            if final_grades_ext in {'.csv', '.xlsx', '.xls', '.pdf'}:
+                grade_filepath = get_upload_path(f"{uuid.uuid4()}{final_grades_ext}")
+                final_grades_file.save(grade_filepath)
+                try:
+                    grade_distribution = parse_final_grade_distribution(grade_filepath, final_grades_ext)
+                    if grade_distribution and grade_distribution.get('total'):
+                        session['temp_grade_distribution'] = grade_distribution
+                    else:
+                        session.pop('temp_grade_distribution', None)
+                except Exception as e:
+                    app.logger.warning("Could not read final grades file in step 1: %s", e)
+                    flash("Warning: Could not parse the provided final grades file.", "error")
+                    session.pop('temp_grade_distribution', None)
+                finally:
+                    try:
+                        os.remove(grade_filepath)
+                    except OSError:
+                        pass
+            else:
+                flash("Final grades file must be CSV, Excel, or PDF.", "error")
+                session.pop('temp_grade_distribution', None)
+        else:
+            session.pop('temp_grade_distribution', None)
     else:
         report_ids = session.get('last_report_ids', [])
         course_name = session.get('last_course_name', '')
@@ -15181,7 +15211,8 @@ def course_report_service_inputs_multi():
         return render_course_report_inputs_from_records(
             records,
             url_for('export_selected_course_report_docx'),
-            course_name or ''
+            course_name or '',
+            grade_distribution_provided=('temp_grade_distribution' in session)
         )
     except Exception as exc:
         app.logger.exception(
@@ -15207,7 +15238,8 @@ def course_report_service_inputs(report_id):
         return render_course_report_inputs_from_records(
             records,
             url_for('export_saved_course_report_docx', report_id=report_id),
-            records[0].get('course_name') or ''
+            records[0].get('course_name') or '',
+            grade_distribution_provided=('temp_grade_distribution' in session)
         )
     except Exception as exc:
         app.logger.exception(
