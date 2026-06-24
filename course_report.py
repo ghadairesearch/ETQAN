@@ -11624,6 +11624,66 @@ def compute_exam_alignment_matrix(payload):
         'total_questions': num_questions
     }
 
+def generate_assessment_coverage_summary_text(matrix_data, all_course_clos, language='en'):
+    totals = matrix_data.get('totals') or {}
+    percentages = matrix_data.get('percentages') or {}
+    unique_clos = matrix_data.get('unique_clos') or []
+    
+    assessed_count = len(unique_clos)
+    
+    # Most frequently assessed
+    most_frequent = []
+    if totals:
+        max_val = max(totals.values())
+        most_frequent = [clo for clo, count in totals.items() if count == max_val]
+        
+    # Low or zero coverage
+    all_clo_numbers = [clo_number(c) or str(c or '').strip() for c in all_course_clos]
+    zero_coverage = [c for c in all_clo_numbers if c not in unique_clos or totals.get(c, 0) == 0]
+    
+    # Balance
+    balance_comment = ""
+    if percentages:
+        vals = list(percentages.values())
+        avg = sum(vals) / len(vals)
+        std_dev = (sum((v - avg) ** 2 for v in vals) / len(vals)) ** 0.5
+        
+        if language == 'ar':
+            if std_dev < 10:
+                balance_comment = "يظهر التقييم توازناً استثنائياً عبر نواتج التعلم المقاسة، مما يدل على تغطية شاملة."
+            elif std_dev < 20:
+                balance_comment = "يظهر التقييم توازناً مقبولاً عبر نواتج التعلم المقاسة."
+            else:
+                balance_comment = "يوجد تباين ملحوظ في تغطية نواتج التعلم، مما قد يشير إلى التركيز على نواتج محددة دون غيرها."
+        else:
+            if std_dev < 10:
+                balance_comment = "The assessment demonstrates excellent balance across the measured CLOs, indicating comprehensive coverage."
+            elif std_dev < 20:
+                balance_comment = "The assessment demonstrates adequate balance across the measured CLOs."
+            else:
+                balance_comment = "There is significant variance in CLO coverage, indicating potential overrepresentation of certain CLOs."
+
+    if language == 'ar':
+        summary = f"إجمالي عدد نواتج التعلم التي تم تقييمها هو {assessed_count}. "
+        if most_frequent:
+            summary += f"ناتج التعلم الأكثر تقييماً هو ({', '.join(most_frequent)}). "
+        if zero_coverage:
+            summary += f"هناك نواتج تعلم لم يتم تغطيتها في هذا التقييم: ({', '.join(zero_coverage)}). "
+        else:
+            summary += "تمت تغطية جميع نواتج تعلم المقرر في هذا التقييم. "
+        summary += balance_comment
+    else:
+        summary = f"The total number of assessed CLOs is {assessed_count}. "
+        if most_frequent:
+            summary += f"The most frequently assessed CLO is ({', '.join(most_frequent)}). "
+        if zero_coverage:
+            summary += f"The following CLOs have zero coverage in this assessment: ({', '.join(zero_coverage)}). "
+        else:
+            summary += "All course CLOs are covered in this assessment. "
+        summary += balance_comment
+        
+    return summary
+
 def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
     payload = payload or {}
     language = get_export_report_language() if has_request_context() else 'en'
@@ -14887,6 +14947,8 @@ def question_clo_mapping_final_review_get(draft_id):
     for q_id in metrics.get('questions') or []:
         matrix_payload['questions'].append({'clos': metrics.get('detected_clo_mappings', {}).get(q_id, [])})
     matrix_data = compute_exam_alignment_matrix(matrix_payload)
+    language = get_export_report_language() if has_request_context() else 'en'
+    coverage_summary = generate_assessment_coverage_summary_text(matrix_data, clos, language)
 
     return render_template(
         'question_clo_final_review.html',
@@ -14895,7 +14957,8 @@ def question_clo_mapping_final_review_get(draft_id):
         metrics=metrics,
         filename=draft.get('filename') or '',
         draft_id=draft_id,
-        matrix_data=matrix_data
+        matrix_data=matrix_data,
+        coverage_summary=coverage_summary
     )
 
 

@@ -69,7 +69,7 @@
         {% if matrix_data and matrix_data.unique_clos %}
             <h3 style="margin-top: 2rem;">{% if language == 'ar' %}مصفوفة الموائمة{% else %}Alignment Matrix{% endif %}</h3>
             <div style="overflow-x: auto;">
-                <table style="margin-top: 0.5rem; text-align: center;">
+                <table style="margin-top: 0.5rem; text-align: center;" class="compact-table">
                     <thead>
                         <tr>
                             <th style="width: 140px; text-align: {{ 'right' if language == 'ar' else 'left' }};">{% if language == 'ar' %}السؤال{% else %}Question{% endif %}</th>
@@ -83,24 +83,33 @@
                             <tr>
                                 <td style="text-align: {{ 'right' if language == 'ar' else 'left' }}; font-weight: 500;">{% if language == 'ar' %}السؤال{% else %}Question{% endif %} {{ row_info.index }}</td>
                                 {% for clo in matrix_data.unique_clos %}
-                                    <td>{% if row_info.clos[clo] %}&#10003;{% endif %}</td>
+                                    <td style="text-align: center; vertical-align: middle;">{% if row_info.clos[clo] %}<span style="color: var(--primary); font-size: 1.2rem;">●</span>{% endif %}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
-                        <tr style="background-color: var(--border-color); font-weight: bold;">
-                            <td style="text-align: {{ 'right' if language == 'ar' else 'left' }};">{% if language == 'ar' %}الإجمالي{% else %}Total Count{% endif %}</td>
-                            {% for clo in matrix_data.unique_clos %}
-                                <td>{{ matrix_data.totals.get(clo, 0) }}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr style="background-color: var(--border-color); font-weight: bold;">
-                            <td style="text-align: {{ 'right' if language == 'ar' else 'left' }};">{% if language == 'ar' %}النسبة من الإجمالي{% else %}Percentage{% endif %}</td>
-                            {% for clo in matrix_data.unique_clos %}
-                                <td>{{ matrix_data.percentages.get(clo, 0) }}%</td>
-                            {% endfor %}
-                        </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <h3 style="margin-top: 2rem;">{% if language == 'ar' %}توزيع تغطية نواتج التعلم{% else %}CLO Coverage Distribution{% endif %}</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; max-width: 500px;">
+                {% for clo in matrix_data.unique_clos %}
+                    {% set pct = matrix_data.percentages.get(clo, 0) %}
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-weight: 600; min-width: 40px;">{{ clo }}</span>
+                        <div style="flex: 1; background-color: var(--border-color); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background-color: var(--primary); height: 100%; width: {{ pct }}%; transition: width 0.3s ease;"></div>
+                        </div>
+                        <span style="min-width: 45px; text-align: {{ 'left' if language == 'ar' else 'right' }};">{{ pct }}%</span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <h3 style="margin-top: 2rem;">{% if language == 'ar' %}ملخص تغطية التقييم{% else %}Assessment Coverage Summary{% endif %}</h3>
+            <div style="background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                <p style="margin: 0; line-height: 1.6; color: var(--text-main);">
+                    {{ coverage_summary }}
+                </p>
             </div>
         {% endif %}
 
