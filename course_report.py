@@ -6376,7 +6376,7 @@ def gemini_exam_question_extraction_prompt():
         "Extract exam questions from the provided exam paper text. "
         "The exam may be Arabic or English. Preserve each question text as completely as possible, "
         "including sub-parts and options. IMPORTANT: For multiple choice questions, ensure each option appears on a new line within the question text (insert \\n before options if needed). "
-        "Detect the question type, such as MCQ, True/False, Essay, Short Answer, Problem Solving, or Other. "
+        "Detect the question type, such as MCQ, T/F, Essay, Short Answer, Problem Solving, or Other. "
         "Detect only CLOs explicitly written in the exam paper near or inside each question, such as CLO1, CLO 1, "
         "CLO1.1, 1.1, or ناتج 1.1. Do not infer CLOs by meaning. "
         "Return JSON only with this exact schema: "
@@ -6406,7 +6406,10 @@ def normalize_gemini_exam_metrics(payload, source='gemini', confidence='Gemini')
             continue
         questions.append(question_id)
         question_texts[question_id] = text[:4000]
-        question_types[question_id] = compact_text(item.get('type') or item.get('question_type') or '')
+        q_type = compact_text(item.get('type') or item.get('question_type') or '')
+        if q_type.lower() in ('true/false', 'true / false', 't / f', 't/f', 'true false'):
+            q_type = 'T/F'
+        question_types[question_id] = q_type
         explicit = item.get('explicit_clos') or item.get('clos') or item.get('clo') or []
         if isinstance(explicit, str):
             explicit = [explicit]

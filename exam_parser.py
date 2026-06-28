@@ -232,8 +232,8 @@ class ExamParser:
 
     def classify_question_type(self, text):
         lowered = str(text or '').lower()
-        if re.search(r'\b(?:true|false|صح|خطأ|صواب|غلط)\b', lowered):
-            return 'True/False'
+        if re.search(r'\b(?:true|false|صواب|خطأ|صح|غلط)\b', lowered):
+            return 'T/F'
         if self.extract_mcq_options(text):
             return 'MCQ'
         if '___' in lowered or 'complete' in lowered or 'أكمل' in lowered:
