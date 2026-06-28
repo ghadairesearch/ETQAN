@@ -81,9 +81,24 @@
         </div>
 
         <div id="exam-paper-field" class="mapping-paper-field" hidden>
-            <label style="display: block; font-weight: 700; margin-bottom: 0.4rem;">{{ _('mapping.exam_paper') }}</label>
-            <input id="exam-paper-input" type="file" name="exam_paper" class="form-control" accept=".pdf,.docx,.txt">
-            <small style="display: block; margin-top: 0.45rem; color: var(--text-muted);">{{ _('mapping.method_exam_paper_help') }}</small>
+            <label style="display: block; font-weight: 700; margin-bottom: 0.8rem;">Select Mapping Reports</label>
+            <div style="display: grid; gap: 0.75rem; max-height: 250px; overflow-y: auto;">
+                {% if associated_reports %}
+                    {% for report in associated_reports %}
+                        <label style="border: 1px solid var(--border-color); border-radius: 8px; padding: 0.9rem; background: var(--bg-card); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.75rem; align-items: start; cursor: pointer;">
+                            <input type="checkbox" name="report_ids" value="{{ report.id }}" style="margin-top: 0.25rem;">
+                            <span>
+                                <span style="display: block; font-weight: 700; font-size: 0.95rem;">{{ report.display_title }}</span>
+                                <span style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">{{ report.created_at }}</span>
+                            </span>
+                        </label>
+                    {% endfor %}
+                {% else %}
+                    <div style="padding: 1rem; border: 1px dashed var(--border-color); border-radius: 6px; text-align: center; color: var(--text-muted);">
+                        No AI-assisted mapping reports found for this course. Please generate one first.
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
         <div class="form-action-row">

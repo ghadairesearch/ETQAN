@@ -200,10 +200,7 @@
                             {% set recommendation_index = recommendation_item.index %}
                             <tr>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                    <label style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; align-items: start;">
-                                        <input type="checkbox" name="course_improvement_recommendations" value="{{ recommendation }}" style="margin-top: 0.2rem;">
-                                        <span>{{ course_report_label(recommendation) }}</span>
-                                    </label>
+                                    <span style="display: block; padding-top: 0.2rem;">{{ course_report_label(recommendation) }}</span>
                                 </td>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
                                     <select name="course_improvement_action_{{ recommendation_index }}" class="form-control" data-improvement-action-select="{{ recommendation_index }}">

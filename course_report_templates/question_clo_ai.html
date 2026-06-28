@@ -58,6 +58,7 @@
     .badge-high { background: var(--success, #10b981); }
     .badge-medium { background: var(--warning, #f59e0b); }
     .badge-low { background: var(--danger, #ef4444); }
+    .badge-score { background: var(--accent-primary); }
     
     .ai-alternatives {
         margin-top: 1rem;
@@ -356,13 +357,7 @@
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                     <strong><span style="color: var(--accent-primary);">✓</span> {{ suggested.clo }}</strong>
                                     {% set conf = suggested.score|float if suggested.score else 0 %}
-                                    {% if conf >= 70 %}
-                                        <span class="ai-confidence-badge badge-high">{{ _('question_mapping.high_conf') if _('question_mapping.high_conf') != 'question_mapping.high_conf' else 'High' }} ({{ suggested.score }}%)</span>
-                                    {% elif conf >= 40 %}
-                                        <span class="ai-confidence-badge badge-medium">{{ _('question_mapping.medium_conf') if _('question_mapping.medium_conf') != 'question_mapping.medium_conf' else 'Medium' }} ({{ suggested.score }}%)</span>
-                                    {% else %}
-                                        <span class="ai-confidence-badge badge-low">{{ _('question_mapping.low_conf') if _('question_mapping.low_conf') != 'question_mapping.low_conf' else 'Low' }} ({{ suggested.score }}%)</span>
-                                    {% endif %}
+                                    <span class="ai-confidence-badge badge-score">{{ conf|round(0)|int }}%</span>
                                 </div>
                             </div>
                             
@@ -381,7 +376,8 @@
                                         <span style="color: var(--text-muted);">○</span>
                                         <span>{{ alt.clo }}</span>
                                         {% if alt.score is defined and alt.score is not none %}
-                                            <span class="ai-confidence-badge badge-low" style="font-size: 0.72rem; padding: 0.12rem 0.45rem;">{{ alt.score }}%</span>
+                                            {% set alt_conf = alt.score|float %}
+                                            <span class="ai-confidence-badge badge-score" style="font-size: 0.72rem; padding: 0.12rem 0.45rem;">{{ alt_conf|round(0)|int }}%</span>
                                         {% endif %}
                                     </div>
                                     {% endif %}
