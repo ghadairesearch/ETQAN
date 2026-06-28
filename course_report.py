@@ -12470,6 +12470,7 @@ def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, co
             insert_course_report_word_identity(body, course_info, branding, logo_rel_id)
             report_language = get_export_report_language()
             grade_distribution = (course_report_inputs or {}).get('grade_distribution') or {}
+            student_grade_comment = (course_report_inputs or {}).get('student_results_comment') or build_student_grade_comment(grade_distribution)
             fill_grade_distribution_in_template_table(
                 body,
                 ['1. Grade Distribution', '1. توزيع التقديرات'],
