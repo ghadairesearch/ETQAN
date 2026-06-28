@@ -207,7 +207,8 @@
                                 </td>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
                                     <div class="action-checkboxes-container" style="max-height: 160px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #fff; opacity: 0.5; transition: opacity 0.2s;" data-improvement-action-container="{{ recommendation_index }}">
-                                        {% for action_option in course_improvement_action_options %}
+                                        {% set action_options = recommendation_action_options[recommendation] | default(course_improvement_action_options) %}
+                                        {% for action_option in action_options %}
                                             <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 0.35rem; cursor: pointer; line-height: 1.2;">
                                                 <input type="checkbox" name="course_improvement_action_{{ recommendation_index }}" value="{{ action_option }}" data-improvement-action-checkbox="{{ recommendation_index }}" style="margin-top: 0.15rem;" disabled>
                                                 <span>{{ course_report_label(action_option) }}</span>
