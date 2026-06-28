@@ -125,7 +125,17 @@
     </p>
     <p style="color: var(--text-muted);">
         {{ _('mapping.course') }} <strong>{{ course_name }}</strong><br>
-        {{ _('detected.source') }} <strong>{{ filename }}</strong>
+        {{ _('detected.source') }} <strong>{{ filename }}</strong><br>
+        {% if metrics and metrics.question_extraction_model %}
+        <span style="display: inline-block; margin-top: 0.25rem;">
+            <strong style="color: #6366f1;">{{ _('courses.extraction_method_prefix') }}</strong>
+            {% if metrics.question_extraction_model == 'ExamParser' %}
+                {{ _('method.rule_based') }}
+            {% else %}
+                {{ _('method.ai_extraction') }} ({{ metrics.question_extraction_model }})
+            {% endif %}
+        </span>
+        {% endif %}
     </p>
 
     {% set question_items = metrics.questions if metrics and metrics.questions else ['Q1'] %}
