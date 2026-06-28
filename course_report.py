@@ -311,13 +311,13 @@ COURSE_REPORT_AR_LABELS = {
 }
 COURSE_IMPROVEMENT_SUPPORT_OPTIONS = [
     'No additional support required',
+    'Course coordinator',
+    'Teaching staff',
+    'Technical staff',
+    'Academic advising committee',
     'Department management',
     'Curriculum committee',
-    'Academic advising committee',
     'College council',
-    'Course coordinator',
-    'Technical staff',
-    'Teaching staff',
     'Technical support',
     'Financial support',
     'Other',
@@ -412,14 +412,26 @@ def grouped_course_improvement_recommendations():
 def course_report_label(value):
     value = str(value or '')
     if has_request_context() and get_language() == 'ar':
-        return COURSE_REPORT_AR_LABELS.get(value, value)
+        if value.startswith('Other:'):
+            other_label = COURSE_REPORT_AR_LABELS.get('Other', 'Other')
+            explanation = value[len('Other:'):].strip()
+            return f"{other_label}: {explanation}"
+        parts = [p.strip() for p in value.split(',') if p.strip()]
+        translated = [COURSE_REPORT_AR_LABELS.get(p, p) for p in parts]
+        return ', '.join(translated)
     return value
 
 def course_report_label_for_language(value, language=None):
     value = str(value or '')
     language = language or (get_export_report_language() if has_request_context() else 'en')
     if language == 'ar':
-        return COURSE_REPORT_AR_LABELS.get(value, value)
+        if value.startswith('Other:'):
+            other_label = COURSE_REPORT_AR_LABELS.get('Other', 'Other')
+            explanation = value[len('Other:'):].strip()
+            return f"{other_label}: {explanation}"
+        parts = [p.strip() for p in value.split(',') if p.strip()]
+        translated = [COURSE_REPORT_AR_LABELS.get(p, p) for p in parts]
+        return ', '.join(translated)
     return value
 
 def localized_uncovered_reason_actions():
@@ -11094,12 +11106,23 @@ def read_course_improvement_plan():
         other_action = compact_text(request.form.get(f'course_improvement_action_other_{index}') or '')
         if action == 'Other' and other_action:
             action = f"Other: {other_action}"
-        support = compact_text(request.form.get(f'course_improvement_support_{index}') or '')
-        if support not in allowed_support:
-            support = ''
-        other_support = compact_text(request.form.get(f'course_improvement_support_other_{index}') or '')
-        if support == 'Other' and other_support:
-            support = f"Other: {other_support}"
+        supports = request.form.getlist(f'course_improvement_support_{index}')
+        valid_supports = []
+        has_other = False
+        for s in supports:
+            s_compact = compact_text(s)
+            if s_compact in allowed_support:
+                if s_compact == 'Other':
+                    has_other = True
+                else:
+                    valid_supports.append(s_compact)
+        if has_other:
+            other_support = compact_text(request.form.get(f'course_improvement_support_other_{index}') or '')
+            if other_support:
+                valid_supports.append(f"Other: {other_support}")
+            else:
+                valid_supports.append("Other")
+        support = ', '.join(valid_supports)
         items.append({
             'recommendation': recommendation,
             'actions_needed': action,
