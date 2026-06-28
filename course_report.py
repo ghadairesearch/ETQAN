@@ -181,7 +181,7 @@ COURSE_REPORT_AR_LABELS = {
     'Improve course materials and resources': 'تحسين مواد ومصادر المقرر',
     'Enhance critical thinking skills': 'تعزيز مهارات التفكير الناقد',
     'Enhance teamwork and communication skills': 'تعزيز مهارات العمل الجماعي والتواصل',
-    'Improve alignment between CLOs and assessments': 'تحسين مواءمة نواتج التعلم مع التقييمات',
+    'Improve alignment between CLOs and assessments': 'تحسين المواءمة بين التقييمات ونواتج التعلم',
     'Increase use of real-world case studies': 'زيادة استخدام دراسات حالة واقعية',
     'Reduce content overload': 'تقليل كثافة محتوى المقرر',
     'Curriculum committee approval': 'موافقة لجنة المناهج',
