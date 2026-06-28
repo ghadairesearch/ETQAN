@@ -11102,12 +11102,23 @@ def read_course_improvement_plan():
         if recommendation not in selected or recommendation in seen:
             continue
         seen.add(recommendation)
-        action = compact_text(request.form.get(f'course_improvement_action_{index}') or '')
-        if action not in allowed_action:
-            action = ''
-        other_action = compact_text(request.form.get(f'course_improvement_action_other_{index}') or '')
-        if action == 'Other' and other_action:
-            action = f"Other: {other_action}"
+        actions = request.form.getlist(f'course_improvement_action_{index}')
+        valid_actions = []
+        has_other_action = False
+        for a in actions:
+            a_compact = compact_text(a)
+            if a_compact in allowed_action:
+                if a_compact == 'Other':
+                    has_other_action = True
+                else:
+                    valid_actions.append(a_compact)
+        if has_other_action:
+            other_action = compact_text(request.form.get(f'course_improvement_action_other_{index}') or '')
+            if other_action:
+                valid_actions.append(f"Other: {other_action}")
+            else:
+                valid_actions.append("Other")
+        action = ', '.join(valid_actions)
         supports = request.form.getlist(f'course_improvement_support_{index}')
         valid_supports = []
         has_other = False

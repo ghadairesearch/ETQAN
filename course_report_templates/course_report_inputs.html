@@ -206,11 +206,14 @@
                                     </label>
                                 </td>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                    <select name="course_improvement_action_{{ recommendation_index }}" class="form-control" data-improvement-action-select="{{ recommendation_index }}" disabled style="opacity: 0.5; transition: opacity 0.2s;">
+                                    <div class="action-checkboxes-container" style="max-height: 160px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #fff; opacity: 0.5; transition: opacity 0.2s;" data-improvement-action-container="{{ recommendation_index }}">
                                         {% for action_option in course_improvement_action_options %}
-                                            <option value="{{ action_option }}">{{ course_report_label(action_option) }}</option>
+                                            <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 0.35rem; cursor: pointer; line-height: 1.2;">
+                                                <input type="checkbox" name="course_improvement_action_{{ recommendation_index }}" value="{{ action_option }}" data-improvement-action-checkbox="{{ recommendation_index }}" style="margin-top: 0.15rem;" disabled>
+                                                <span>{{ course_report_label(action_option) }}</span>
+                                            </label>
                                         {% endfor %}
-                                    </select>
+                                    </div>
                                     <div id="course_improvement_action_other_group_{{ recommendation_index }}" style="display: none; margin-top: 0.5rem;">
                                         <label class="form-label">{{ _('results.please_explain') }}</label>
                                         <textarea name="course_improvement_action_other_{{ recommendation_index }}" class="form-control" rows="2" disabled></textarea>
@@ -321,12 +324,12 @@
             actionGroup.style.display = reasonSelect.value ? 'block' : 'none';
             syncActionOther(actionSelect);
         }
-        function syncImprovementActionOther(select) {
-            const index = select.getAttribute('data-improvement-action-select');
+        function syncImprovementActionOther(index) {
             const group = document.getElementById('course_improvement_action_other_group_' + index);
             const toggle = document.querySelector('[data-improvement-toggle="' + index + '"]');
+            const otherCheckbox = document.querySelector('input[data-improvement-action-checkbox="' + index + '"][value="Other"]');
             if (group) {
-                const show = select.value === 'Other';
+                const show = otherCheckbox && otherCheckbox.checked;
                 group.style.display = show ? 'block' : 'none';
                 const textarea = group.querySelector('textarea');
                 if (textarea) {
@@ -359,17 +362,23 @@
             const index = toggle.getAttribute('data-improvement-toggle');
             const row = document.querySelector('[data-improvement-row="' + index + '"]');
             if (!row) return;
-            const actionSelect = row.querySelector('[data-improvement-action-select="' + index + '"]');
-            if (actionSelect) {
-                if (toggle.checked) {
-                    actionSelect.removeAttribute('disabled');
-                    actionSelect.style.opacity = '1';
-                } else {
-                    actionSelect.setAttribute('disabled', 'true');
-                    actionSelect.style.opacity = '0.5';
-                }
-                syncImprovementActionOther(actionSelect);
+
+            // Sync action container and checkboxes
+            const actionContainer = row.querySelector('[data-improvement-action-container="' + index + '"]');
+            if (actionContainer) {
+                actionContainer.style.opacity = toggle.checked ? '1' : '0.5';
             }
+            const actionCheckboxes = row.querySelectorAll('[data-improvement-action-checkbox="' + index + '"]');
+            actionCheckboxes.forEach(function(cb) {
+                if (toggle.checked) {
+                    cb.removeAttribute('disabled');
+                } else {
+                    cb.setAttribute('disabled', 'true');
+                }
+            });
+            syncImprovementActionOther(index);
+
+            // Sync support container and checkboxes
             const supportContainer = row.querySelector('[data-improvement-support-container="' + index + '"]');
             if (supportContainer) {
                 supportContainer.style.opacity = toggle.checked ? '1' : '0.5';
@@ -405,11 +414,13 @@
             });
             syncActionOther(select);
         });
-        document.querySelectorAll('[data-improvement-action-select]').forEach(function(select) {
-            select.addEventListener('change', function() {
-                syncImprovementActionOther(select);
+        document.querySelectorAll('[data-improvement-action-checkbox]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                const index = checkbox.getAttribute('data-improvement-action-checkbox');
+                if (checkbox.value === 'Other') {
+                    syncImprovementActionOther(index);
+                }
             });
-            syncImprovementActionOther(select);
         });
         document.querySelectorAll('[data-improvement-support-checkbox]').forEach(function(checkbox) {
             checkbox.addEventListener('change', function() {
@@ -424,6 +435,12 @@
                 syncImprovementRow(toggle);
             });
             syncImprovementRow(toggle);
+        });
+        // Initial load sync for other textareas on all rows
+        document.querySelectorAll('[data-improvement-toggle]').forEach(function(toggle) {
+            const index = toggle.getAttribute('data-improvement-toggle');
+            syncImprovementActionOther(index);
+            syncImprovementSupportOther(index);
         });
         syncTopicsGroup();
     });
