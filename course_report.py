@@ -123,6 +123,8 @@ COURSE_IMPROVEMENT_RECOMMENDATIONS = [
     'Improve alignment between CLOs and assessments',
     'Increase use of real-world case studies',
     'Reduce content overload',
+    'Diversify teaching strategies',
+    'Enhance active learning',
 ]
 COURSE_IMPROVEMENT_RECOMMENDATION_GROUPS = [
     {
@@ -138,6 +140,8 @@ COURSE_IMPROVEMENT_RECOMMENDATION_GROUPS = [
         'items': [
             'Increase project-based learning',
             'Increase use of real-world case studies',
+            'Diversify teaching strategies',
+            'Enhance active learning',
         ],
     },
     {
@@ -178,6 +182,8 @@ COURSE_REPORT_AR_LABELS = {
     'Strengthen industry alignment': 'تعزيز مواءمة المقرر مع سوق العمل',
     'Improve prerequisite knowledge': 'تحسين المعرفة السابقة المطلوبة',
     'Increase project-based learning': 'زيادة التعلم القائم على المشاريع',
+    'Diversify teaching strategies': 'تنويع استراتيجيات التدريس',
+    'Enhance active learning': 'تعزيز التعلم النشط',
     'Improve course materials and resources': 'تحسين مواد ومصادر المقرر',
     'Enhance critical thinking skills': 'تعزيز مهارات التفكير الناقد',
     'Enhance teamwork and communication skills': 'تعزيز مهارات العمل الجماعي والتواصل',
