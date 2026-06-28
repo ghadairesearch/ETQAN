@@ -167,8 +167,8 @@
         <div style="display: flex; gap: 0.5rem; align-items: center;">
             {% if is_draft %}
                 <form id="draft_save_form" method="POST" action="{{ url_for('save_course_report_draft_action', draft_id=report_id) }}" style="margin: 0; display: flex; gap: 0.5rem; align-items: center;">
-                    <button type="submit" class="btn btn-primary" name="final_action" value="save">
-                        {{ _('courses.save') }}
+                    <button type="submit" class="btn save-icon-button" name="final_action" value="save" aria-label="{{ _('courses.save') }}" title="{{ _('courses.save') }}">
+                        {% include "save_icon.html" %}
                     </button>
                     <div class="report-action-menu" data-auto-menu>
                         <button type="button" class="btn" style="background-color: var(--border-color); color: var(--text-main);" aria-label="Export" aria-haspopup="true" aria-expanded="false">
@@ -181,8 +181,8 @@
                     </div>
                 </form>
             {% else %}
-                <button type="button" class="btn btn-primary" style="opacity: 0.8; cursor: default;" disabled>
-                    {{ _('courses.save') }}
+                <button type="button" class="btn save-icon-button" style="opacity: 0.8; cursor: default;" aria-label="{{ _('courses.save') }}" title="{{ _('courses.save') }}" disabled>
+                    {% include "save_icon.html" %}
                 </button>
                 <div class="report-action-menu" data-auto-menu>
                     <button type="button" class="btn" style="background-color: var(--border-color); color: var(--text-main);" aria-label="Export" aria-haspopup="true" aria-expanded="false">

@@ -11959,16 +11959,47 @@ def build_generated_course_report_docx(stats, course_report_inputs=None, course_
     root.append(body)
 
     course_info = course_info or {}
-    insert_course_report_word_identity(body, course_info, apply_university_identity_colors(get_report_branding()) if has_request_context() else {}, '')
-    body.append(word_paragraph('Course Report', bold=True))
+    branding = apply_university_identity_colors(get_report_branding()) if has_request_context() else {}
+    logo_path = resolve_branding_logo_path(branding, report_ready=True) if branding else ''
+    logo_bytes = b''
+    logo_ext = ''
+    if logo_path and os.path.exists(logo_path):
+        logo_ext = os.path.splitext(logo_path)[1].lower()
+        if logo_ext in {'.jpg', '.jpeg', '.png'}:
+            with open(logo_path, 'rb') as f:
+                logo_bytes = f.read()
+
+    logo_rel_id = 'rId2' if logo_bytes else ''
+    insert_course_report_word_identity(body, course_info, branding, logo_rel_id)
+    language = get_export_report_language() if has_request_context() else 'en'
+    body.append(word_paragraph('تقرير المقرر' if language == 'ar' else 'Course Report', bold=True))
+    
+    report_details = (course_report_inputs or {}).get('report_details') or {}
     course_name = course_info.get('course_name') or course_info.get('raw_name') or ''
     course_id = course_info.get('course_id') or ''
-    if course_name:
-        body.append(word_paragraph(f"Course Name: {course_name}"))
-    if course_id:
-        body.append(word_paragraph(f"Course Code: {course_id}"))
+    
+    def add_detail(label_en, label_ar, value):
+        if value:
+            body.append(word_paragraph(f"{label_ar if language == 'ar' else label_en}: {value}"))
 
-    body.append(word_paragraph('Course Learning Outcomes Assessment Results', bold=True))
+    add_detail('Course Name', 'اسم المقرر', course_name)
+    add_detail('Course Code', 'رمز المقرر', course_id)
+    add_detail('Course Instructor', 'أستاذ المقرر', report_details.get('course_instructor'))
+    add_detail('Course Coordinator', 'منسق المقرر', report_details.get('course_coordinator'))
+    
+    location = report_details.get('location')
+    if location == 'main':
+        add_detail('Location', 'المقر', 'المقر الرئيسي' if language == 'ar' else 'Main Campus')
+    elif location == 'branch':
+        branch_name = report_details.get('branch_name')
+        val = f"{'الفرع' if language == 'ar' else 'Branch'}: {branch_name}" if branch_name else ('الفرع' if language == 'ar' else 'Branch')
+        add_detail('Location', 'المقر', val)
+        
+    add_detail('Number of Sections', 'عدد الشعب', report_details.get('sections_count'))
+    add_detail('Students Started', 'الطلاب في بداية الفصل', report_details.get('students_started'))
+    add_detail('Students Completed', 'الطلاب الذين أكملوا المقرر', report_details.get('students_completed'))
+
+    body.append(word_paragraph('نتائج تقييم نواتج التعلم للمقرر' if language == 'ar' else 'Course Learning Outcomes Assessment Results', bold=True))
     body.append(build_clo_assessment_word_table(stats, course_info, get_export_report_language() if has_request_context() else 'en'))
     for block in build_course_report_input_blocks(course_report_inputs):
         body.append(block)
@@ -11978,16 +12009,31 @@ def build_generated_course_report_docx(stats, course_report_inputs=None, course_
 
     output = io.BytesIO()
     with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED) as docx:
-        docx.writestr('[Content_Types].xml', '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>''')
-        docx.writestr('_rels/.rels', '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>''')
+        content_types = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">']
+        content_types.append('  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>')
+        content_types.append('  <Default Extension="xml" ContentType="application/xml"/>')
+        
+        if logo_bytes:
+            ext_clean = logo_ext.lstrip('.')
+            ctype = 'image/png' if ext_clean == 'png' else 'image/jpeg'
+            content_types.append(f'  <Default Extension="{ext_clean}" ContentType="{ctype}"/>')
+            docx.writestr(f'word/media/logo{logo_ext}', logo_bytes)
+            
+        content_types.append('  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>')
+        content_types.append('</Types>')
+        docx.writestr('[Content_Types].xml', '\n'.join(content_types))
+
+        rels = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">']
+        rels.append('  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>')
+        rels.append('</Relationships>')
+        docx.writestr('_rels/.rels', '\n'.join(rels))
+
+        if logo_bytes:
+            doc_rels = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">']
+            doc_rels.append(f'  <Relationship Id="{logo_rel_id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo{logo_ext}"/>')
+            doc_rels.append('</Relationships>')
+            docx.writestr('word/_rels/document.xml.rels', '\n'.join(doc_rels))
+        
         docx.writestr('word/document.xml', document_xml)
 
     output.seek(0)
