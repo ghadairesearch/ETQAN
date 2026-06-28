@@ -1534,7 +1534,7 @@ TRANSLATIONS = {
         'history.rename_invalid': '\u0623\u062f\u062e\u0644 \u0627\u0633\u0645\u0627\u064b \u0644\u0644\u062a\u0642\u0631\u064a\u0631.',
         'history.rename_duplicate': '\u064a\u0648\u062c\u062f \u062a\u0642\u0631\u064a\u0631 \u0628\u0647\u0630\u0627 \u0627\u0644\u0627\u0633\u0645 \u0644\u0647\u0630\u0627 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'history.delete': 'حذف',
-        'history.delete_confirm': 'هل أنت متأكد من حذف هذا التقرير؟ لا يمكن التراجع عن هذا الإجراء.',
+        'history.delete_confirm': 'هل أنت متأكد من حذف هذا الملف؟ لا يمكن التراجع عن هذا الإجراء.',
         'history.deleted': 'تم حذف التقرير.',
         'history.empty': 'لا توجد تقارير محفوظة بعد. أنشئ تقرير من الصفحة الرئيسية.',
         'billing.title': 'الاشتراكات',
@@ -1745,6 +1745,7 @@ def translate(key):
     return TRANSLATIONS.get(lang, {}).get(key, key)
 
 AR_FLASH_EXACT_TRANSLATIONS = {
+    'Exam deleted successfully.': 'تم حذف الاختبار بنجاح.',
     'No course report file uploaded': '\u0644\u0645 \u064a\u062a\u0645 \u0631\u0641\u0639 \u0645\u0644\u0641 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
     'No selected course report file': '\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0645\u0644\u0641 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
     'Please upload a PDF, CSV, or Excel course report.': '\u064a\u0631\u062c\u0649 \u0631\u0641\u0639 \u062a\u0642\u0631\u064a\u0631 \u0645\u0642\u0631\u0631 \u0628\u0635\u064a\u063a\u0629 PDF \u0623\u0648 CSV \u0623\u0648 Excel.',
