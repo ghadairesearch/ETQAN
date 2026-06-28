@@ -171,8 +171,12 @@
                         {% include "save_icon.html" %}
                     </button>
                     <div class="report-action-menu" data-auto-menu>
-                        <button type="button" class="btn" style="background-color: var(--border-color); color: var(--text-main);" aria-label="Export" aria-haspopup="true" aria-expanded="false">
-                            {% if language == 'ar' %}تصدير{% else %}Export{% endif %}
+                        <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <path d="M7 10l5 5 5-5"></path>
+                                <path d="M12 15V3"></path>
+                            </svg>
                         </button>
                         <div class="report-action-panel" style="bottom: 100%; top: auto; margin-bottom: 0.25rem;">
                             <button type="submit" name="final_action" value="export_word" style="background: none; border: none; width: 100%; text-align: left; padding: 0.65rem 0.75rem; font-weight: 600; cursor: pointer; color: var(--text-main);">{{ _('course_report.export_word') }}</button>
@@ -185,8 +189,12 @@
                     {% include "save_icon.html" %}
                 </button>
                 <div class="report-action-menu" data-auto-menu>
-                    <button type="button" class="btn" style="background-color: var(--border-color); color: var(--text-main);" aria-label="Export" aria-haspopup="true" aria-expanded="false">
-                        {% if language == 'ar' %}تصدير{% else %}Export{% endif %}
+                    <button type="button" class="report-action-button" aria-label="Export" aria-haspopup="true" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
                     </button>
                     <div class="report-action-panel" style="bottom: 100%; top: auto; margin-bottom: 0.25rem;">
                         <a href="{{ url_for('export_saved_course_report_word', report_id=report_id) }}">{{ _('course_report.export_word') }}</a>
