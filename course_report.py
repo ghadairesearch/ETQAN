@@ -11228,7 +11228,7 @@ def build_course_report_word_identity_blocks(course_info=None, branding=None, lo
     if language == 'ar':
         accent_properties.append(word_element('bidiVisual'))
     accent_table.append(accent_properties)
-    accent_table.append(word_row([''], fill=secondary, size='40', width='9600'))
+    accent_table.append(word_row([''], fill=secondary, size='40'))
 
     blocks.append(accent_table)
     blocks.append(word_paragraph(''))
