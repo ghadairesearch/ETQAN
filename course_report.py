@@ -11094,6 +11094,13 @@ def clean_xml_text(text):
     return re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', str(text))
 
 def word_paragraph(text='', bold=False, color='', size='', alignment=''):
+    if not alignment and text:
+        s_text = str(text)
+        if any('؀' <= c <= 'ۿ' or 'ݐ' <= c <= 'ݿ' or 'ࢠ' <= c <= 'ࣿ' for c in s_text):
+            alignment = 'right'
+        elif any(c.isalpha() for c in s_text):
+            alignment = 'left'
+
     paragraph = word_element('p')
     if alignment:
         paragraph_properties = word_element('pPr')
