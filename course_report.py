@@ -12857,6 +12857,61 @@ def course_report_docx_response(docx_bytes):
     return docx_response(docx_bytes, "course_report_filled.docx")
 
 def build_course_report_pdf(stats, course_report_inputs=None, course_info=None, total_students=None):
+    try:
+        import os
+        import subprocess
+        import uuid
+
+        docx_bytes = build_course_report_docx(
+            stats,
+            course_report_inputs or {},
+            course_info or {},
+            total_students
+        )
+
+        temp_dir = os.path.join(APP_BASE_DIR, 'temp_conversion')
+        os.makedirs(temp_dir, exist_ok=True)
+
+        unique_id = uuid.uuid4().hex
+        docx_path = os.path.abspath(os.path.join(temp_dir, f"temp_{unique_id}.docx"))
+        pdf_path = os.path.abspath(os.path.join(temp_dir, f"temp_{unique_id}.pdf"))
+
+        with open(docx_path, 'wb') as f:
+            f.write(docx_bytes)
+
+        ps_script = (
+            f"$word = New-Object -ComObject Word.Application; "
+            f"$word.Visible = $false; "
+            f"$doc = $word.Documents.Open('{docx_path}'); "
+            f"$doc.SaveAs('{pdf_path}', 17); "
+            f"$doc.Close(); "
+            f"$word.Quit();"
+        )
+        
+        cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps_script]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        
+        if result.returncode == 0 and os.path.exists(pdf_path):
+            with open(pdf_path, 'rb') as f:
+                pdf_bytes = f.read()
+            try:
+                os.remove(docx_path)
+                os.remove(pdf_path)
+                if not os.listdir(temp_dir):
+                    os.rmdir(temp_dir)
+            except Exception:
+                pass
+            return pdf_bytes
+            
+    except Exception as e:
+        try:
+            if 'docx_path' in locals() and os.path.exists(docx_path):
+                os.remove(docx_path)
+            if 'pdf_path' in locals() and os.path.exists(pdf_path):
+                os.remove(pdf_path)
+        except Exception:
+            pass
+
     from xml.sax.saxutils import escape
     from reportlab.lib import colors
     from reportlab.lib.enums import TA_LEFT, TA_RIGHT
@@ -14471,6 +14526,20 @@ def export_saved_report_pdf(report_id):
     if not row:
         flash("Report not found.", "error")
         return redirect(url_for('reports'))
+
+    if payload.get('report_type') == 'course_report':
+        try:
+            pdf_bytes = build_course_report_pdf(
+                payload.get('stats') or {},
+                payload.get('course_report_inputs') or {},
+                payload.get('course_info') or {},
+                payload.get('total_students') or None
+            )
+        except Exception as e:
+            app.logger.exception("Failed to export course report PDF: %s", e)
+            flash(f"Failed to generate PDF: {e}", "error")
+            return redirect(url_for('reports'))
+        return course_report_pdf_response(pdf_bytes)
 
     student_rows = student_rows_from_matrix(payload.get('student_achievement_matrix') or {})
     pdf_bytes = build_results_pdf(
