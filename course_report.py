@@ -11349,7 +11349,7 @@ def build_clo_course_report_rows(stats, course_info=None, language=None):
         target = f"{float(data.get('target_pct', 0)):.2f}%"
         actual = f"{float(data.get('achievement_percentage', 0)):.2f}%"
         achieved = float(data.get('achievement_percentage', 0)) >= float(data.get('target_pct', 0))
-        comment = ('تم تحقق المستوى المستهدف' if achieved else 'أقل من المستوى المستهدف') if language == 'ar' else ('Target achieved' if achieved else 'Below target')
+        comment = ('تم تحقيق المستوى المستهدف' if achieved else 'لم يتم تحقيق المستوى الهدف') if language == 'ar' else ('Target achieved' if achieved else 'Below target')
         rows.append([
             f"{number} {wording}".strip(),
             resolve_clo_plo_code(clo, clo_plos),
