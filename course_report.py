@@ -168,6 +168,8 @@ COURSE_REPORT_AR_LABELS = {
     'CLO Attainment and Assessment': 'تحقق نواتج التعلم والتقييم',
     'Teaching and Learning Strategies': 'استراتيجيات التعليم والتعلم',
     'Curriculum and Course Content': 'المنهج ومحتوى المقرر',
+    'Course Content and Prerequisites': 'محتوى المقرر والمتطلبات السابقة',
+    'Practical and Applied Learning': 'التعلم العملي والتطبيقي',
     'Learning Resources and Skills': 'مصادر التعلم والمهارات',
     'Improve student performance in CLOs': 'تحسين أداء الطلاب في نواتج التعلم',
     'Enhance practical/laboratory activities': 'تعزيز الأنشطة العملية أو المعملية',
