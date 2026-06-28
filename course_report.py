@@ -11095,27 +11095,31 @@ def clean_xml_text(text):
 
 def word_paragraph(text='', bold=False, color='', size='', alignment=''):
     is_arabic = False
-    if text:
-        s_text = str(text)
+    s_text = str(text) if text is not None else ''
+    
+    if s_text:
         is_arabic = any('؀' <= c <= 'ۿ' or 'ݐ' <= c <= 'ݿ' or 'ࢠ' <= c <= 'ࣿ' for c in s_text)
         if not alignment:
             if is_arabic:
                 alignment = 'right'
-            elif any(c.isalpha() for c in s_text):
+            elif s_text.strip():
                 alignment = 'left'
 
     paragraph = word_element('p')
+    paragraph_properties = word_element('pPr')
     
-    # We always need pPr if there is alignment OR if it's arabic (to set bidi)
-    if alignment or is_arabic:
-        paragraph_properties = word_element('pPr')
-        if alignment:
-            paragraph_properties.append(word_element('jc', {word_tag('val'): alignment}))
-        if is_arabic:
-            paragraph_properties.append(word_element('bidi'))
-        paragraph.append(paragraph_properties)
+    if alignment:
+        paragraph_properties.append(word_element('jc', {word_tag('val'): alignment}))
+        
+    if is_arabic:
+        paragraph_properties.append(word_element('bidi', {word_tag('val'): '1'}))
+    else:
+        paragraph_properties.append(word_element('bidi', {word_tag('val'): '0'}))
+        
+    paragraph.append(paragraph_properties)
+
     run = word_element('r')
-    if bold or color or size:
+    if bold or color or size or is_arabic:
         run_properties = word_element('rPr')
         if bold:
             run_properties.append(word_element('b'))
@@ -11123,11 +11127,14 @@ def word_paragraph(text='', bold=False, color='', size='', alignment=''):
             run_properties.append(word_element('color', {word_tag('val'): str(color).lstrip('#')}))
         if size:
             run_properties.append(word_element('sz', {word_tag('val'): str(size)}))
+        if is_arabic:
+            run_properties.append(word_element('rtl', {word_tag('val'): '1'}))
         run.append(run_properties)
-    text_node = word_element('t')
-    text_node.set(f'{{{WORD_XML_NS}}}space', 'preserve')
-    text_node.text = clean_xml_text(text or '')
-    run.append(text_node)
+
+    text_element = word_element('t')
+    text_element.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    text_element.text = s_text
+    run.append(text_element)
     paragraph.append(run)
     return paragraph
 
