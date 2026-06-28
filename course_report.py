@@ -174,7 +174,7 @@ COURSE_REPORT_AR_LABELS = {
     'Improve student performance in CLOs': 'تحسين أداء الطلاب في نواتج التعلم',
     'Enhance practical/laboratory activities': 'تعزيز الأنشطة العملية أو المعملية',
     'Update course content': 'تحديث محتوى المقرر',
-    'Improve assessment methods': 'تحسين أساليب التقييم',
+    'Improve assessment methods': 'تحسين آليات قياس مخرجات التعلم',
     'Strengthen industry alignment': 'تعزيز مواءمة المقرر مع سوق العمل',
     'Improve prerequisite knowledge': 'تحسين المعرفة السابقة المطلوبة',
     'Increase project-based learning': 'زيادة التعلم القائم على المشاريع',
