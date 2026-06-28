@@ -801,7 +801,7 @@ EN_TRANSLATIONS = {
     'index.select_course_populate': 'Select a course to populate...',
     'index.no_clos_category': 'No CLOs detected for this category.',
     'index.assessment_files': 'Assessment Files',
-    'index.assessment_help': 'Upload at least one grades file for each assessment.',
+    'index.assessment_help': 'Upload at least one grades file.',
     'index.type': 'Type',
     'index.grades_file': 'Grades File',
     'index.exam_paper': 'Exam Paper',
@@ -815,7 +815,7 @@ EN_TRANSLATIONS = {
     'index.add_file': 'Add File',
     'index.next_mapping': 'Next',
     'index.error_course': 'Please select a course or add course information before continuing.',
-    'index.error_file': 'Upload at least one grades file for each assessment.',
+    'index.error_file': 'Upload at least one grades file.',
     'spec.title': 'Upload Course Specification',
     'spec.back': 'Back',
     'spec.description': 'Upload a course specification PDF to extract the course name, course number, and CLOs. Arabic text-based and OCR-supported scanned PDFs are supported.',
@@ -936,7 +936,7 @@ EN_TRANSLATIONS = {
     'results.create_account': 'Create Account',
     'results.org_identity': 'Organization Visual Identity',
     'results.export_requires_account': "Exporting reports requires an account so the report can use your organization's visual identity.",
-    'results.clo_definitions': 'CLOs',
+    'results.clo_definitions': 'CLO Definitions',
     'results.domain': 'Domain',
     'results.clo': 'Code',
     'results.wording': 'CLOs',
@@ -1374,7 +1374,7 @@ TRANSLATIONS = {
         'index.select_course_populate': 'اختر مقرراً لعرض النواتج...',
         'index.no_clos_category': 'لا توجد نواتج تعلم في هذه الفئة.',
         'index.assessment_files': 'ملفات التقييم',
-        'index.assessment_help': 'ارفع ملف درجات واحداً على الأقل لكل تقييم.',
+        'index.assessment_help': 'ارفع ملف درجات واحداً على الأقل.',
         'index.type': 'النوع',
         'index.grades_file': 'ملف الدرجات',
         'index.exam_paper': 'ورقة الاختبار',
@@ -1388,7 +1388,7 @@ TRANSLATIONS = {
         'index.add_file': 'إضافة ملف',
         'index.next_mapping': '\u0627\u0644\u062a\u0627\u0644\u064a',
         'index.error_course': 'يرجى اختيار مقرر أو إضافة معلومات المقرر قبل المتابعة.',
-        'index.error_file': 'ارفع ملف درجات واحداً على الأقل لكل تقييم.',
+        'index.error_file': 'ارفع ملف درجات واحداً على الأقل.',
         'spec.title': 'رفع توصيف المقرر',
         'spec.back': 'عودة',
         'spec.description': 'ارفع ملف PDF لتوصيف المقرر لاستخراج اسم المقرر ورقمه ونواتج التعلم. تُدعم ملفات PDF النصية العربية والملفات الممسوحة عند توفر OCR.',
@@ -1499,7 +1499,7 @@ TRANSLATIONS = {
         'results.create_account': 'إنشاء حساب',
         'results.org_identity': 'الهوية البصرية للجهة',
         'results.export_requires_account': 'يتطلب تصدير التقارير حساباً حتى يستخدم التقرير الهوية البصرية لجهتك.',
-        'results.clo_definitions': 'نواتج التعلم',
+        'results.clo_definitions': 'تعريف نواتج التعلم',
         'results.domain': 'المجال',
         'results.clo': 'الرمز',
         'results.wording': 'نواتج التعلم',
@@ -12074,17 +12074,7 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     root.append(body)
 
     branding = apply_university_identity_colors(get_report_branding()) if has_request_context() else {}
-    logo_path = resolve_branding_logo_path(branding, report_ready=True) if branding else ''
-    logo_bytes = b''
-    logo_ext = ''
-    if logo_path and os.path.exists(logo_path):
-        logo_ext = os.path.splitext(logo_path)[1].lower()
-        if logo_ext in {'.jpg', '.jpeg', '.png'}:
-            with open(logo_path, 'rb') as f:
-                logo_bytes = f.read()
-
-    logo_rel_id = 'rId2' if logo_bytes else ''
-    insert_course_report_word_identity(body, course_info, branding, logo_rel_id)
+    insert_course_report_word_identity(body, course_info, branding, '')
 
     title = '\u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645' if language == 'ar' else 'CLO Attainment Report'
     course_label = '\u0627\u0644\u0645\u0642\u0631\u0631' if language == 'ar' else 'Course'
@@ -12098,60 +12088,8 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     body.append(word_paragraph(f"{total_label}: {total_students or 0}"))
     body.append(word_paragraph(''))
 
-    body.append(word_paragraph('تعريف نواتج التعلم' if language == 'ar' else 'CLO Definitions', bold=True))
-    clo_definitions = build_clo_definitions(stats.keys())
-    
-    primary = docx_hex_color(branding.get('primary_color'))
-
-    def_table = word_element('tbl')
-    def_table_props = word_element('tblPr')
-    def_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
-    borders = word_element('tblBorders')
-    for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
-        borders.append(word_element(border_name, {word_tag('val'): 'single', word_tag('sz'): '6', word_tag('space'): '0', word_tag('color'): '808080'}))
-    def_table_props.append(borders)
-    def_table.append(def_table_props)
-    
-    def_headers = ['المجال', 'الرمز', 'النص'] if language == 'ar' else ['Domain', 'CLO', 'Wording']
-    def_table.append(word_row(def_headers, header=True, fill=primary, color='FFFFFF'))
-    for item in clo_definitions:
-        domain_text = localized_clo_domain(item['domain'], language)
-        def_table.append(word_row([domain_text, item['number'], item['wording']]))
-    body.append(def_table)
-    body.append(word_paragraph(''))
-
     body.append(word_paragraph('ملخص تحقق نواتج التعلم' if language == 'ar' else 'CLO Achievement Summary', bold=True))
     body.append(build_clo_assessment_word_table(stats or {}, course_info, language))
-    
-    if student_achievement_matrix and student_achievement_matrix.get('students'):
-        body.append(word_paragraph(''))
-        body.append(word_paragraph('إنجاز الطلاب في نواتج التعلم' if language == 'ar' else 'Student CLO Achievement', bold=True))
-        matrix_table = word_element('tbl')
-        matrix_table_props = word_element('tblPr')
-        matrix_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
-        mborders = word_element('tblBorders')
-        for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
-            mborders.append(word_element(border_name, {word_tag('val'): 'single', word_tag('sz'): '6', word_tag('space'): '0', word_tag('color'): '808080'}))
-        matrix_table_props.append(mborders)
-        matrix_table.append(matrix_table_props)
-        
-        clos = student_achievement_matrix.get('clos') or []
-        matrix_headers = ['الرقم الجامعي' if language == 'ar' else 'Student ID'] + [clo_number(c) for c in clos]
-        matrix_table.append(word_row(matrix_headers, header=True, fill=primary, color='FFFFFF'))
-        
-        cells = student_achievement_matrix.get('cells') or {}
-        for student_id in student_achievement_matrix.get('students', []):
-            row_data = [display_student_id(student_id)]
-            for clo in clos:
-                cell = cells.get(student_id, {}).get(clo)
-                if cell:
-                    status = 'متحقق' if cell.get('achieved') and language == 'ar' else 'غير متحقق' if language == 'ar' else 'Met' if cell.get('achieved') else 'Not met'
-                    score = cell.get('score', 0)
-                    row_data.append(f"{score:.2f} ({status})")
-                else:
-                    row_data.append('-')
-            matrix_table.append(word_row(row_data))
-        body.append(matrix_table)
 
     body.append(word_element('sectPr'))
     document_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
@@ -12161,11 +12099,6 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
         content_types = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">']
         content_types.append('  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>')
         content_types.append('  <Default Extension="xml" ContentType="application/xml"/>')
-        if logo_bytes:
-            ext_clean = logo_ext.lstrip('.')
-            ctype = 'image/png' if ext_clean == 'png' else 'image/jpeg'
-            content_types.append(f'  <Default Extension="{ext_clean}" ContentType="{ctype}"/>')
-            docx.writestr(f'word/media/logo{logo_ext}', logo_bytes)
         content_types.append('  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>')
         content_types.append('</Types>')
         docx.writestr('[Content_Types].xml', '\n'.join(content_types))
@@ -12174,13 +12107,6 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
         rels.append('  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>')
         rels.append('</Relationships>')
         docx.writestr('_rels/.rels', '\n'.join(rels))
-
-        if logo_bytes:
-            doc_rels = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">']
-            doc_rels.append(f'  <Relationship Id="{logo_rel_id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo{logo_ext}"/>')
-            doc_rels.append('</Relationships>')
-            docx.writestr('word/_rels/document.xml.rels', '\n'.join(doc_rels))
-        
         docx.writestr('word/document.xml', document_xml)
 
     output.seek(0)
