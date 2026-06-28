@@ -11102,7 +11102,7 @@ def word_paragraph(text='', bold=False, color='', size='', alignment=''):
         is_arabic = any('\u0600' <= c <= '\u06FF' or '\u0750' <= c <= '\u077F' or '\u08A0' <= c <= '\u08FF' for c in s_text)
         if not alignment:
             if is_arabic:
-                alignment = 'right'
+                alignment = '' # Let bidi handle right alignment naturally
             elif s_text.strip():
                 alignment = 'left'
 
@@ -11111,9 +11111,9 @@ def word_paragraph(text='', bold=False, color='', size='', alignment=''):
     
     # OOXML Spec: bidi must come before jc in pPr
     if is_arabic:
-        paragraph_properties.append(word_element('bidi', {word_tag('val'): '1'}))
-    else:
-        paragraph_properties.append(word_element('bidi', {word_tag('val'): '0'}))
+        paragraph_properties.append(word_element('bidi'))
+        if alignment == 'right':
+            alignment = '' # Prevent Word 365 from mapping 'right' to 'end' (logical right = physical left) in RTL
 
     if alignment:
         paragraph_properties.append(word_element('jc', {word_tag('val'): alignment}))
@@ -11130,7 +11130,7 @@ def word_paragraph(text='', bold=False, color='', size='', alignment=''):
         if size:
             run_properties.append(word_element('sz', {word_tag('val'): str(size)}))
         if is_arabic:
-            run_properties.append(word_element('rtl', {word_tag('val'): '1'}))
+            run_properties.append(word_element('rtl'))
         run.append(run_properties)
 
     text_element = word_element('t')
