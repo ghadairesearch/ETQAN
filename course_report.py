@@ -765,7 +765,7 @@ def grouped_course_improvement_recommendations():
                     'text': recommendation,
                     'index': COURSE_IMPROVEMENT_RECOMMENDATIONS.index(recommendation),
                 })
-        if items:
+        if items or group['heading'] == 'Other':
             groups.append({'heading': group['heading'], 'items': items})
     return groups
 

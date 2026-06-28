@@ -239,8 +239,8 @@
                             {% if group.heading == 'Other' %}
                             <tr>
                                 <td colspan="3" style="padding: 0.75rem 0.65rem; border-top: 1px solid var(--border-color);">
-                                    <label class="form-label">{% if language == 'ar' %}إضافة نص{% else %}Add text{% endif %}</label>
-                                    <textarea name="course_improvement_other_recommendation" class="form-control" rows="3" placeholder="{% if language == 'ar' %}إضافة نص{% else %}Add text{% endif %}">{{ saved_other_recommendation|default('') }}</textarea>
+                                    <label class="form-label">{% if language == 'ar' %}إضافة مقترحات{% else %}Add suggestions{% endif %}</label>
+                                    <textarea name="course_improvement_other_recommendation" class="form-control" rows="3" placeholder="{% if language == 'ar' %}إضافة مقترحات{% else %}Add suggestions{% endif %}">{{ saved_other_recommendation|default('') }}</textarea>
                                 </td>
                             </tr>
                             {% endif %}
