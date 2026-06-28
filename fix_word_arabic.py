@@ -1,0 +1,32 @@
+import os
+import sys
+
+with open("course_report.py", "r", encoding="utf-8") as f:
+    text = f.read()
+
+# Fix table directions
+tbl_w_str = "table_properties.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))"
+tbl_w_repl = tbl_w_str + "\n    if language == 'ar':\n        table_properties.append(word_element('bidiVisual'))"
+text = text.replace(tbl_w_str, tbl_w_repl)
+
+def_tbl_w_str = "def_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))"
+def_tbl_w_repl = def_tbl_w_str + "\n    if language == 'ar':\n        def_table_props.append(word_element('bidiVisual'))"
+text = text.replace(def_tbl_w_str, def_tbl_w_repl)
+
+mat_tbl_w_str = "matrix_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))"
+mat_tbl_w_repl = mat_tbl_w_str + "\n        if language == 'ar':\n            matrix_table_props.append(word_element('bidiVisual'))"
+text = text.replace(mat_tbl_w_str, mat_tbl_w_repl)
+
+# Fix corrupted strings
+text = text.replace("'????? ????? ??????' if language == 'ar'", "'????? ????? ??????' if language == 'ar'")
+text = text.replace("['??????', '?????', '????'] if language == 'ar'", "['??????', '?????', '????'] if language == 'ar'")
+text = text.replace("'???? ???? ????? ??????' if language == 'ar'", "'???? ???? ????? ??????' if language == 'ar'")
+text = text.replace("'????? ?????? ?? ????? ??????' if language == 'ar'", "'????? ?????? ?? ????? ??????' if language == 'ar'")
+text = text.replace("['????? ???????' if language == 'ar'", "['????? ???????' if language == 'ar'")
+text = text.replace("status = '?????' if cell.get('achieved') and language == 'ar' else '??? ?????' if language == 'ar'", 
+                    "status = '?????' if cell.get('achieved') and language == 'ar' else '??? ?????' if language == 'ar'")
+
+with open("course_report.py", "w", encoding="utf-8") as f:
+    f.write(text)
+
+print("Fixed successfully")

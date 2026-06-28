@@ -11353,6 +11353,8 @@ def build_clo_assessment_word_table(stats, course_info=None, language=None, bran
     table = word_element('tbl')
     table_properties = word_element('tblPr')
     table_properties.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
+    if language == 'ar':
+        table_properties.append(word_element('bidiVisual'))
     borders = word_element('tblBorders')
     for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
         borders.append(word_element(border_name, {
@@ -12098,7 +12100,7 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     body.append(word_paragraph(f"{total_label}: {total_students or 0}"))
     body.append(word_paragraph(''))
 
-    body.append(word_paragraph('????? ????? ??????' if language == 'ar' else 'CLO Definitions', bold=True))
+    body.append(word_paragraph('\u062a\u0639\u0631\u064a\u0641 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645' if language == 'ar' else 'CLO Definitions', bold=True))
     clo_definitions = build_clo_definitions(stats.keys())
     
     primary = docx_hex_color(branding.get('primary_color'))
@@ -12106,13 +12108,15 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     def_table = word_element('tbl')
     def_table_props = word_element('tblPr')
     def_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
+    if language == 'ar':
+        def_table_props.append(word_element('bidiVisual'))
     borders = word_element('tblBorders')
     for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
         borders.append(word_element(border_name, {word_tag('val'): 'single', word_tag('sz'): '6', word_tag('space'): '0', word_tag('color'): '808080'}))
     def_table_props.append(borders)
     def_table.append(def_table_props)
     
-    def_headers = ['??????', '?????', '????'] if language == 'ar' else ['Domain', 'CLO', 'Wording']
+    def_headers = ['\u0627\u0644\u0645\u062c\u0627\u0644', '\u0627\u0644\u0631\u0645\u0632', '\u0627\u0644\u0646\u0635'] if language == 'ar' else ['Domain', 'CLO', 'Wording']
     def_table.append(word_row(def_headers, header=True, fill=primary, color='FFFFFF'))
     for item in clo_definitions:
         domain_text = localized_clo_domain(item['domain'], language)
@@ -12120,15 +12124,17 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     body.append(def_table)
     body.append(word_paragraph(''))
 
-    body.append(word_paragraph('???? ???? ????? ??????' if language == 'ar' else 'CLO Achievement Summary', bold=True))
+    body.append(word_paragraph('\u0645\u0644\u062e\u0635 \u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645' if language == 'ar' else 'CLO Achievement Summary', bold=True))
     body.append(build_clo_assessment_word_table(stats or {}, course_info, language))
     
     if student_achievement_matrix and student_achievement_matrix.get('students'):
         body.append(word_paragraph(''))
-        body.append(word_paragraph('????? ?????? ?? ????? ??????' if language == 'ar' else 'Student CLO Achievement', bold=True))
+        body.append(word_paragraph('\u0625\u0646\u062c\u0627\u0632 \u0627\u0644\u0637\u0644\u0627\u0628 \u0641\u064a \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645' if language == 'ar' else 'Student CLO Achievement', bold=True))
         matrix_table = word_element('tbl')
         matrix_table_props = word_element('tblPr')
         matrix_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
+        if language == 'ar':
+            matrix_table_props.append(word_element('bidiVisual'))
         mborders = word_element('tblBorders')
         for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
             mborders.append(word_element(border_name, {word_tag('val'): 'single', word_tag('sz'): '6', word_tag('space'): '0', word_tag('color'): '808080'}))
@@ -12136,7 +12142,7 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
         matrix_table.append(matrix_table_props)
         
         clos = student_achievement_matrix.get('clos') or []
-        matrix_headers = ['????? ???????' if language == 'ar' else 'Student ID'] + [clo_number(c) for c in clos]
+        matrix_headers = ['\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u062c\u0627\u0645\u0639\u064a' if language == 'ar' else 'Student ID'] + [clo_number(c) for c in clos]
         matrix_table.append(word_row(matrix_headers, header=True, fill=primary, color='FFFFFF'))
         
         cells = student_achievement_matrix.get('cells') or {}
@@ -12145,7 +12151,7 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
             for clo in clos:
                 cell = cells.get(student_id, {}).get(clo)
                 if cell:
-                    status = '?????' if cell.get('achieved') and language == 'ar' else '??? ?????' if language == 'ar' else 'Met' if cell.get('achieved') else 'Not met'
+                    status = '\u0645\u062a\u062d\u0642\u0642' if cell.get('achieved') and language == 'ar' else '\u063a\u064a\u0631 \u0645\u062a\u062d\u0642\u0642' if language == 'ar' else 'Met' if cell.get('achieved') else 'Not met'
                     # FIX: Cast score to float before formatting to avoid ValueError on strings
                     score = 0.0
                     try:
