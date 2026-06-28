@@ -376,23 +376,36 @@ COURSE_REPORT_AR_LABELS = {
     'Discuss code of ethics': 'مناقشة ميثاق الأخلاقيات',
     'Present professional case studies': 'تقديم دراسات حالة مهنية',
     'Conduct professional roleplay': 'إجراء محاكاة للأدوار المهنية',
+    'Review teaching strategies': 'مراجعة استراتيجيات التدريس.',
+    'Diversify teaching and learning methods': 'تنويع أساليب التدريس والتعلم.',
+    'Provide additional classroom exercises and activities': 'توفير تمارين وأنشطة صفية إضافية.',
+    'Increase applied and practical activities': 'زيادة الأنشطة التطبيقية والعملية.',
+    'Provide remedial activities for struggling students': 'تقديم أنشطة علاجية للطلاب المتعثرين.',
+    'Enhance student participation and interaction in class': 'تعزيز مشاركة وتفاعل الطلاب داخل القاعة الدراسية.',
+    'Improve distribution of content and activities during the semester': 'تحسين توزيع المحتوى والأنشطة خلال الفصل الدراسي.',
+    'Review alignment of learning activities with CLOs': 'مراجعة مواءمة أنشطة التعلم مع نواتج التعلم.',
+    'Use educational technologies to support student learning': 'توظيف التقنيات التعليمية لدعم تعلم الطلاب.',
+    'Provide additional learning resources and references': 'توفير مصادر تعلم ومراجع إضافية.',
+    'Encourage self-directed and collaborative learning': 'تشجيع التعلم الذاتي والتعلم التعاوني.',
+    'Monitor implementation of the improvement plan in the next offering': 'متابعة تنفيذ خطة التحسين في الطرح القادم.',
 }
 
 COURSE_IMPROVEMENT_RECOMMENDATION_ACTIONS = {
     'Improve student performance in CLOs': [
-        'Revise teaching strategies',
-        'Diversify teaching methods',
-        'Increase classroom activities',
-        'Provide additional exercises and activities',
+        'Review teaching strategies',
+        'Diversify teaching and learning methods',
+        'Provide additional classroom exercises and activities',
+        'Increase applied and practical activities',
         'Enhance student feedback',
         'Conduct academic support and advising sessions',
-        'Provide supplementary learning resources',
-        'Conduct remedial/support sessions',
-        'Revise assessment methods',
-        'Review CLO-assessment alignment',
-        'Increase practical/application activities',
-        'Coordinate with the department/course team',
-        'Monitor implementation in the next offering',
+        'Provide remedial activities for struggling students',
+        'Enhance student participation and interaction in class',
+        'Improve distribution of content and activities during the semester',
+        'Review alignment of learning activities with CLOs',
+        'Use educational technologies to support student learning',
+        'Provide additional learning resources and references',
+        'Encourage self-directed and collaborative learning',
+        'Monitor implementation of the improvement plan in the next offering',
         'Other',
     ],
     'Improve assessment methods': [
@@ -1309,6 +1322,7 @@ EN_TRANSLATIONS = {
     'results.title': 'CLO Attainment Report',
     'results.course': 'Course:',
     'results.total_students': 'Total Students Evaluated:',
+    'results.total': 'Total',
     'results.export_csv': 'Export CSV',
     'results.export_pdf': 'Export PDF',
     'results.export_course_report': 'Export Course Report DOCX',
@@ -1614,8 +1628,8 @@ TRANSLATIONS = {
         'course_report.need_clo_report': '\u0644\u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631\u060c \u062a\u062d\u062a\u0627\u062c \u0623\u0648\u0644\u0627\u064b \u0625\u0644\u0649 \u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'course_report.create_clo_prompt': '\u0647\u0644 \u062a\u0631\u063a\u0628 \u0628\u0625\u0646\u0634\u0627\u0621 \u0648\u0627\u062d\u062f \u0627\u0644\u0622\u0646\u061f',
         'course_report.create_clo_report': '\u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 CLO',
-        'course_report.associated_reports': '\u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629',
-        'course_report.associated_reports_help': '\u062d\u062f\u062f \u062a\u0642\u0631\u064a\u0631\u0627\u064b \u0648\u0627\u062d\u062f\u0627\u064b \u0623\u0648 \u0623\u0643\u062b\u0631 \u0645\u0646 \u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0644\u0627\u0633\u062a\u062d\u062f\u0627\u0645\u0647\u0627 \u0641\u064a \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
+        'course_report.associated_reports': '\u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629',
+        'course_report.associated_reports_help': '\u062d\u062f\u062f \u062a\u0642\u0631\u064a\u0631\u064b\u0627 \u0648\u0627\u062d\u062f\u064b\u0627 \u0623\u0648 \u0623\u0643\u062b\u0631 \u0645\u0646 \u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0644\u0627\u0633\u062a\u062e\u062f\u0627\u0645\u0647\u0627 \u0641\u064a \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'course_report.no_associated_reports': '\u0644\u0627 \u064a\u0648\u062c\u062f \u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u062a\u0639\u0644\u0645 \u0645\u0631\u062a\u0628\u0637 \u0628\u0647\u0630\u0627 \u0627\u0644\u0645\u0642\u0631\u0631. \u064a\u062c\u0628 \u0625\u0646\u0634\u0627\u0621 \u0648\u0627\u062d\u062f \u0642\u0628\u0644 \u0625\u0646\u0634\u0627\u0621 \u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0645\u0642\u0631\u0631.',
         'course_report.use_report': '\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0647\u0630\u0627 \u0627\u0644\u062a\u0642\u0631\u064a\u0631',
         'course_report.create_report': '\u0627\u0644\u062a\u0627\u0644\u064a',
@@ -1631,7 +1645,7 @@ TRANSLATIONS = {
         'course_report.clo_summary': '\u0646\u062a\u0627\u0626\u062c \u062a\u0642\u0648\u064a\u0645 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645',
         'course_report.recommendations': '\u0627\u0644\u062a\u0648\u0635\u064a\u0627\u062a',
         'course_report.select_one_report': '\u062d\u062f\u062f \u062a\u0642\u0631\u064a\u0631 CLO \u0648\u0627\u062d\u062f\u0627\u064b \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644.',
-        'course_report.selected_reports': '\u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 CLO \u0627\u0644\u0645\u062d\u062f\u062f\u0629',
+        'course_report.selected_reports': '\u062a\u0642\u0627\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0627\u0644\u0645\u062d\u062f\u062f\u0629',
         'course_report.continue': '\u0627\u0644\u062a\u0627\u0644\u064a',
         'home.open_service': 'ابدأ',
         'service.coming_soon': 'صفحة هذه الخدمة جاهزة. ستتم إضافة أدوات سير العمل الكاملة هنا.',
@@ -1874,6 +1888,7 @@ TRANSLATIONS = {
         'results.title': 'تقرير تحقق نواتج التعلم',
         'results.course': 'المقرر:',
         'results.total_students': 'إجمالي الطلاب:',
+        'results.total': 'الإجمالي',
         'results.export_csv': 'تصدير CSV',
         'results.export_pdf': 'تصدير PDF',
         'results.export_course_report': 'تصدير تقرير المقرر DOCX',
@@ -2145,7 +2160,7 @@ TRANSLATIONS['ar'].update({
     'mapping.method_description': '\u062d\u062f\u062f \u0643\u064a\u0641 \u062a\u0631\u064a\u062f \u0631\u0628\u0637 \u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u062a\u0642\u064a\u064a\u0645 \u0628\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645.',
     'mapping.method_choice': '\u0637\u0631\u064a\u0642\u0629 \u0627\u0644\u0631\u0628\u0637',
     'mapping.method_manual_title': '\u0631\u0628\u0637 \u064a\u062f\u0648\u064a',
-    'mapping.method_manual_description': 'استخدم الربط المستورد من ملف الدرجات، و عدله عند الحاجة، أو حدّد نواتج التعلم يدويًا لكل سؤال.',
+    'mapping.method_manual_description': 'استخدم الربط المستورد من ملف الدرجات، وعدله عند الحاجة، أو حدّد نواتج التعلم يدويًا لكل سؤال.',
     'mapping.method_ai_title': '\u0631\u0628\u0637 \u0628\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
     'mapping.method_ai_description': 'اختر تقرير ربط تم إنشاؤه مسبقًا لإعادة استخدام ربط الأسئلة بنواتج التعلم.',
     'mapping.method_exam_paper_help': '\u0627\u0631\u0641\u0639 \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0623\u0633\u0626\u0644\u0629 \u0645\u0644\u0641\u0627\u062a \u0627\u0644\u062f\u0631\u062c\u0627\u062a.',
@@ -13165,7 +13180,7 @@ def build_course_report_pdf(stats, course_report_inputs=None, course_info=None, 
     grade_distribution = course_report_inputs.get('grade_distribution') or {}
     if grade_distribution.get('total'):
         story.extend([Spacer(1, 0.12 * inch), paragraph(label('course_report.grade_distribution', 'Final Grade Distribution'), section_style)])
-        grade_rows = [[paragraph(item, header_style) for item in GRADE_ORDER + [label('checkout.total', 'Total')]]]
+        grade_rows = [[paragraph(item, header_style) for item in GRADE_ORDER + [label('results.total', 'Total')]]]
         counts = grade_distribution.get('counts') or {}
         grade_rows.append([paragraph(counts.get(grade, 0), text_style) for grade in GRADE_ORDER] + [paragraph(grade_distribution.get('total'), text_style)])
         story.append(table(grade_rows, [0.72 * inch] * (len(GRADE_ORDER) + 1)))
@@ -13193,22 +13208,6 @@ def build_course_report_pdf(stats, course_report_inputs=None, course_info=None, 
         ])
     story.append(table(clo_rows, [1.05 * inch, 1.35 * inch, 2.2 * inch, 1.55 * inch, 1.4 * inch]))
 
-    improvement_items = course_report_inputs.get('course_improvement_plan') or []
-    if improvement_items:
-        story.extend([Spacer(1, 0.12 * inch), paragraph(label('course_report.recommendations', 'Recommendations'), section_style)])
-        recommendation_rows = [[
-            paragraph(label('results.recommendation', 'Recommendation'), header_style),
-            paragraph(label('results.actions_needed', 'Actions Needed'), header_style),
-            paragraph(label('results.needed_support', 'Needed Support'), header_style),
-        ]]
-        for item in improvement_items:
-            recommendation_rows.append([
-                paragraph(course_label(item.get('recommendation')), text_style),
-                paragraph(course_label(item.get('actions_needed')), text_style),
-                paragraph(course_label(item.get('support')), text_style),
-            ])
-        story.append(table(recommendation_rows, [3.2 * inch, 3.2 * inch, 3.1 * inch]))
-
     uncovered_items = course_report_inputs.get('uncovered_topic_details') or []
     if course_report_inputs.get('topics_covered') != 'yes' and uncovered_items:
         story.extend([Spacer(1, 0.12 * inch), paragraph(label('results.uncovered_topics', 'Uncovered Topics'), section_style)])
@@ -13224,6 +13223,22 @@ def build_course_report_pdf(stats, course_report_inputs=None, course_info=None, 
                 paragraph(course_label(item.get('action')), text_style),
             ])
         story.append(table(uncovered_rows, [3.2 * inch, 3.2 * inch, 3.1 * inch]))
+
+    improvement_items = course_report_inputs.get('course_improvement_plan') or []
+    if improvement_items:
+        story.extend([Spacer(1, 0.12 * inch), paragraph(label('course_report.recommendations', 'Recommendations'), section_style)])
+        recommendation_rows = [[
+            paragraph(label('results.recommendation', 'Recommendation'), header_style),
+            paragraph(label('results.actions_needed', 'Actions Needed'), header_style),
+            paragraph(label('results.needed_support', 'Needed Support'), header_style),
+        ]]
+        for item in improvement_items:
+            recommendation_rows.append([
+                paragraph(course_label(item.get('recommendation')), text_style),
+                paragraph(course_label(item.get('actions_needed')), text_style),
+                paragraph(course_label(item.get('support')), text_style),
+            ])
+        story.append(table(recommendation_rows, [3.2 * inch, 3.2 * inch, 3.1 * inch]))
 
     doc.build(story)
     buffer.seek(0)
