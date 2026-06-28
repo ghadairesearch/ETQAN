@@ -198,69 +198,46 @@
                             {% for recommendation_item in group['items'] %}
                             {% set recommendation = recommendation_item.text %}
                             {% set recommendation_index = recommendation_item.index %}
-                            <tr>
+                            <tr data-improvement-row="{{ recommendation_index }}">
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                    <span style="display: block; padding-top: 0.2rem;">{{ course_report_label(recommendation) }}</span>
+                                    <label style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; align-items: start; cursor: pointer; margin: 0;">
+                                        <input type="checkbox" name="course_improvement_recommendations" value="{{ recommendation }}" data-improvement-toggle="{{ recommendation_index }}" style="margin-top: 0.25rem;">
+                                        <span>{{ course_report_label(recommendation) }}</span>
+                                    </label>
                                 </td>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                    <select name="course_improvement_action_{{ recommendation_index }}" class="form-control" data-improvement-action-select="{{ recommendation_index }}">
+                                    <select name="course_improvement_action_{{ recommendation_index }}" class="form-control" data-improvement-action-select="{{ recommendation_index }}" disabled style="opacity: 0.5; transition: opacity 0.2s;">
                                         {% for action_option in course_improvement_action_options %}
                                             <option value="{{ action_option }}">{{ course_report_label(action_option) }}</option>
                                         {% endfor %}
                                     </select>
                                     <div id="course_improvement_action_other_group_{{ recommendation_index }}" style="display: none; margin-top: 0.5rem;">
                                         <label class="form-label">{{ _('results.please_explain') }}</label>
-                                        <textarea name="course_improvement_action_other_{{ recommendation_index }}" class="form-control" rows="2"></textarea>
+                                        <textarea name="course_improvement_action_other_{{ recommendation_index }}" class="form-control" rows="2" disabled></textarea>
                                     </div>
                                 </td>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                    <select name="course_improvement_support_{{ recommendation_index }}" class="form-control" data-improvement-support-select="{{ recommendation_index }}">
+                                    <select name="course_improvement_support_{{ recommendation_index }}" class="form-control" data-improvement-support-select="{{ recommendation_index }}" disabled style="opacity: 0.5; transition: opacity 0.2s;">
                                         {% for support_option in course_improvement_support_options %}
                                             <option value="{{ support_option }}">{{ course_report_label(support_option) }}</option>
                                         {% endfor %}
                                     </select>
                                     <div id="course_improvement_support_other_group_{{ recommendation_index }}" style="display: none; margin-top: 0.5rem;">
                                         <label class="form-label">{{ _('results.please_explain') }}</label>
-                                        <textarea name="course_improvement_support_other_{{ recommendation_index }}" class="form-control" rows="2"></textarea>
+                                        <textarea name="course_improvement_support_other_{{ recommendation_index }}" class="form-control" rows="2" disabled></textarea>
                                     </div>
                                 </td>
                             </tr>
                             {% endfor %}
+                            {% if group.heading == 'Other' %}
+                            <tr>
+                                <td colspan="3" style="padding: 0.75rem 0.65rem; border-top: 1px solid var(--border-color);">
+                                    <textarea name="course_improvement_other_recommendation" class="form-control" rows="3" placeholder="{{ _('results.please_explain') }}">{{ saved_other_recommendation|default('') }}</textarea>
+                                </td>
+                            </tr>
+                            {% endif %}
                         {% endfor %}
-                        <tr>
-                            <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                <label style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; align-items: start;">
-                                    <input type="checkbox" name="course_improvement_other_selected" value="1" style="margin-top: 0.2rem;" data-improvement-other-recommendation>
-                                    <span>{{ _('results.reason_other') }}</span>
-                                </label>
-                                <div id="course_improvement_other_recommendation_group" style="display: none; margin-top: 0.5rem;">
-                                    <label class="form-label">{{ _('results.please_explain') }}</label>
-                                    <textarea name="course_improvement_other_recommendation" class="form-control" rows="2"></textarea>
-                                </div>
-                            </td>
-                            <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                <select name="course_improvement_action_other_recommendation" class="form-control" data-improvement-action-select="other_recommendation">
-                                    {% for action_option in course_improvement_action_options %}
-                                        <option value="{{ action_option }}">{{ course_report_label(action_option) }}</option>
-                                    {% endfor %}
-                                </select>
-                                <div id="course_improvement_action_other_group_other_recommendation" style="display: none; margin-top: 0.5rem;">
-                                    <label class="form-label">{{ _('results.please_explain') }}</label>
-                                    <textarea name="course_improvement_action_other_recommendation_text" class="form-control" rows="2"></textarea>
-                                </div>
-                            </td>
-                            <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                <select name="course_improvement_support_other_recommendation" class="form-control" data-improvement-support-select="other_recommendation">
-                                    {% for support_option in course_improvement_support_options %}
-                                        <option value="{{ support_option }}">{{ course_report_label(support_option) }}</option>
-                                    {% endfor %}
-                                </select>
-                                <div id="course_improvement_support_other_group_other_recommendation" style="display: none; margin-top: 0.5rem;">
-                                    <label class="form-label">{{ _('results.please_explain') }}</label>
-                                    <textarea name="course_improvement_support_other_recommendation_text" class="form-control" rows="2"></textarea>
-                                </div>
-                            </td>
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -342,21 +319,60 @@
             syncActionOther(actionSelect);
         }
         function syncImprovementActionOther(select) {
-            const group = document.getElementById('course_improvement_action_other_group_' + select.getAttribute('data-improvement-action-select'));
+            const index = select.getAttribute('data-improvement-action-select');
+            const group = document.getElementById('course_improvement_action_other_group_' + index);
+            const toggle = document.querySelector('[data-improvement-toggle="' + index + '"]');
             if (group) {
-                group.style.display = select.value === 'Other' ? 'block' : 'none';
+                const show = select.value === 'Other';
+                group.style.display = show ? 'block' : 'none';
+                const textarea = group.querySelector('textarea');
+                if (textarea) {
+                    if (show && toggle && toggle.checked) {
+                        textarea.removeAttribute('disabled');
+                    } else {
+                        textarea.setAttribute('disabled', 'true');
+                    }
+                }
             }
         }
         function syncImprovementSupportOther(select) {
-            const group = document.getElementById('course_improvement_support_other_group_' + select.getAttribute('data-improvement-support-select'));
+            const index = select.getAttribute('data-improvement-support-select');
+            const group = document.getElementById('course_improvement_support_other_group_' + index);
+            const toggle = document.querySelector('[data-improvement-toggle="' + index + '"]');
             if (group) {
-                group.style.display = select.value === 'Other' ? 'block' : 'none';
+                const show = select.value === 'Other';
+                group.style.display = show ? 'block' : 'none';
+                const textarea = group.querySelector('textarea');
+                if (textarea) {
+                    if (show && toggle && toggle.checked) {
+                        textarea.removeAttribute('disabled');
+                    } else {
+                        textarea.setAttribute('disabled', 'true');
+                    }
+                }
             }
         }
-        function syncImprovementOtherRecommendation(toggle) {
-            const group = document.getElementById('course_improvement_other_recommendation_group');
-            if (group) {
-                group.style.display = toggle.checked ? 'block' : 'none';
+        function syncImprovementRow(toggle) {
+            const index = toggle.getAttribute('data-improvement-toggle');
+            const row = document.querySelector('[data-improvement-row="' + index + '"]');
+            if (!row) return;
+            const selects = row.querySelectorAll('select');
+            selects.forEach(function(select) {
+                if (toggle.checked) {
+                    select.removeAttribute('disabled');
+                    select.style.opacity = '1';
+                } else {
+                    select.setAttribute('disabled', 'true');
+                    select.style.opacity = '0.5';
+                }
+            });
+            const actionSelect = row.querySelector('[data-improvement-action-select="' + index + '"]');
+            if (actionSelect) {
+                syncImprovementActionOther(actionSelect);
+            }
+            const supportSelect = row.querySelector('[data-improvement-support-select="' + index + '"]');
+            if (supportSelect) {
+                syncImprovementSupportOther(supportSelect);
             }
         }
         toggles.forEach(function(toggle) {
@@ -392,11 +408,11 @@
             });
             syncImprovementSupportOther(select);
         });
-        document.querySelectorAll('[data-improvement-other-recommendation]').forEach(function(toggle) {
+        document.querySelectorAll('[data-improvement-toggle]').forEach(function(toggle) {
             toggle.addEventListener('change', function() {
-                syncImprovementOtherRecommendation(toggle);
+                syncImprovementRow(toggle);
             });
-            syncImprovementOtherRecommendation(toggle);
+            syncImprovementRow(toggle);
         });
         syncTopicsGroup();
     });

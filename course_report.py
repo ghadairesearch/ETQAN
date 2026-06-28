@@ -243,10 +243,16 @@ COURSE_REPORT_AR_LABELS = {
     'Reduce content overload': 'تقليل كثافة محتوى المقرر',
     'Revise course topic sequencing': 'تعديل تسلسل موضوعات المقرر',
     'Review course credit hours': 'مراجعة عدد الساعات المعتمدة للمقرر',
-    'Curriculum committee approval': 'موافقة لجنة المناهج',
+    'Curriculum committee': 'لجنة المناهج',
     'No additional support required': 'لا يتطلب دعمًا إضافيًا',
-    'Department approval': 'موافقة القسم',
+    'Department management': 'إدارة القسم',
     'Technical support': 'دعم فني',
+    'Financial support': 'دعم مالي',
+    'Academic advising committee': 'لجنة الإرشاد الأكاديمي',
+    'College council': 'مجلس الكلية',
+    'Course coordinator': 'منسق المقرر',
+    'Technical staff': 'الكادر الفني',
+    'Teaching staff': 'الكادر التعليمي',
     'Revise teaching strategies': 'مراجعة استراتيجيات التدريس',
     'Provide supplementary learning resources': 'توفير مصادر تعلم إضافية',
     'Conduct remedial/support sessions': 'تنفيذ جلسات علاجية أو داعمة',
@@ -304,10 +310,16 @@ COURSE_REPORT_AR_LABELS = {
     'Other': 'أخرى',
 }
 COURSE_IMPROVEMENT_SUPPORT_OPTIONS = [
-    'Curriculum committee approval',
     'No additional support required',
-    'Department approval',
+    'Department management',
+    'Curriculum committee',
+    'Academic advising committee',
+    'College council',
+    'Course coordinator',
+    'Technical staff',
+    'Teaching staff',
     'Technical support',
+    'Financial support',
     'Other',
 ]
 COURSE_IMPROVEMENT_ACTION_OPTIONS = [
@@ -11093,26 +11105,13 @@ def read_course_improvement_plan():
             'actions_needed': action,
             'support': support,
         })
-    if request.form.get('course_improvement_other_selected'):
-        recommendation = compact_text(request.form.get('course_improvement_other_recommendation') or '')
-        if recommendation:
-            action = compact_text(request.form.get('course_improvement_action_other_recommendation') or '')
-            if action not in allowed_action:
-                action = ''
-            other_action = compact_text(request.form.get('course_improvement_action_other_recommendation_text') or '')
-            if action == 'Other' and other_action:
-                action = f"Other: {other_action}"
-            support = compact_text(request.form.get('course_improvement_support_other_recommendation') or '')
-            if support not in allowed_support:
-                support = ''
-            other_support = compact_text(request.form.get('course_improvement_support_other_recommendation_text') or '')
-            if support == 'Other' and other_support:
-                support = f"Other: {other_support}"
-            items.append({
-                'recommendation': recommendation,
-                'actions_needed': action,
-                'support': support,
-            })
+    recommendation = compact_text(request.form.get('course_improvement_other_recommendation') or '')
+    if recommendation:
+        items.append({
+            'recommendation': recommendation,
+            'actions_needed': '',
+            'support': '',
+        })
     return items
 
 def read_course_report_optional_details():
