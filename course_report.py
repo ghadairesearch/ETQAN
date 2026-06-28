@@ -12243,6 +12243,40 @@ def replace_next_table_after_heading(body, heading_text, table_element):
             return
     raise ValueError(f"Could not find a table after '{matched_heading}' in the Word template.")
 
+def fill_text_in_next_table_after_heading(body, heading_text, text):
+    children = list(body)
+    heading_options = list(heading_text) if isinstance(heading_text, (list, tuple)) else [heading_text]
+    heading_index = None
+    matched_heading = heading_options[0] if heading_options else ''
+    for heading_option in heading_options:
+        heading_index = find_body_child_index(body, heading_option)
+        if heading_index is not None:
+            matched_heading = heading_option
+            break
+    if heading_index is None:
+        raise ValueError(f"Could not find '{matched_heading}' in the Word template.")
+    for index in range(heading_index + 1, len(children)):
+        child = children[index]
+        if child.tag.split('}')[-1] == 'tbl':
+            tc_elements = child.findall('.//' + word_tag('tc'))
+            if tc_elements:
+                tc = tc_elements[0]
+                for elem in list(tc):
+                    tc.remove(elem)
+                lines = (text or '').splitlines()
+                if not lines:
+                    lines = ['']
+                for line in lines:
+                    p_elem = ET.Element(word_tag('p'))
+                    r_elem = ET.Element(word_tag('r'))
+                    t_elem = ET.Element(word_tag('t'))
+                    t_elem.text = line
+                    r_elem.append(t_elem)
+                    p_elem.append(r_elem)
+                    tc.append(p_elem)
+            return
+    raise ValueError(f"Could not find a table after '{matched_heading}' in the Word template.")
+
 def course_report_template_replacements(course_info=None, course_report_inputs=None, total_students=None):
     course_info = course_info or {}
     course_report_inputs = course_report_inputs or {}
@@ -12277,7 +12311,6 @@ def course_report_template_replacements(course_info=None, course_report_inputs=N
         'Enter Number of Students Starting the Course.': started_students,
         'Enter Number of Students Completed the Course.': completed_students,
         'Pick Report Date.': datetime.now().strftime('%Y-%m-%d'),
-        'Including particular factors (if any) affecting the results': student_grade_comment,
         'اسم المقرر:   اكتب هنا': f"اسم المقرر:   {course_info.get('course_name') or course_info.get('raw_name') or ''}",
         'رمز المقرر:  اكتب هنا': f"رمز المقرر:  {course_info.get('course_id') or ''}",
         'أستاذ المقرر:  اكتب هنا': f"أستاذ المقرر:  {report_details.get('course_instructor') or course_info.get('instructor') or ''}",
@@ -12287,7 +12320,6 @@ def course_report_template_replacements(course_info=None, course_report_inputs=N
         'عدد الطلاب (الذين بدأوا المقرر):  اكتب هنا': f"عدد الطلاب (الذين بدأوا المقرر):  {started_students}",
         'عدد الطلاب (الذين أنهوا المقرر):  اكتب هنا': f"عدد الطلاب (الذين أنهوا المقرر):  {completed_students}",
         'تاريخ إعداد التقرير:  اكتب هنا': f"تاريخ إعداد التقرير:  {datetime.now().strftime('%Y-%m-%d')}",
-        'متضمنًا العوامل التي أثرت على النتائج - إن وجدت-.': student_grade_comment,
     }
 
 def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, course_info=None, total_students=None):
@@ -12331,6 +12363,11 @@ def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, co
                 body,
                 ['1. Grade Distribution', '1. توزيع التقديرات'],
                 build_template_grade_distribution_word_table(grade_distribution)
+            )
+            fill_text_in_next_table_after_heading(
+                body,
+                ['2. التعليق على نتائج الطلاب', '2. Commentary on Student Results'],
+                student_grade_comment
             )
             replace_next_table_after_heading(
                 body,
