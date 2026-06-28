@@ -6525,6 +6525,21 @@ def flash_course_spec_extraction_method(extracted):
     flash(message, "info")
 
 
+def flash_course_spec_extraction_method_short(extracted):
+    method = (extracted or {}).get('extraction_method')
+    if method == 'gemini':
+        method_label = 'G'
+    elif method == 'qwen':
+        method_label = 'Q'
+    elif method == 'llama':
+        method_label = 'Llama'
+    elif method == 'groq':
+        method_label = 'Gr'
+    else:
+        method_label = 'L'
+    flash(method_label, "info")
+
+
 def extract_exam_paper_text(filepath, file_ext):
     if file_ext == '.pdf':
         return extract_pdf_text(filepath)
@@ -13947,7 +13962,7 @@ def new_course():
                 clo_plos = {}
             else:
                 flash(translate('courses.extracted'))
-                flash_course_spec_extraction_method(extracted)
+                flash_course_spec_extraction_method_short(extracted)
             draft_course = {
                 'source': 'spec' if spec_file and spec_file.filename else '',
                 'course_name': course_name,
@@ -14183,7 +14198,7 @@ def edit_course(course_id):
                 clo_plos = {}
             else:
                 flash(translate('courses.extracted'))
-                flash_course_spec_extraction_method(extracted)
+                flash_course_spec_extraction_method_short(extracted)
             draft_course = {
                 'source': 'spec' if spec_file and spec_file.filename else '',
                 'course_name': course_name,
