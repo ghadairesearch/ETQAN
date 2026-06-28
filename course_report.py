@@ -2145,7 +2145,7 @@ TRANSLATIONS['ar'].update({
     'mapping.method_description': '\u062d\u062f\u062f \u0643\u064a\u0641 \u062a\u0631\u064a\u062f \u0631\u0628\u0637 \u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u062a\u0642\u064a\u064a\u0645 \u0628\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645.',
     'mapping.method_choice': '\u0637\u0631\u064a\u0642\u0629 \u0627\u0644\u0631\u0628\u0637',
     'mapping.method_manual_title': '\u0631\u0628\u0637 \u064a\u062f\u0648\u064a',
-    'mapping.method_manual_description': 'حدد نواتج التعلم لكل سؤال يدويا.',
+    'mapping.method_manual_description': 'استخدم الربط المستورد من ملف الدرجات، أو عدله عند الحاجة، أو حدّد نواتج التعلم يدويًا لكل سؤال.',
     'mapping.method_ai_title': '\u0631\u0628\u0637 \u0628\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
     'mapping.method_ai_description': 'اختر تقرير ربط تم إنشاؤه مسبقًا لإعادة استخدام ربط الأسئلة بنواتج التعلم.',
     'mapping.method_exam_paper_help': '\u0627\u0631\u0641\u0639 \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0623\u0633\u0626\u0644\u0629 \u0645\u0644\u0641\u0627\u062a \u0627\u0644\u062f\u0631\u062c\u0627\u062a.',
@@ -12218,6 +12218,8 @@ def find_body_child_index(body, needle, start=0):
     fallback_index = None
     for index in range(start, len(children)):
         text = re.sub(r'\s+', ' ', word_block_text(children[index])).strip()
+        if 'جدول المحتويات' in text or 'table of contents' in text.lower():
+            continue
         if text == needle or text.startswith(needle):
             return index
         if needle in text and fallback_index is None:
@@ -12322,6 +12324,115 @@ def course_report_template_replacements(course_info=None, course_report_inputs=N
         'تاريخ إعداد التقرير:  اكتب هنا': f"تاريخ إعداد التقرير:  {datetime.now().strftime('%Y-%m-%d')}",
     }
 
+def set_cell_text(tc, text):
+    p_elem = tc.find('.//' + word_tag('p'))
+    if p_elem is None:
+        p_elem = ET.Element(word_tag('p'))
+        tc.append(p_elem)
+    
+    r_elem = p_elem.find('.//' + word_tag('r'))
+    if r_elem is None:
+        r_elem = ET.Element(word_tag('r'))
+        p_elem.append(r_elem)
+        
+    t_elem = r_elem.find('.//' + word_tag('t'))
+    if t_elem is None:
+        t_elem = ET.Element(word_tag('t'))
+        r_elem.append(t_elem)
+        
+    t_elem.text = str(text)
+    
+    # Clear other text elements
+    first_t = t_elem
+    for other_t in tc.findall('.//' + word_tag('t')):
+        if other_t != first_t:
+            other_t.text = ''
+
+def fill_grade_distribution_in_template_table(body, heading_text, grade_distribution):
+    children = list(body)
+    heading_options = list(heading_text) if isinstance(heading_text, (list, tuple)) else [heading_text]
+    heading_index = None
+    matched_heading = heading_options[0] if heading_options else ''
+    for heading_option in heading_options:
+        heading_index = find_body_child_index(body, heading_option)
+        if heading_index is not None:
+            matched_heading = heading_option
+            break
+    if heading_index is None:
+        raise ValueError(f"Could not find '{matched_heading}' in the Word template.")
+        
+    for index in range(heading_index + 1, len(children)):
+        child = children[index]
+        if child.tag.split('}')[-1] == 'tbl':
+            rows = child.findall('.//' + word_tag('tr'))
+            if len(rows) < 4:
+                new_table = build_template_grade_distribution_word_table(grade_distribution)
+                body.remove(child)
+                body.insert(index, new_table)
+                return
+            
+            grade_mapping = {
+                'A+': 'A+', 'أ+': 'A+',
+                'A': 'A', 'أ': 'A',
+                'B+': 'B+', 'ب+': 'B+',
+                'B': 'B', 'ب': 'B',
+                'C+': 'C+', 'ج+': 'C+',
+                'C': 'C', 'ج': 'C',
+                'D+': 'D+', 'د+': 'D+',
+                'D': 'D', 'د': 'D',
+                'F': 'F', 'هـ': 'F',
+                'Denied Entry': 'Denied Entry', 'محروم': 'Denied Entry',
+                'In Progress': 'In Progress', 'مستمر': 'In Progress',
+                'Incomplete': 'Incomplete', 'غير مكتمل': 'Incomplete',
+                'Pass': 'Pass', 'ناجح': 'Pass',
+                'Fail': 'Fail', 'راسب': 'Fail',
+                'Withdrawn': 'Withdrawn', 'منسحب': 'Withdrawn'
+            }
+            
+            header_cells = rows[1].findall('.//' + word_tag('tc'))
+            count_cells = rows[2].findall('.//' + word_tag('tc'))
+            percentage_cells = rows[3].findall('.//' + word_tag('tc'))
+            
+            if len(count_cells) < len(header_cells) or len(percentage_cells) < len(header_cells):
+                new_table = build_template_grade_distribution_word_table(grade_distribution)
+                body.remove(child)
+                body.insert(index, new_table)
+                return
+                
+            counts = grade_distribution.get('counts') or {}
+            percentages = {row.get('grade'): row.get('percentage', 0) for row in grade_distribution.get('rows') or []}
+            status_summary = grade_distribution_pass_fail_summary(grade_distribution)
+            
+            for col_idx in range(1, len(header_cells)):
+                header_text = word_block_text(header_cells[col_idx]).strip()
+                header_text = re.sub(r'\s+', ' ', header_text).strip()
+                
+                key = grade_mapping.get(header_text)
+                if not key:
+                    for k, val in grade_mapping.items():
+                        if k.lower() == header_text.lower():
+                            key = val
+                            break
+                            
+                if key:
+                    count_val = ''
+                    percentage_val = ''
+                    if key in GRADE_ORDER:
+                        if key in counts:
+                            count_val = str(counts[key])
+                        if grade_distribution.get('total') and key in percentages:
+                            percentage_val = f"{float(percentages[key]):.2f}%"
+                    elif key in status_summary:
+                        count_val = str(status_summary[key]['count'])
+                        if grade_distribution.get('total'):
+                            percentage_val = f"{status_summary[key]['percentage']:.2f}%"
+                    
+                    set_cell_text(count_cells[col_idx], count_val)
+                    set_cell_text(percentage_cells[col_idx], percentage_val)
+            return
+            
+    raise ValueError(f"Could not find a table after '{matched_heading}' in the Word template.")
+
 def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, course_info=None, total_students=None):
     source = io.BytesIO(template_bytes)
     output = io.BytesIO()
@@ -12359,10 +12470,10 @@ def fill_course_report_docx(template_bytes, stats, course_report_inputs=None, co
             insert_course_report_word_identity(body, course_info, branding, logo_rel_id)
             report_language = get_export_report_language()
             grade_distribution = (course_report_inputs or {}).get('grade_distribution') or {}
-            replace_next_table_after_heading(
+            fill_grade_distribution_in_template_table(
                 body,
                 ['1. Grade Distribution', '1. توزيع التقديرات'],
-                build_template_grade_distribution_word_table(grade_distribution)
+                grade_distribution
             )
             fill_text_in_next_table_after_heading(
                 body,
