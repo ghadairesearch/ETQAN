@@ -16528,6 +16528,98 @@ def export_course_report_docx():
 
     return course_report_docx_response(docx_bytes)
 
+def compute_exam_alignment_matrix(payload, all_course_clos=None):
+    questions = payload.get('questions') or []
+    unique_clos = set()
+    
+    if all_course_clos:
+        for c in all_course_clos:
+            unique_clos.add(clo_number(c) or str(c or '').strip())
+            
+    for item in questions:
+        for clo in item.get('clos') or []:
+            unique_clos.add(clo_number(clo) or str(clo or '').strip())
+    
+    unique_clos = sorted(list(unique_clos))
+    num_questions = len(questions)
+    
+    matrix_rows = []
+    clo_counts = {clo: 0 for clo in unique_clos}
+    
+    for index, item in enumerate(questions, start=1):
+        q_clos = [clo_number(c) or str(c or '').strip() for c in item.get('clos') or []]
+        row_clos = {}
+        for clo in unique_clos:
+            is_mapped = clo in q_clos
+            row_clos[clo] = is_mapped
+            if is_mapped:
+                clo_counts[clo] += 1
+        matrix_rows.append({
+            'index': index,
+            'clos': row_clos
+        })
+        
+    percentages = {
+        clo: round((clo_counts[clo] / num_questions * 100), 1) if num_questions > 0 else 0
+        for clo in unique_clos
+    }
+    
+    return {
+        'unique_clos': unique_clos,
+        'rows': matrix_rows,
+        'totals': clo_counts,
+        'percentages': percentages,
+        'total_questions': num_questions
+    }
+
+def generate_assessment_coverage_summary(matrix_data, all_course_clos, language='en'):
+    totals = matrix_data.get('totals') or {}
+    percentages = matrix_data.get('percentages') or {}
+    
+    all_clo_numbers = [clo_number(c) or str(c or '').strip() for c in all_course_clos]
+    
+    zero_coverage = [c for c in all_clo_numbers if totals.get(c, 0) == 0]
+    covered_clos = [c for c in all_clo_numbers if totals.get(c, 0) > 0]
+    
+    most_frequent = []
+    max_val = 0
+    if totals and covered_clos:
+        max_val = max(totals.get(c, 0) for c in covered_clos)
+        if max_val > 0:
+            most_frequent = [c for c in covered_clos if totals.get(c, 0) == max_val]
+            
+    balance_comment = ""
+    if covered_clos:
+        vals = [percentages.get(c, 0) for c in covered_clos]
+        avg = sum(vals) / len(vals)
+        std_dev = (sum((v - avg) ** 2 for v in vals) / len(vals)) ** 0.5
+        
+        if language == 'ar':
+            if std_dev < 10:
+                balance_comment = "???? ??????? ??????? ?????????? ??? ????? ?????? ???????? ??? ??? ??? ????? ?????."
+            elif std_dev < 20:
+                balance_comment = "???? ??????? ??????? ??????? ??? ????? ?????? ???????."
+            else:
+                balance_comment = "???? ????? ????? ?? ????? ????? ??????? ??? ?? ???? ??? ??????? ??? ????? ????? ??? ?????."
+        else:
+            if std_dev < 10:
+                balance_comment = "The assessment demonstrates excellent balance across the measured CLOs, indicating comprehensive coverage."
+            elif std_dev < 20:
+                balance_comment = "The assessment demonstrates adequate balance across the measured CLOs."
+            else:
+                balance_comment = "There is significant variance in CLO coverage, indicating potential overrepresentation of certain CLOs."
+
+    return {
+        'total_clos': len(all_clo_numbers),
+        'covered_count': len(covered_clos),
+        'uncovered_count': len(zero_coverage),
+        'most_frequent': most_frequent,
+        'most_frequent_count': max_val,
+        'most_frequent_pct': percentages.get(most_frequent[0], 0) if most_frequent else 0,
+        'zero_coverage': zero_coverage,
+        'balance_comment': balance_comment
+    }
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT') or 8093)
     print(f"Starting ETQAN v2 on http://127.0.0.1:{port}")
