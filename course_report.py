@@ -12111,10 +12111,6 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     course_text = f"{course_name} ({course_id})" if course_name and course_id else (course_name or course_id or '-')
     
     body.append(word_paragraph(title, bold=True))
-    department = course_info.get('department') or branding.get('department') or ''
-    if department:
-        department_label = '\u0627\u0644\u0642\u0633\u0645' if language == 'ar' else 'Department'
-        body.append(word_paragraph(f"{department_label}: {department}"))
     body.append(word_paragraph(f"{course_label}: {course_text}"))
     body.append(word_paragraph(f"{total_label}: {total_students or 0}"))
     body.append(word_paragraph(''))
