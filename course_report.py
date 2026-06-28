@@ -842,7 +842,7 @@ EN_TRANSLATIONS = {
     'mapping.method_manual_title': 'Manual mapping',
     'mapping.method_manual_description': 'Use the current mapping table and select CLOs for each question yourself.',
     'mapping.method_ai_title': 'AI-assisted mapping',
-    'mapping.method_ai_description': 'Upload the exam paper so ETQAN can extract questions and suggest CLO mappings for review.',
+    'mapping.method_ai_description': 'Select a previously generated AI-assisted mapping report to reuse its question-to-CLO mappings for this analysis.',
     'mapping.method_exam_paper_help': 'Upload the exam paper for the assessment questions in the grade files.',
     'mapping.method_continue': 'Continue',
     'mapping.exam_paper': 'Exam paper:',
@@ -1711,7 +1711,7 @@ TRANSLATIONS['ar'].update({
     'mapping.method_manual_title': '\u0631\u0628\u0637 \u064a\u062f\u0648\u064a',
     'mapping.method_manual_description': '\u0627\u0633\u062a\u062e\u062f\u0645 \u062c\u062f\u0648\u0644 \u0627\u0644\u0631\u0628\u0637 \u0627\u0644\u062d\u0627\u0644\u064a \u0648\u062d\u062f\u062f \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0644\u0643\u0644 \u0633\u0624\u0627\u0644 \u0628\u0646\u0641\u0633\u0643.',
     'mapping.method_ai_title': '\u0631\u0628\u0637 \u0628\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
-    'mapping.method_ai_description': '\u0627\u0631\u0641\u0639 \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 \u0644\u064a\u0642\u062a\u0631\u062d \u0625\u062a\u0642\u0627\u0646 \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0628\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u062b\u0645 \u0631\u0627\u062c\u0639\u0647\u0627 \u0642\u0628\u0644 \u0627\u0644\u062d\u0633\u0627\u0628.',
+    'mapping.method_ai_description': '\u0627\u062e\u062a\u0631 \u062a\u0642\u0631\u064a\u0631 \u0631\u0628\u0637 \u0622\u0644\u064a \u062a\u0645 \u0625\u0646\u0634\u0627\u0624\u0647 \u0645\u0633\u0628\u0642\u064b\u0627 \u0644\u0625\u0639\u0627\u062f\u0629 \u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0628\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0641\u064a \u0647\u0630\u0627 \u0627\u0644\u062a\u062d\u0644\u064a\u0644.',
     'mapping.method_exam_paper_help': '\u0627\u0631\u0641\u0639 \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0623\u0633\u0626\u0644\u0629 \u0645\u0644\u0641\u0627\u062a \u0627\u0644\u062f\u0631\u062c\u0627\u062a.',
     'mapping.method_continue': '\u0645\u062a\u0627\u0628\u0639\u0629',
 })
@@ -11116,7 +11116,7 @@ def word_paragraph(text='', bold=False, color='', size='', alignment=''):
     paragraph.append(run)
     return paragraph
 
-def word_cell(text='', bold=False, width='2400', fill='', color='', size=''):
+def word_cell(text='', bold=False, width='2400', fill='', color='', size='', alignment=''):
     cell = word_element('tc')
     cell_properties = word_element('tcPr')
     cell_properties.append(word_element('tcW', {word_tag('w'): str(width), word_tag('type'): 'dxa'}))
@@ -11129,13 +11129,13 @@ def word_cell(text='', bold=False, width='2400', fill='', color='', size=''):
     cell.append(cell_properties)
     parts = str(text or '').split('\n') or ['']
     for part in parts:
-        cell.append(word_paragraph(part, bold=bold, color=color, size=size))
+        cell.append(word_paragraph(part, bold=bold, color=color, size=size, alignment=alignment))
     return cell
 
-def word_row(values, header=False):
+def word_row(values, header=False, alignment=''):
     row = word_element('tr')
     for value in values:
-        row.append(word_cell(value, bold=header))
+        row.append(word_cell(value, bold=header, alignment=alignment))
     return row
 
 def word_image_paragraph(rel_id, width_emu=1300000, height_emu=850000, alignment='right'):
@@ -11707,16 +11707,18 @@ def build_course_improvement_plan_word_table(improvement_items, language=None):
         }))
     table_properties.append(borders)
     table.append(table_properties)
+    alignment = 'right' if language == 'ar' else ''
     table.append(word_row(
         ['التوصيات', 'الإجراءات المطلوبة', 'الدعم المطلوب'] if language == 'ar' else ['Recommendations', 'Actions Needed', 'Support'],
-        header=True
+        header=True,
+        alignment=alignment
     ))
     for item in improvement_items or []:
         table.append(word_row([
             course_report_label_for_language(item.get('recommendation', ''), language),
             course_report_label_for_language(item.get('actions_needed', ''), language),
             course_report_label_for_language(item.get('support', ''), language),
-        ]))
+        ], alignment=alignment))
     return table
 
 def build_course_report_input_blocks(course_report_inputs):
@@ -16099,6 +16101,11 @@ def clo_attainment():
 
 @app.route('/mapping-method', methods=['GET', 'POST'])
 def mapping_method():
+    user = current_user()
+    if not user:
+        flash(translate('courses.login_required'), "error")
+        return redirect(url_for('login'))
+
     assessment_files = session.get('assessment_files') or []
     file_id = session.get('file_id')
     file_ext = session.get('file_ext')
@@ -16118,30 +16125,43 @@ def mapping_method():
             flash("Please choose a valid mapping method.", "error")
             return redirect(request.url)
 
-        exam_paper = request.files.get('exam_paper')
-        if not exam_paper or not exam_paper.filename:
-            flash("Please upload the exam paper before using AI-assisted mapping.", "error")
+        report_ids = request.form.getlist('report_ids')
+        if not report_ids:
+            flash("Please select at least one mapping report.", "error")
             return redirect(request.url)
 
-        exam_ext = os.path.splitext(exam_paper.filename)[1].lower()
-        if exam_ext not in {'.pdf', '.docx', '.txt'}:
-            flash("Exam paper must be PDF, Word, or TXT.", "error")
-            return redirect(request.url)
-
-        stored_name = f"{uuid.uuid4()}{exam_ext}"
-        filepath = get_upload_path(stored_name)
-        exam_paper.save(filepath)
+        exam_metrics = {
+            'detected_clo_mappings': {},
+            'question_texts': {},
+            'question_types': {}
+        }
+        
         try:
-            exam_metrics = parse_exam_paper_metrics(filepath)
+            with get_db() as conn:
+                placeholders = ','.join('?' * len(report_ids))
+                query = f"SELECT payload_json FROM saved_exams WHERE user_id = ? AND id IN ({placeholders})"
+                rows = conn.execute(query, [user['id']] + report_ids).fetchall()
+                
+                for row in rows:
+                    payload = safe_json_loads(row_get(row, 'payload_json'), {}) or {}
+                    for q in payload.get('questions') or []:
+                        q_id = q.get('question') or ''
+                        if not q_id: continue
+                        
+                        mapped_clos = q.get('clos') or []
+                        if mapped_clos:
+                            exam_metrics['detected_clo_mappings'][q_id] = mapped_clos
+                        elif q.get('ai_suggested_clo'):
+                            exam_metrics['detected_clo_mappings'][q_id] = [q.get('ai_suggested_clo')]
+                            
+                        if q.get('text'):
+                            exam_metrics['question_texts'][q_id] = q.get('text')
+                        if q.get('type'):
+                            exam_metrics['question_types'][q_id] = q.get('type')
         except Exception as exc:
-            app.logger.exception("Failed to parse mapping exam paper: %s", exc)
-            flash(f"Could not read the exam paper: {exc}", "error")
+            app.logger.exception("Failed to load mapping reports: %s", exc)
+            flash(f"Could not load the mapping reports: {exc}", "error")
             return redirect(request.url)
-        finally:
-            try:
-                os.remove(filepath)
-            except OSError:
-                pass
 
         course_clos = session.get('custom_clos') or get_course_clos(course_name)
         course_clos = list(course_clos or [])
@@ -16155,7 +16175,7 @@ def mapping_method():
                 only_unmapped=report_metrics.get('question_clo_suggestion_source') == 'gemini'
             )
 
-        paper_name = secure_filename(exam_paper.filename) or exam_paper.filename
+        paper_name = "Imported Mapping Reports"
         updated_assessment_files = []
         for item in assessment_files:
             item = dict(item)
@@ -16168,9 +16188,28 @@ def mapping_method():
         session.modified = True
         return redirect(url_for('mapping'))
 
+    try:
+        with get_db() as conn:
+            report_rows = conn.execute(
+                "SELECT id, title, created_at FROM saved_exams WHERE user_id = ? AND course_name = ? ORDER BY id DESC",
+                (user['id'], course_name or '')
+            ).fetchall()
+    except Exception:
+        app.logger.exception("Failed to load associated exam reports")
+        report_rows = []
+
+    associated_reports = []
+    for row in report_rows:
+        associated_reports.append({
+            'id': row_get(row, 'id'),
+            'display_title': row_get(row, 'title') or 'Mapping Report',
+            'created_at': row_get(row, 'created_at')
+        })
+
     return render_template(
         'mapping_method.html',
-        course_name=course_name
+        course_name=course_name,
+        associated_reports=associated_reports
     )
 
 @app.route('/mapping', methods=['GET', 'POST'])
