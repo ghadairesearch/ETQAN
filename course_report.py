@@ -5338,6 +5338,7 @@ def call_groq_json_with_error(system_prompt, user_payload, timeout=90, model_nam
         payload = {
             'model': model_name or GROQ_MODEL,
             'temperature': 0,
+            'max_tokens': 8192,
             'response_format': {'type': 'json_object'},
             'messages': [
                 {'role': 'system', 'content': system_prompt},
@@ -6380,7 +6381,7 @@ def gemini_exam_question_extraction_prompt():
         "Detect only CLOs explicitly written in the exam paper near or inside each question, such as CLO1, CLO 1, "
         "CLO1.1, 1.1, or ناتج 1.1. Do not infer CLOs by meaning. "
         "Return JSON only with this exact schema: "
-        '{"questions":[{"number":"Q1","text":"full question text with \\n separating options","type":"MCQ","explicit_clos":["1.1"]}]}'
+        '{"questions":[{"number":"Q1","text":"full question text with \\n separating options","type":"MCQ","explicit_clos":["1.1"]},{"number":"Q2","text":"full question text","type":"T/F","explicit_clos":[]}]}'
     )
 
 def normalize_gemini_exam_metrics(payload, source='gemini', confidence='Gemini'):
@@ -6497,7 +6498,7 @@ def gemini_question_clo_prompt():
         "Return JSON only, with no markdown. Do not invent CLO codes. "
         "Use only the provided CLO codes. A question may map to more than one CLO when justified. "
         "Use this exact schema: "
-        '{"mappings":[{"question":"Q1","clos":["1.1"],"confidence":0.85,"reason":"short reason"}]}'
+        '{"mappings":[{"question":"Q1","clos":["1.1"],"confidence":0.85,"reason":"short reason"},{"question":"Q2","clos":["1.1","1.2"],"confidence":0.90,"reason":"short reason"}]}'
     )
 
 
