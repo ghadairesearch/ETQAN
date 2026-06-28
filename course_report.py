@@ -12074,11 +12074,21 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     root.append(body)
 
     branding = apply_university_identity_colors(get_report_branding()) if has_request_context() else {}
-    insert_course_report_word_identity(body, course_info, branding, '')
+    logo_path = resolve_branding_logo_path(branding, report_ready=True) if branding else ''
+    logo_bytes = b''
+    logo_ext = ''
+    if logo_path and os.path.exists(logo_path):
+        logo_ext = os.path.splitext(logo_path)[1].lower()
+        if logo_ext in {'.jpg', '.jpeg', '.png'}:
+            with open(logo_path, 'rb') as f:
+                logo_bytes = f.read()
 
-    title = '\u062a\u0642\u0631\u064a\u0631 \u062a\u062d\u0642\u0642 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645' if language == 'ar' else 'CLO Attainment Report'
-    course_label = '\u0627\u0644\u0645\u0642\u0631\u0631' if language == 'ar' else 'Course'
-    total_label = '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0637\u0644\u0627\u0628' if language == 'ar' else 'Total Students'
+    logo_rel_id = 'rId2' if logo_bytes else ''
+    insert_course_report_word_identity(body, course_info, branding, logo_rel_id)
+
+    title = 'تقرير تحقق نواتج التعلم' if language == 'ar' else 'CLO Attainment Report'
+    course_label = 'المقرر' if language == 'ar' else 'Course'
+    total_label = 'إجمالي الطلاب' if language == 'ar' else 'Total Students'
     course_name = course_info.get('course_name') or course_info.get('raw_name') or ''
     course_id = course_info.get('course_id') or course_info.get('course_code') or ''
     course_text = f"{course_name} ({course_id})" if course_name and course_id else (course_name or course_id or '-')
@@ -12088,8 +12098,65 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     body.append(word_paragraph(f"{total_label}: {total_students or 0}"))
     body.append(word_paragraph(''))
 
-    body.append(word_paragraph('ملخص تحقق نواتج التعلم' if language == 'ar' else 'CLO Achievement Summary', bold=True))
+    body.append(word_paragraph('????? ????? ??????' if language == 'ar' else 'CLO Definitions', bold=True))
+    clo_definitions = build_clo_definitions(stats.keys())
+    
+    primary = docx_hex_color(branding.get('primary_color'))
+
+    def_table = word_element('tbl')
+    def_table_props = word_element('tblPr')
+    def_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
+    borders = word_element('tblBorders')
+    for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
+        borders.append(word_element(border_name, {word_tag('val'): 'single', word_tag('sz'): '6', word_tag('space'): '0', word_tag('color'): '808080'}))
+    def_table_props.append(borders)
+    def_table.append(def_table_props)
+    
+    def_headers = ['??????', '?????', '????'] if language == 'ar' else ['Domain', 'CLO', 'Wording']
+    def_table.append(word_row(def_headers, header=True, fill=primary, color='FFFFFF'))
+    for item in clo_definitions:
+        domain_text = localized_clo_domain(item['domain'], language)
+        def_table.append(word_row([domain_text, item['number'], item['wording']]))
+    body.append(def_table)
+    body.append(word_paragraph(''))
+
+    body.append(word_paragraph('???? ???? ????? ??????' if language == 'ar' else 'CLO Achievement Summary', bold=True))
     body.append(build_clo_assessment_word_table(stats or {}, course_info, language))
+    
+    if student_achievement_matrix and student_achievement_matrix.get('students'):
+        body.append(word_paragraph(''))
+        body.append(word_paragraph('????? ?????? ?? ????? ??????' if language == 'ar' else 'Student CLO Achievement', bold=True))
+        matrix_table = word_element('tbl')
+        matrix_table_props = word_element('tblPr')
+        matrix_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
+        mborders = word_element('tblBorders')
+        for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
+            mborders.append(word_element(border_name, {word_tag('val'): 'single', word_tag('sz'): '6', word_tag('space'): '0', word_tag('color'): '808080'}))
+        matrix_table_props.append(mborders)
+        matrix_table.append(matrix_table_props)
+        
+        clos = student_achievement_matrix.get('clos') or []
+        matrix_headers = ['????? ???????' if language == 'ar' else 'Student ID'] + [clo_number(c) for c in clos]
+        matrix_table.append(word_row(matrix_headers, header=True, fill=primary, color='FFFFFF'))
+        
+        cells = student_achievement_matrix.get('cells') or {}
+        for student_id in student_achievement_matrix.get('students', []):
+            row_data = [display_student_id(student_id)]
+            for clo in clos:
+                cell = cells.get(student_id, {}).get(clo)
+                if cell:
+                    status = '?????' if cell.get('achieved') and language == 'ar' else '??? ?????' if language == 'ar' else 'Met' if cell.get('achieved') else 'Not met'
+                    # FIX: Cast score to float before formatting to avoid ValueError on strings
+                    score = 0.0
+                    try:
+                        score = float(cell.get('score', 0))
+                    except (ValueError, TypeError):
+                        pass
+                    row_data.append(f"{score:.2f} ({status})")
+                else:
+                    row_data.append('-')
+            matrix_table.append(word_row(row_data))
+        body.append(matrix_table)
 
     body.append(word_element('sectPr'))
     document_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
@@ -12099,6 +12166,13 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
         content_types = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">']
         content_types.append('  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>')
         content_types.append('  <Default Extension="xml" ContentType="application/xml"/>')
+        
+        if logo_bytes:
+            ext_clean = logo_ext.lstrip('.')
+            ctype = 'image/png' if ext_clean == 'png' else 'image/jpeg'
+            content_types.append(f'  <Default Extension="{ext_clean}" ContentType="{ctype}"/>')
+            docx.writestr(f'word/media/logo{logo_ext}', logo_bytes)
+            
         content_types.append('  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>')
         content_types.append('</Types>')
         docx.writestr('[Content_Types].xml', '\n'.join(content_types))
@@ -12107,105 +12181,17 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
         rels.append('  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>')
         rels.append('</Relationships>')
         docx.writestr('_rels/.rels', '\n'.join(rels))
+
+        if logo_bytes:
+            doc_rels = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">']
+            doc_rels.append(f'  <Relationship Id="{logo_rel_id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo{logo_ext}"/>')
+            doc_rels.append('</Relationships>')
+            docx.writestr('word/_rels/document.xml.rels', '\n'.join(doc_rels))
+        
         docx.writestr('word/document.xml', document_xml)
 
     output.seek(0)
     return output.getvalue()
-
-def compute_exam_alignment_matrix(payload, all_course_clos=None):
-    questions = payload.get('questions') or []
-    unique_clos = set()
-    
-    if all_course_clos:
-        for c in all_course_clos:
-            unique_clos.add(clo_number(c) or str(c or '').strip())
-            
-    for item in questions:
-        for clo in item.get('clos') or []:
-            unique_clos.add(clo_number(clo) or str(clo or '').strip())
-    
-    unique_clos = sorted(list(unique_clos))
-    num_questions = len(questions)
-    
-    matrix_rows = []
-    clo_counts = {clo: 0 for clo in unique_clos}
-    
-    for index, item in enumerate(questions, start=1):
-        q_clos = [clo_number(c) or str(c or '').strip() for c in item.get('clos') or []]
-        row_clos = {}
-        for clo in unique_clos:
-            is_mapped = clo in q_clos
-            row_clos[clo] = is_mapped
-            if is_mapped:
-                clo_counts[clo] += 1
-        matrix_rows.append({
-            'index': index,
-            'clos': row_clos
-        })
-        
-    percentages = {
-        clo: round((clo_counts[clo] / num_questions * 100), 1) if num_questions > 0 else 0
-        for clo in unique_clos
-    }
-    
-    return {
-        'unique_clos': unique_clos,
-        'rows': matrix_rows,
-        'totals': clo_counts,
-        'percentages': percentages,
-        'total_questions': num_questions
-    }
-
-def generate_assessment_coverage_summary(matrix_data, all_course_clos, language='en'):
-    totals = matrix_data.get('totals') or {}
-    percentages = matrix_data.get('percentages') or {}
-    
-    all_clo_numbers = [clo_number(c) or str(c or '').strip() for c in all_course_clos]
-    
-    # Low or zero coverage
-    zero_coverage = [c for c in all_clo_numbers if totals.get(c, 0) == 0]
-    covered_clos = [c for c in all_clo_numbers if totals.get(c, 0) > 0]
-    
-    # Most frequently assessed
-    most_frequent = []
-    max_val = 0
-    if totals and covered_clos:
-        max_val = max(totals.get(c, 0) for c in covered_clos)
-        if max_val > 0:
-            most_frequent = [c for c in covered_clos if totals.get(c, 0) == max_val]
-            
-    # Balance
-    balance_comment = ""
-    if covered_clos:
-        vals = [percentages.get(c, 0) for c in covered_clos]
-        avg = sum(vals) / len(vals)
-        std_dev = (sum((v - avg) ** 2 for v in vals) / len(vals)) ** 0.5
-        
-        if language == 'ar':
-            if std_dev < 10:
-                balance_comment = "يظهر التقييم توازناً استثنائياً عبر نواتج التعلم المقاسة، مما يدل على تغطية شاملة."
-            elif std_dev < 20:
-                balance_comment = "يظهر التقييم توازناً مقبولاً عبر نواتج التعلم المقاسة."
-            else:
-                balance_comment = "يوجد تباين ملحوظ في تغطية نواتج التعلم، مما قد يشير إلى التركيز على نواتج محددة دون غيرها."
-        else:
-            if std_dev < 10:
-                balance_comment = "The assessment demonstrates excellent balance across the measured CLOs, indicating comprehensive coverage."
-            elif std_dev < 20:
-                balance_comment = "The assessment demonstrates adequate balance across the measured CLOs."
-            else:
-                balance_comment = "There is significant variance in CLO coverage, indicating potential overrepresentation of certain CLOs."
-
-    return {
-        'total_clos': len(all_clo_numbers),
-        'covered_count': len(covered_clos),
-        'uncovered_count': len(zero_coverage),
-        'most_frequent': most_frequent,
-        'most_frequent_count': max_val,
-        'most_frequent_pct': percentages.get(most_frequent[0], 0) if most_frequent else 0,
-        'zero_coverage': zero_coverage,
-        'balance_comment': balance_comment
-    }
 
 def build_exam_mapping_docx(payload, title='', course_name='', filename=''):
     payload = payload or {}
