@@ -11098,7 +11098,7 @@ def word_paragraph(text='', bold=False, color='', size='', alignment=''):
     s_text = str(text) if text is not None else ''
     
     if s_text:
-        is_arabic = any('؀' <= c <= 'ۿ' or 'ݐ' <= c <= 'ݿ' or 'ࢠ' <= c <= 'ࣿ' for c in s_text)
+        is_arabic = any('\u0600' <= c <= '\u06FF' or '\u0750' <= c <= '\u077F' or '\u08A0' <= c <= '\u08FF' for c in s_text)
         if not alignment:
             if is_arabic:
                 alignment = 'right'
@@ -11133,7 +11133,7 @@ def word_paragraph(text='', bold=False, color='', size='', alignment=''):
 
     text_element = word_element('t')
     text_element.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-    text_element.text = s_text
+    text_element.text = clean_xml_text(s_text)
     run.append(text_element)
     paragraph.append(run)
     return paragraph
