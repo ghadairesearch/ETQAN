@@ -206,7 +206,7 @@
                                     </label>
                                 </td>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                    <div class="action-checkboxes-container" style="max-height: 160px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #fff; opacity: 0.5; transition: opacity 0.2s;" data-improvement-action-container="{{ recommendation_index }}">
+                                    <div class="action-checkboxes-container" style="display: none; max-height: 160px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #fff; transition: opacity 0.2s;" data-improvement-action-container="{{ recommendation_index }}">
                                         {% set action_options = recommendation_action_options[recommendation] | default(course_improvement_action_options) %}
                                         {% for action_option in action_options %}
                                             <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 0.35rem; cursor: pointer; line-height: 1.2;">
@@ -221,7 +221,7 @@
                                     </div>
                                 </td>
                                 <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
-                                    <div class="support-checkboxes-container" style="max-height: 160px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #fff; opacity: 0.5; transition: opacity 0.2s;" data-improvement-support-container="{{ recommendation_index }}">
+                                    <div class="support-checkboxes-container" style="display: none; max-height: 160px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #fff; transition: opacity 0.2s;" data-improvement-support-container="{{ recommendation_index }}">
                                         {% for support_option in course_improvement_support_options %}
                                             <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 0.35rem; cursor: pointer; line-height: 1.2;">
                                                 <input type="checkbox" name="course_improvement_support_{{ recommendation_index }}" value="{{ support_option }}" data-improvement-support-checkbox="{{ recommendation_index }}" style="margin-top: 0.15rem;" disabled>
@@ -367,7 +367,7 @@
             // Sync action container and checkboxes
             const actionContainer = row.querySelector('[data-improvement-action-container="' + index + '"]');
             if (actionContainer) {
-                actionContainer.style.opacity = toggle.checked ? '1' : '0.5';
+                actionContainer.style.display = toggle.checked ? 'block' : 'none';
             }
             const actionCheckboxes = row.querySelectorAll('[data-improvement-action-checkbox="' + index + '"]');
             actionCheckboxes.forEach(function(cb) {
@@ -382,7 +382,7 @@
             // Sync support container and checkboxes
             const supportContainer = row.querySelector('[data-improvement-support-container="' + index + '"]');
             if (supportContainer) {
-                supportContainer.style.opacity = toggle.checked ? '1' : '0.5';
+                supportContainer.style.display = toggle.checked ? 'block' : 'none';
             }
             const supportCheckboxes = row.querySelectorAll('[data-improvement-support-checkbox="' + index + '"]');
             supportCheckboxes.forEach(function(cb) {
