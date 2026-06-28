@@ -246,7 +246,10 @@ COURSE_REPORT_AR_LABELS = {
     'Curriculum committee': 'لجنة المناهج',
     'Partnerships committee': 'لجنة الشراكات',
     'No additional support required': 'لا يتطلب دعمًا إضافيًا',
-    'Department management': 'إدارة القسم',
+    'Department chair': 'رئيس القسم',
+    'Department council': 'مجلس القسم',
+    'College dean': 'عميد الكلية',
+    'University administration': 'إدارة الجامعة',
     'Technical support': 'دعم فني',
     'Financial support': 'دعم مالي',
     'Academic advising committee': 'لجنة الإرشاد الأكاديمي',
@@ -660,6 +663,24 @@ COURSE_IMPROVEMENT_ACTION_OPTIONS = list({
     for actions in COURSE_IMPROVEMENT_RECOMMENDATION_ACTIONS.values()
     for action in actions
 })
+
+COURSE_IMPROVEMENT_SUPPORT_OPTIONS = [
+    'No additional support required',
+    'Course coordinator',
+    'Teaching staff',
+    'Technical staff',
+    'Academic advising committee',
+    'Department chair',
+    'Department council',
+    'Curriculum committee',
+    'Partnerships committee',
+    'College council',
+    'College dean',
+    'University administration',
+    'Technical support',
+    'Financial support',
+    'Other',
+]
 UNCOVERED_TOPIC_REASON_ACTIONS = {
     'Time constraints': [
         'Provide supplementary learning materials.',
