@@ -11108,13 +11108,14 @@ def word_paragraph(text='', bold=False, color='', size='', alignment=''):
     paragraph = word_element('p')
     paragraph_properties = word_element('pPr')
     
-    if alignment:
-        paragraph_properties.append(word_element('jc', {word_tag('val'): alignment}))
-        
+    # OOXML Spec: bidi must come before jc in pPr
     if is_arabic:
         paragraph_properties.append(word_element('bidi', {word_tag('val'): '1'}))
     else:
         paragraph_properties.append(word_element('bidi', {word_tag('val'): '0'}))
+
+    if alignment:
+        paragraph_properties.append(word_element('jc', {word_tag('val'): alignment}))
         
     paragraph.append(paragraph_properties)
 
@@ -11222,16 +11223,6 @@ def build_course_report_word_identity_blocks(course_info=None, branding=None, lo
         blocks.append(word_image_paragraph(logo_rel_id, alignment='center'))
         blocks.append(word_paragraph(''))
 
-    accent_table = word_element('tbl')
-    accent_properties = word_element('tblPr')
-    accent_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
-    if language == 'ar':
-        accent_properties.append(word_element('bidiVisual'))
-    accent_table.append(accent_properties)
-    accent_table.append(word_row([''], fill=secondary, size='40'))
-
-    blocks.append(accent_table)
-    blocks.append(word_paragraph(''))
     return blocks
 
 def insert_course_report_word_identity(body, course_info=None, branding=None, logo_rel_id=''):
