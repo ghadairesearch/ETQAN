@@ -11206,65 +11206,26 @@ def docx_optional_hex_color(value, fallback=''):
 
 def build_course_report_word_identity_blocks(course_info=None, branding=None, logo_rel_id=''):
     language = get_export_report_language() if has_request_context() else 'en'
-    labels = pdf_report_labels(language)
     branding = apply_university_identity_colors(branding or get_report_branding())
-    course_info = course_info or {}
-    organization_name = localized_university_name(branding.get('organization_name'), language) or ''
-    department = course_info.get('department') or branding.get('department') or ''
-    website = branding.get('organization_website') or ''
     primary = docx_hex_color(branding.get('primary_color'))
     secondary = docx_optional_hex_color(branding.get('secondary_color'), branding.get('primary_color')) or primary
 
-    detail_lines = []
-    if organization_name:
-        detail_lines.append(organization_name)
-    if department:
-        detail_lines.append(department)
-    if not detail_lines and not logo_rel_id:
-        return []
-
-    text_cell = word_cell('\n'.join(detail_lines), bold=True, width='7600', fill='FFFFFF', color='000000', size='22')
+    blocks = []
     if logo_rel_id:
-        logo_cell = word_element('tc')
-        logo_cell_properties = word_element('tcPr')
-        logo_cell_properties.append(word_element('tcW', {word_tag('w'): '2000', word_tag('type'): 'dxa'}))
-        logo_cell_properties.append(word_element('shd', {word_tag('val'): 'clear', word_tag('color'): 'auto', word_tag('fill'): 'FFFFFF'}))
-        logo_cell.append(logo_cell_properties)
-        logo_cell.append(word_image_paragraph(logo_rel_id, alignment='center'))
-        row_cells = [text_cell, logo_cell] if language != 'ar' else [logo_cell, text_cell]
-    else:
-        row_cells = [text_cell]
-
-    header_table = word_element('tbl')
-    table_properties = word_element('tblPr')
-    table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
-    borders = word_element('tblBorders')
-    for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
-        borders.append(word_element(border_name, {
-            word_tag('val'): 'nil',
-            word_tag('sz'): '0',
-            word_tag('space'): '0',
-            word_tag('color'): 'FFFFFF',
-        }))
-    table_properties.append(borders)
-    header_table.append(table_properties)
-    row = word_element('tr')
-    for cell in row_cells:
-        row.append(cell)
-    header_table.append(row)
+        blocks.append(word_image_paragraph(logo_rel_id, alignment='center'))
+        blocks.append(word_paragraph(''))
 
     accent_table = word_element('tbl')
     accent_properties = word_element('tblPr')
     accent_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
+    if language == 'ar':
+        accent_properties.append(word_element('bidiVisual'))
     accent_table.append(accent_properties)
-    accent_row = word_element('tr')
-    accent_row_properties = word_element('trPr')
-    accent_row_properties.append(word_element('trHeight', {word_tag('val'): '120', word_tag('hRule'): 'exact'}))
-    accent_row.append(accent_row_properties)
-    accent_row.append(word_cell('', width='9600', fill=secondary))
-    accent_table.append(accent_row)
+    accent_table.append(word_row([''], fill=secondary, size='40', width='9600'))
 
-    return [header_table, accent_table, word_paragraph('')]
+    blocks.append(accent_table)
+    blocks.append(word_paragraph(''))
+    return blocks
 
 def insert_course_report_word_identity(body, course_info=None, branding=None, logo_rel_id=''):
     blocks = build_course_report_word_identity_blocks(course_info, branding, logo_rel_id)
