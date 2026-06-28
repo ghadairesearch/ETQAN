@@ -281,14 +281,18 @@
             
             {% if current_user and current_user.university_name %}
                 <form method="POST" action="/save-report" style="margin: 0;">
-                    <button type="submit" class="btn btn-primary">
-                        {{ _('courses.save') }}
+                    <button type="submit" class="btn save-icon-button" aria-label="{{ _('courses.save') }}" title="{{ _('courses.save') }}">
+                        {% include "save_icon.html" %}
                     </button>
                 </form>
 
                 <div class="result-export-menu" id="result_export_menu">
-                    <button type="button" class="btn" id="result_export_button" aria-haspopup="true" aria-expanded="false" style="display: flex; align-items: center; gap: 0.5rem; background-color: var(--border-color); color: var(--text-main);">
-                        {% if language == 'ar' %}تصدير{% else %}Export{% endif %}
+                    <button type="button" class="report-action-button" id="result_export_button" aria-haspopup="true" aria-expanded="false" aria-label="Export">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
                     </button>
                     <div class="result-export-panel" aria-labelledby="result_export_button">
                         <a href="{{ export_word_url }}">{{ _('results.export_word') }}</a>
