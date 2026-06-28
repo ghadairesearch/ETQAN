@@ -11132,10 +11132,10 @@ def word_cell(text='', bold=False, width='2400', fill='', color='', size='', ali
         cell.append(word_paragraph(part, bold=bold, color=color, size=size, alignment=alignment))
     return cell
 
-def word_row(values, header=False, alignment=''):
+def word_row(values, header=False, alignment='', fill='', color='', size=''):
     row = word_element('tr')
     for value in values:
-        row.append(word_cell(value, bold=header, alignment=alignment))
+        row.append(word_cell(value, bold=header, alignment=alignment, fill=fill, color=color, size=size))
     return row
 
 def word_image_paragraph(rel_id, width_emu=1300000, height_emu=850000, alignment='right'):
@@ -11202,20 +11202,18 @@ def build_course_report_word_identity_blocks(course_info=None, branding=None, lo
 
     detail_lines = []
     if organization_name:
-        detail_lines.append(f"{labels['university']}: {organization_name}")
+        detail_lines.append(organization_name)
     if department:
-        detail_lines.append(f"{labels['department']}: {department}")
-    if website:
-        detail_lines.append(("الموقع الرسمي" if language == 'ar' else "Official website") + f": {website}")
+        detail_lines.append(department)
     if not detail_lines and not logo_rel_id:
         return []
 
-    text_cell = word_cell('\n'.join(detail_lines), bold=True, width='7600', fill=primary, color='FFFFFF', size='22')
+    text_cell = word_cell('\n'.join(detail_lines), bold=True, width='7600', fill='FFFFFF', color='000000', size='22')
     if logo_rel_id:
         logo_cell = word_element('tc')
         logo_cell_properties = word_element('tcPr')
         logo_cell_properties.append(word_element('tcW', {word_tag('w'): '2000', word_tag('type'): 'dxa'}))
-        logo_cell_properties.append(word_element('shd', {word_tag('val'): 'clear', word_tag('color'): 'auto', word_tag('fill'): primary}))
+        logo_cell_properties.append(word_element('shd', {word_tag('val'): 'clear', word_tag('color'): 'auto', word_tag('fill'): 'FFFFFF'}))
         logo_cell.append(logo_cell_properties)
         logo_cell.append(word_image_paragraph(logo_rel_id, alignment='center'))
         row_cells = [text_cell, logo_cell] if language != 'ar' else [logo_cell, text_cell]
@@ -11347,11 +11345,14 @@ def build_clo_course_report_rows(stats, course_info=None, language=None):
         ])
     return rows
 
-def build_clo_assessment_word_table(stats, course_info=None, language=None):
+def build_clo_assessment_word_table(stats, course_info=None, language=None, branding=None):
     language = language or (get_export_report_language() if has_request_context() else 'en')
+    branding = apply_university_identity_colors(branding or (get_report_branding() if has_request_context() else {}))
+    primary = docx_hex_color(branding.get('primary_color'))
+
     table = word_element('tbl')
     table_properties = word_element('tblPr')
-    table_properties.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
+    table_properties.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
     borders = word_element('tblBorders')
     for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
         borders.append(word_element(border_name, {
@@ -11368,7 +11369,7 @@ def build_clo_assessment_word_table(stats, course_info=None, language=None):
         if language == 'ar'
         else ['Course Learning Outcomes (CLOs)', 'Related PLOs Code', 'Assessment Methods', 'Targeted Level', 'Actual Level', 'Comment on Assessment Results']
     )
-    table.append(word_row(headers, header=True))
+    table.append(word_row(headers, header=True, fill=primary, color='FFFFFF'))
     for row in build_clo_course_report_rows(stats, course_info, language):
         table.append(word_row(row))
     return table
@@ -12100,9 +12101,11 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     body.append(word_paragraph('تعريف نواتج التعلم' if language == 'ar' else 'CLO Definitions', bold=True))
     clo_definitions = build_clo_definitions(stats.keys())
     
+    primary = docx_hex_color(branding.get('primary_color'))
+
     def_table = word_element('tbl')
     def_table_props = word_element('tblPr')
-    def_table_props.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
+    def_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
     borders = word_element('tblBorders')
     for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
         borders.append(word_element(border_name, {word_tag('val'): 'single', word_tag('sz'): '6', word_tag('space'): '0', word_tag('color'): '808080'}))
@@ -12110,7 +12113,7 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
     def_table.append(def_table_props)
     
     def_headers = ['المجال', 'الرمز', 'النص'] if language == 'ar' else ['Domain', 'CLO', 'Wording']
-    def_table.append(word_row(def_headers, header=True))
+    def_table.append(word_row(def_headers, header=True, fill=primary, color='FFFFFF'))
     for item in clo_definitions:
         domain_text = localized_clo_domain(item['domain'], language)
         def_table.append(word_row([domain_text, item['number'], item['wording']]))
@@ -12125,7 +12128,7 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
         body.append(word_paragraph('إنجاز الطلاب في نواتج التعلم' if language == 'ar' else 'Student CLO Achievement', bold=True))
         matrix_table = word_element('tbl')
         matrix_table_props = word_element('tblPr')
-        matrix_table_props.append(word_element('tblW', {word_tag('w'): '0', word_tag('type'): 'auto'}))
+        matrix_table_props.append(word_element('tblW', {word_tag('w'): '5000', word_tag('type'): 'pct'}))
         mborders = word_element('tblBorders')
         for border_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
             mborders.append(word_element(border_name, {word_tag('val'): 'single', word_tag('sz'): '6', word_tag('space'): '0', word_tag('color'): '808080'}))
@@ -12134,7 +12137,7 @@ def build_clo_results_docx(stats, total_students=0, course_info=None, student_ac
         
         clos = student_achievement_matrix.get('clos') or []
         matrix_headers = ['الرقم الجامعي' if language == 'ar' else 'Student ID'] + [clo_number(c) for c in clos]
-        matrix_table.append(word_row(matrix_headers, header=True))
+        matrix_table.append(word_row(matrix_headers, header=True, fill=primary, color='FFFFFF'))
         
         cells = student_achievement_matrix.get('cells') or {}
         for student_id in student_achievement_matrix.get('students', []):
