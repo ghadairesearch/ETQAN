@@ -125,6 +125,8 @@ COURSE_IMPROVEMENT_RECOMMENDATIONS = [
     'Reduce content overload',
     'Diversify teaching strategies',
     'Enhance active learning',
+    'Increase applied activities and problem-solving',
+    'Strengthen theory-practice integration',
 ]
 COURSE_IMPROVEMENT_RECOMMENDATION_GROUPS = [
     {
@@ -149,6 +151,8 @@ COURSE_IMPROVEMENT_RECOMMENDATION_GROUPS = [
         'items': [
             'Enhance practical/laboratory activities',
             'Strengthen industry alignment',
+            'Increase applied activities and problem-solving',
+            'Strengthen theory-practice integration',
         ],
     },
     {
@@ -180,6 +184,8 @@ COURSE_REPORT_AR_LABELS = {
     'Update course content': 'تحديث محتوى المقرر',
     'Improve assessment methods': 'تحسين آليات قياس مخرجات التعلم',
     'Strengthen industry alignment': 'تعزيز مواءمة المقرر مع سوق العمل',
+    'Increase applied activities and problem-solving': 'زيادة الأنشطة التطبيقية وحل المشكلات',
+    'Strengthen theory-practice integration': 'تعزيز التكامل بين الجانبين النظري والتطبيقي',
     'Improve prerequisite knowledge': 'تحسين المعرفة السابقة المطلوبة',
     'Increase project-based learning': 'زيادة التعلم القائم على المشاريع',
     'Diversify teaching strategies': 'تنويع استراتيجيات التدريس',
