@@ -842,7 +842,7 @@ EN_TRANSLATIONS = {
     'mapping.method_manual_title': 'Manual mapping',
     'mapping.method_manual_description': 'Select CLOs for each question manually.',
     'mapping.method_ai_title': 'AI-assisted mapping',
-    'mapping.method_ai_description': 'Select a previously generated AI-assisted mapping report to reuse its question-to-CLO mappings for this analysis.',
+    'mapping.method_ai_description': 'Select a previously generated mapping report to reuse its question-to-CLO mappings.',
     'mapping.method_exam_paper_help': 'Upload the exam paper for the assessment questions in the grade files.',
     'mapping.method_continue': 'Next',
     'mapping.exam_paper': 'Exam paper:',
@@ -1711,7 +1711,7 @@ TRANSLATIONS['ar'].update({
     'mapping.method_manual_title': '\u0631\u0628\u0637 \u064a\u062f\u0648\u064a',
     'mapping.method_manual_description': 'حدد نواتج التعلم لكل سؤال يدويا.',
     'mapping.method_ai_title': '\u0631\u0628\u0637 \u0628\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a',
-    'mapping.method_ai_description': '\u0627\u062e\u062a\u0631 \u062a\u0642\u0631\u064a\u0631 \u0631\u0628\u0637 \u0622\u0644\u064a \u062a\u0645 \u0625\u0646\u0634\u0627\u0624\u0647 \u0645\u0633\u0628\u0642\u064b\u0627 \u0644\u0625\u0639\u0627\u062f\u0629 \u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0631\u0628\u0637 \u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0628\u0646\u0648\u0627\u062a\u062c \u0627\u0644\u062a\u0639\u0644\u0645 \u0641\u064a \u0647\u0630\u0627 \u0627\u0644\u062a\u062d\u0644\u064a\u0644.',
+    'mapping.method_ai_description': 'اختر تقرير ربط تم إنشاؤه مسبقًا لإعادة استخدام ربط الأسئلة بنواتج التعلم.',
     'mapping.method_exam_paper_help': '\u0627\u0631\u0641\u0639 \u0648\u0631\u0642\u0629 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0623\u0633\u0626\u0644\u0629 \u0645\u0644\u0641\u0627\u062a \u0627\u0644\u062f\u0631\u062c\u0627\u062a.',
     'mapping.method_continue': '\u0627\u0644\u062a\u0627\u0644\u064a',
 })
