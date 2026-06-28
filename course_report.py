@@ -11094,17 +11094,25 @@ def clean_xml_text(text):
     return re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', str(text))
 
 def word_paragraph(text='', bold=False, color='', size='', alignment=''):
-    if not alignment and text:
+    is_arabic = False
+    if text:
         s_text = str(text)
-        if any('؀' <= c <= 'ۿ' or 'ݐ' <= c <= 'ݿ' or 'ࢠ' <= c <= 'ࣿ' for c in s_text):
-            alignment = 'right'
-        elif any(c.isalpha() for c in s_text):
-            alignment = 'left'
+        is_arabic = any('؀' <= c <= 'ۿ' or 'ݐ' <= c <= 'ݿ' or 'ࢠ' <= c <= 'ࣿ' for c in s_text)
+        if not alignment:
+            if is_arabic:
+                alignment = 'right'
+            elif any(c.isalpha() for c in s_text):
+                alignment = 'left'
 
     paragraph = word_element('p')
-    if alignment:
+    
+    # We always need pPr if there is alignment OR if it's arabic (to set bidi)
+    if alignment or is_arabic:
         paragraph_properties = word_element('pPr')
-        paragraph_properties.append(word_element('jc', {word_tag('val'): alignment}))
+        if alignment:
+            paragraph_properties.append(word_element('jc', {word_tag('val'): alignment}))
+        if is_arabic:
+            paragraph_properties.append(word_element('bidi'))
         paragraph.append(paragraph_properties)
     run = word_element('r')
     if bold or color or size:
