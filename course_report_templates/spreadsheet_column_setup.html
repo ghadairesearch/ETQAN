@@ -44,9 +44,13 @@
 </style>
 
 <div class="card">
-    <h2 style="margin-top: 0;">Select Spreadsheet Columns</h2>
+    <h2 style="margin-top: 0;">{% if language == 'ar' %}تحديد أعمدة ملف الدرجات{% else %}Select Spreadsheet Columns{% endif %}</h2>
     <p style="color: var(--text-muted); margin-bottom: 2rem;">
-        Etqan could not automatically find question or CLO score columns in one or more uploaded files. Select the sheet and columns to continue.
+        {% if language == 'ar' %}
+            لم يتمكن إتقان من اكتشاف أعمدة الأسئلة أو درجات نواتج التعلم تلقائياً في ملف واحد أو أكثر. حدد الورقة والأعمدة للمتابعة.
+        {% else %}
+            Etqan could not automatically find question or CLO score columns in one or more uploaded files. Select the sheet and columns to continue.
+        {% endif %}
     </p>
 
     <form method="POST" action="{{ url_for('spreadsheet_column_setup') }}">
@@ -61,7 +65,7 @@
 
                 <div class="column-setup-grid">
                     <div class="form-group">
-                        <label class="form-label" for="sheet_{{ spec.index }}">Sheet</label>
+                        <label class="form-label" for="sheet_{{ spec.index }}">{% if language == 'ar' %}الورقة{% else %}Sheet{% endif %}</label>
                         <select id="sheet_{{ spec.index }}" name="assessment_{{ spec.index }}_sheet_name" class="form-control sheet-select" required>
                             {% for sheet in spec.sheets %}
                                 <option value="{{ sheet.name }}">{{ sheet.display }}</option>
@@ -70,37 +74,37 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="student_{{ spec.index }}">Student ID column</label>
+                        <label class="form-label" for="student_{{ spec.index }}">{% if language == 'ar' %}عمود معرف الطالب{% else %}Student ID column{% endif %}</label>
                         <select id="student_{{ spec.index }}" name="assessment_{{ spec.index }}_student_column" class="form-control column-select" data-field="student">
-                            <option value="">No student ID column</option>
+                            <option value="">{% if language == 'ar' %}لا يوجد عمود معرف طالب{% else %}No student ID column{% endif %}</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="question_{{ spec.index }}">Question column</label>
+                        <label class="form-label" for="question_{{ spec.index }}">{% if language == 'ar' %}عمود السؤال{% else %}Question column{% endif %}</label>
                         <select id="question_{{ spec.index }}" name="assessment_{{ spec.index }}_question_column" class="form-control column-select" data-field="question">
-                            <option value="">Use CLO column as item</option>
+                            <option value="">{% if language == 'ar' %}استخدم عمود ناتج التعلم كبند{% else %}Use CLO column as item{% endif %}</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="clo_{{ spec.index }}">CLO column</label>
+                        <label class="form-label" for="clo_{{ spec.index }}">{% if language == 'ar' %}عمود ناتج التعلم{% else %}CLO column{% endif %}</label>
                         <select id="clo_{{ spec.index }}" name="assessment_{{ spec.index }}_clo_column" class="form-control column-select" data-field="clo">
-                            <option value="">No CLO column</option>
+                            <option value="">{% if language == 'ar' %}لا يوجد عمود ناتج تعلم{% else %}No CLO column{% endif %}</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="score_{{ spec.index }}">Score column</label>
+                        <label class="form-label" for="score_{{ spec.index }}">{% if language == 'ar' %}عمود الدرجة{% else %}Score column{% endif %}</label>
                         <select id="score_{{ spec.index }}" name="assessment_{{ spec.index }}_score_column" class="form-control column-select" data-field="score" required>
-                            <option value="">Select score column...</option>
+                            <option value="">{% if language == 'ar' %}حدد عمود الدرجة...{% else %}Select score column...{% endif %}</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="possible_{{ spec.index }}">Max score column</label>
+                        <label class="form-label" for="possible_{{ spec.index }}">{% if language == 'ar' %}عمود الدرجة الكلية{% else %}Max score column{% endif %}</label>
                         <select id="possible_{{ spec.index }}" name="assessment_{{ spec.index }}_possible_column" class="form-control column-select" data-field="possible">
-                            <option value="">Use highest score as max</option>
+                            <option value="">{% if language == 'ar' %}استخدم أعلى درجة كدرجة كلية{% else %}Use highest score as max{% endif %}</option>
                         </select>
                     </div>
                 </div>
@@ -111,7 +115,7 @@
 
         <div class="form-action-row">
             <a href="{{ url_for('clo_attainment') }}" class="btn back-action" style="background-color: var(--border-color); color: var(--text-main);">{{ _('mapping.back') }}</a>
-            <button type="submit" class="btn">Next</button>
+            <button type="submit" class="btn">{% if language == 'ar' %}التالي{% else %}Next{% endif %}</button>
         </div>
     </form>
 </div>

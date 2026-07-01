@@ -52,7 +52,7 @@
             <label class="form-label">{{ _('index.exam_paper') }}</label>
             <div class="exam-upload-zone">
                 <input type="file" name="exam_paper" class="form-control" accept=".pdf,.docx,.txt" required style="padding: 0.65rem;">
-                <p class="exam-upload-help">PDF, DOCX, or TXT</p>
+                <p class="exam-upload-help">{% if language == 'ar' %}PDF أو DOCX أو TXT{% else %}PDF, DOCX, or TXT{% endif %}</p>
             </div>
         </div>
 

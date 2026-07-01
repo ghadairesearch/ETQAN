@@ -1,25 +1,35 @@
 {% set wizard_current_step = wizard_current_step|default(1) %}
-{% set wizard_steps = [
-    {'number': 1, 'label': 'Upload Exam'},
-    {'number': 2, 'label': 'Review Questions'},
-    {'number': 3, 'label': 'CLO Mapping'},
-    {'number': 4, 'label': 'Results'}
-] %}
+{% if language == 'ar' %}
+    {% set wizard_step_text = '&#1575;&#1604;&#1582;&#1591;&#1608;&#1577; ' ~ wizard_current_step ~ ' &#1605;&#1606; 4' %}
+    {% set wizard_steps = [
+        {'number': 1, 'label': '&#1585;&#1601;&#1593; &#1575;&#1604;&#1575;&#1582;&#1578;&#1576;&#1575;&#1585;'},
+        {'number': 2, 'label': '&#1605;&#1585;&#1575;&#1580;&#1593;&#1577; &#1575;&#1604;&#1571;&#1587;&#1574;&#1604;&#1577;'},
+        {'number': 3, 'label': '&#1585;&#1576;&#1591; &#1606;&#1608;&#1575;&#1578;&#1580; &#1575;&#1604;&#1578;&#1593;&#1604;&#1605;'},
+        {'number': 4, 'label': '&#1575;&#1604;&#1606;&#1578;&#1575;&#1574;&#1580;'}
+    ] %}
+{% else %}
+    {% set wizard_step_text = 'Step ' ~ wizard_current_step ~ ' of 4' %}
+    {% set wizard_steps = [
+        {'number': 1, 'label': 'Upload Exam'},
+        {'number': 2, 'label': 'Review Questions'},
+        {'number': 3, 'label': 'CLO Mapping'},
+        {'number': 4, 'label': 'Results'}
+    ] %}
+{% endif %}
 <div class="wizard-progress" aria-label="Wizard progress">
-    <div class="wizard-progress-kicker">Step {{ wizard_current_step }} of 4</div>
     <ol class="wizard-stepper">
         {% for step in wizard_steps %}
             {% set state = 'complete' if step.number < wizard_current_step else ('current' if step.number == wizard_current_step else 'future') %}
             <li class="wizard-step is-{{ state }}">
                 <span class="wizard-step-marker" aria-hidden="true">{% if state == 'complete' %}&#10003;{% else %}{{ step.number }}{% endif %}</span>
-                <span class="wizard-step-label">{{ step.label }}</span>
+                <span class="wizard-step-label">{{ step.label|safe }}</span>
             </li>
         {% endfor %}
     </ol>
 </div>
 
 <div class="wizard-page-header">
-    <div class="wizard-page-kicker">Step {{ wizard_current_step }} of 4</div>
+    <div class="wizard-page-kicker">{{ wizard_step_text|safe }}</div>
     <h2>{{ wizard_title|safe }}</h2>
     {% if wizard_description %}
         <p>{{ wizard_description }}</p>
