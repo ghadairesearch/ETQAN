@@ -1,11 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card" style="max-width: 760px; margin: 0 auto;">
+<div class="card wizard-card">
+    {% set wizard_steps = [
+        {'number': 1, 'label': '&#1605;&#1589;&#1575;&#1583;&#1585; &#1575;&#1604;&#1576;&#1610;&#1575;&#1606;&#1575;&#1578;' if language == 'ar' else 'Data Sources'},
+        {'number': 2, 'label': '&#1578;&#1601;&#1575;&#1589;&#1610;&#1604; &#1575;&#1604;&#1605;&#1602;&#1585;&#1585;' if language == 'ar' else 'Course Details'},
+        {'number': 3, 'label': '&#1575;&#1604;&#1605;&#1593;&#1575;&#1610;&#1606;&#1577;' if language == 'ar' else 'Preview'}
+    ] %}
+    {% set wizard_current_step = 2 %}
+    {% set wizard_title = '&#1578;&#1601;&#1575;&#1589;&#1610;&#1604; &#1575;&#1604;&#1605;&#1602;&#1585;&#1585; &#1608;&#1575;&#1604;&#1578;&#1608;&#1589;&#1610;&#1575;&#1578;' if language == 'ar' else 'Course Details &amp; Recommendations' %}
+    {% include "wizard_stepper.html" %}
+    <div hidden>
     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
         <div>
             <h2 style="margin-top: 0;">{% if language == 'ar' %}الخطوة 2: تفاصيل المقرر والتوصيات{% else %}Step 2: Course Details &amp; Recommendations{% endif %}</h2>
         </div>
+    </div>
+
     </div>
 
     <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #f9fafb; margin-bottom: 1.25rem;">

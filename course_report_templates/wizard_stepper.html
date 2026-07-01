@@ -1,20 +1,26 @@
 {% set wizard_current_step = wizard_current_step|default(1) %}
+{% if wizard_steps is not defined or not wizard_steps %}
+    {% if language == 'ar' %}
+        {% set wizard_steps = [
+            {'number': 1, 'label': '&#1585;&#1601;&#1593; &#1575;&#1604;&#1575;&#1582;&#1578;&#1576;&#1575;&#1585;'},
+            {'number': 2, 'label': '&#1605;&#1585;&#1575;&#1580;&#1593;&#1577; &#1575;&#1604;&#1571;&#1587;&#1574;&#1604;&#1577;'},
+            {'number': 3, 'label': '&#1585;&#1576;&#1591; &#1606;&#1608;&#1575;&#1578;&#1580; &#1575;&#1604;&#1578;&#1593;&#1604;&#1605;'},
+            {'number': 4, 'label': '&#1575;&#1604;&#1606;&#1578;&#1575;&#1574;&#1580;'}
+        ] %}
+    {% else %}
+        {% set wizard_steps = [
+            {'number': 1, 'label': 'Upload Exam'},
+            {'number': 2, 'label': 'Review Questions'},
+            {'number': 3, 'label': 'CLO Mapping'},
+            {'number': 4, 'label': 'Results'}
+        ] %}
+    {% endif %}
+{% endif %}
+{% set wizard_total_steps = wizard_steps|length %}
 {% if language == 'ar' %}
-    {% set wizard_step_text = '&#1575;&#1604;&#1582;&#1591;&#1608;&#1577; ' ~ wizard_current_step ~ ' &#1605;&#1606; 4' %}
-    {% set wizard_steps = [
-        {'number': 1, 'label': '&#1585;&#1601;&#1593; &#1575;&#1604;&#1575;&#1582;&#1578;&#1576;&#1575;&#1585;'},
-        {'number': 2, 'label': '&#1605;&#1585;&#1575;&#1580;&#1593;&#1577; &#1575;&#1604;&#1571;&#1587;&#1574;&#1604;&#1577;'},
-        {'number': 3, 'label': '&#1585;&#1576;&#1591; &#1606;&#1608;&#1575;&#1578;&#1580; &#1575;&#1604;&#1578;&#1593;&#1604;&#1605;'},
-        {'number': 4, 'label': '&#1575;&#1604;&#1606;&#1578;&#1575;&#1574;&#1580;'}
-    ] %}
+    {% set wizard_step_text = '&#1575;&#1604;&#1582;&#1591;&#1608;&#1577; ' ~ wizard_current_step ~ ' &#1605;&#1606; ' ~ wizard_total_steps %}
 {% else %}
-    {% set wizard_step_text = 'Step ' ~ wizard_current_step ~ ' of 4' %}
-    {% set wizard_steps = [
-        {'number': 1, 'label': 'Upload Exam'},
-        {'number': 2, 'label': 'Review Questions'},
-        {'number': 3, 'label': 'CLO Mapping'},
-        {'number': 4, 'label': 'Results'}
-    ] %}
+    {% set wizard_step_text = 'Step ' ~ wizard_current_step ~ ' of ' ~ wizard_total_steps %}
 {% endif %}
 <div class="wizard-progress" aria-label="Wizard progress">
     <ol class="wizard-stepper">

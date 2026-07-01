@@ -133,12 +133,22 @@
         padding: 0.22rem 0.55rem;
     }
 </style>
-<div class="card">
+<div class="card wizard-card">
+    {% set wizard_steps = [
+        {'number': 1, 'label': '&#1585;&#1601;&#1593; &#1575;&#1604;&#1583;&#1585;&#1580;&#1575;&#1578;' if language == 'ar' else 'Upload Grades'},
+        {'number': 2, 'label': '&#1578;&#1581;&#1583;&#1610;&#1583; &#1575;&#1604;&#1571;&#1593;&#1605;&#1583;&#1577;' if language == 'ar' else 'Configure Columns'},
+        {'number': 3, 'label': '&#1591;&#1585;&#1610;&#1602;&#1577; &#1575;&#1604;&#1585;&#1576;&#1591;' if language == 'ar' else 'Mapping Method'},
+        {'number': 4, 'label': '&#1585;&#1576;&#1591; &#1575;&#1604;&#1606;&#1608;&#1575;&#1578;&#1580;' if language == 'ar' else 'CLO Mapping'},
+        {'number': 5, 'label': '&#1575;&#1604;&#1606;&#1578;&#1575;&#1574;&#1580;' if language == 'ar' else 'Results'}
+    ] %}
+    {% set wizard_current_step = 5 %}
+    {% set wizard_title = _('results.title') %}
+    {% include "wizard_stepper.html" %}
     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
         <div style="display: flex; gap: 1rem; align-items: flex-start;">
             <!-- Logo hidden on webpage, only shown in PDF exports -->
             <div>
-            <h2 style="margin-top: 0;">{{ _('results.title') }}</h2>
+            <div hidden><h2 style="margin-top: 0;">{{ _('results.title') }}</h2></div>
             {% if course_info %}
                 <p style="color: var(--text-main); margin: 0 0 0.5rem;">
                     <strong>{{ _('results.course') }}</strong> {{ course_info.course_name }}{% if course_info.course_id %} ({{ course_info.course_id }}){% endif %}

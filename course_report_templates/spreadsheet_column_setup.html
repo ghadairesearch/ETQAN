@@ -43,7 +43,19 @@
     }
 </style>
 
-<div class="card">
+<div class="card wizard-card">
+    {% set wizard_steps = [
+        {'number': 1, 'label': '&#1585;&#1601;&#1593; &#1575;&#1604;&#1583;&#1585;&#1580;&#1575;&#1578;' if language == 'ar' else 'Upload Grades'},
+        {'number': 2, 'label': '&#1578;&#1581;&#1583;&#1610;&#1583; &#1575;&#1604;&#1571;&#1593;&#1605;&#1583;&#1577;' if language == 'ar' else 'Configure Columns'},
+        {'number': 3, 'label': '&#1591;&#1585;&#1610;&#1602;&#1577; &#1575;&#1604;&#1585;&#1576;&#1591;' if language == 'ar' else 'Mapping Method'},
+        {'number': 4, 'label': '&#1585;&#1576;&#1591; &#1575;&#1604;&#1606;&#1608;&#1575;&#1578;&#1580;' if language == 'ar' else 'CLO Mapping'},
+        {'number': 5, 'label': '&#1575;&#1604;&#1606;&#1578;&#1575;&#1574;&#1580;' if language == 'ar' else 'Results'}
+    ] %}
+    {% set wizard_current_step = 2 %}
+    {% set wizard_title = '&#1578;&#1581;&#1583;&#1610;&#1583; &#1571;&#1593;&#1605;&#1583;&#1577; &#1605;&#1604;&#1601; &#1575;&#1604;&#1583;&#1585;&#1580;&#1575;&#1578;' if language == 'ar' else 'Select Spreadsheet Columns' %}
+    {% set wizard_description = '&#1604;&#1605; &#1610;&#1578;&#1605;&#1603;&#1606; &#1573;&#1578;&#1602;&#1575;&#1606; &#1605;&#1606; &#1575;&#1603;&#1578;&#1588;&#1575;&#1601; &#1571;&#1593;&#1605;&#1583;&#1577; &#1575;&#1604;&#1571;&#1587;&#1574;&#1604;&#1577; &#1571;&#1608; &#1583;&#1585;&#1580;&#1575;&#1578; &#1606;&#1608;&#1575;&#1578;&#1580; &#1575;&#1604;&#1578;&#1593;&#1604;&#1605; &#1578;&#1604;&#1602;&#1575;&#1574;&#1610;&#1575;. &#1581;&#1583;&#1583; &#1575;&#1604;&#1608;&#1585;&#1602;&#1577; &#1608;&#1575;&#1604;&#1571;&#1593;&#1605;&#1583;&#1577; &#1604;&#1604;&#1605;&#1578;&#1575;&#1576;&#1593;&#1577;.' if language == 'ar' else 'Etqan could not automatically find question or CLO score columns in one or more uploaded files. Select the sheet and columns to continue.' %}
+    {% include "wizard_stepper.html" %}
+    <div hidden>
     <h2 style="margin-top: 0;">{% if language == 'ar' %}تحديد أعمدة ملف الدرجات{% else %}Select Spreadsheet Columns{% endif %}</h2>
     <p style="color: var(--text-muted); margin-bottom: 2rem;">
         {% if language == 'ar' %}
@@ -52,6 +64,8 @@
             Etqan could not automatically find question or CLO score columns in one or more uploaded files. Select the sheet and columns to continue.
         {% endif %}
     </p>
+
+    </div>
 
     <form method="POST" action="{{ url_for('spreadsheet_column_setup') }}">
         {% for spec in specs %}

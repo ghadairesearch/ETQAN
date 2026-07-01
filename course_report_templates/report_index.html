@@ -75,8 +75,20 @@
     }
 </style>
 
-<div class="card">
+<div class="card wizard-card">
+    {% set wizard_steps = [
+        {'number': 1, 'label': '&#1585;&#1601;&#1593; &#1575;&#1604;&#1583;&#1585;&#1580;&#1575;&#1578;' if language == 'ar' else 'Upload Grades'},
+        {'number': 2, 'label': '&#1578;&#1581;&#1583;&#1610;&#1583; &#1575;&#1604;&#1571;&#1593;&#1605;&#1583;&#1577;' if language == 'ar' else 'Configure Columns'},
+        {'number': 3, 'label': '&#1591;&#1585;&#1610;&#1602;&#1577; &#1575;&#1604;&#1585;&#1576;&#1591;' if language == 'ar' else 'Mapping Method'},
+        {'number': 4, 'label': '&#1585;&#1576;&#1591; &#1575;&#1604;&#1606;&#1608;&#1575;&#1578;&#1580;' if language == 'ar' else 'CLO Mapping'},
+        {'number': 5, 'label': '&#1575;&#1604;&#1606;&#1578;&#1575;&#1574;&#1580;' if language == 'ar' else 'Results'}
+    ] %}
+    {% set wizard_current_step = 1 %}
+    {% set wizard_title = _('index.title') %}
+    {% include "wizard_stepper.html" %}
+    <div hidden>
     <h2 style="margin-top: 0;">{{ _('index.title') }}</h2>
+    </div>
 
     <form method="POST" enctype="multipart/form-data">
         <div class="form-group">
