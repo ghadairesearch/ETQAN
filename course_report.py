@@ -16931,7 +16931,10 @@ def save_course_report_draft_action(draft_id):
         course_report_inputs['student_results_comment'] = request.form.get('student_results_comment').strip()
         
     if course_report_inputs.get('course_improvement_plan'):
+        updated_improvement_plan = []
         for i, item in enumerate(course_report_inputs['course_improvement_plan']):
+            if request.form.get(f'delete_rec_{i}') == '1':
+                continue
             rec_text = request.form.get(f'rec_text_{i}')
             if rec_text is not None:
                 item['recommendation'] = rec_text.strip()
@@ -16941,6 +16944,8 @@ def save_course_report_draft_action(draft_id):
             rec_support = request.form.get(f'rec_support_{i}')
             if rec_support is not None:
                 item['support'] = rec_support.strip()
+            updated_improvement_plan.append(item)
+        course_report_inputs['course_improvement_plan'] = updated_improvement_plan
     
     save_result = save_course_report_snapshot(combined_stats, course_report_inputs, course_info, total_students, source_report_ids)
     if not save_result.get('allowed'):
