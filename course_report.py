@@ -7206,18 +7206,22 @@ def parse_exam_paper_with_module(filepath):
         questions = []
         question_texts = {}
         question_types = {}
+        question_confidences = {}
+        question_warnings = {}
         detected_clo_mappings = {}
         
         for q in parsed_questions:
             q_id = q['question_id']
             questions.append(q_id)
             question_types[q_id] = str(q.get('question_type') or '').strip()
+            question_confidences[q_id] = q.get('confidence')
+            question_warnings[q_id] = q.get('warnings') or []
             full_text = str(q.get('question_text') or '').strip()
             if q.get('marks', 1.0) != 1.0:
                 full_text += f"\nMarks: {q['marks']}"
                 
             question_texts[q_id] = full_text[:2500] + ('...' if len(full_text) > 2500 else '')
-            tags = detect_clo_tags_from_text(q['question_text'])
+            tags = q.get('detected_clo_tags') or detect_clo_tags_from_text(q['question_text'])
             if tags:
                 detected_clo_mappings[q_id] = tags
                 
@@ -7229,6 +7233,9 @@ def parse_exam_paper_with_module(filepath):
             'text_sample': (parser.raw_text[:150] + '...') if hasattr(parser, 'raw_text') else '',
             'question_texts': question_texts,
             'question_types': question_types,
+            'question_confidences': question_confidences,
+            'question_warnings': question_warnings,
+            'question_extraction_warnings': parser.validation_warnings,
             'detected_clo_mappings': detected_clo_mappings,
             'question_extraction_source': 'local',
             'question_extraction_model': 'ExamParser',

@@ -138,6 +138,17 @@
         {% endif %}
     </p>
 
+    {% if metrics and metrics.question_extraction_warnings %}
+        <div class="alert" style="margin-bottom: 1rem;">
+            <strong>{% if language == 'ar' %}تنبيهات استخراج الأسئلة{% else %}Question extraction warnings{% endif %}</strong>
+            <ul style="margin: 0.5rem 0 0; padding-{{ 'right' if language == 'ar' else 'left' }}: 1.25rem;">
+                {% for warning in metrics.question_extraction_warnings %}
+                    <li>{{ warning }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     {% set question_items = metrics.questions if metrics and metrics.questions else ['Q1'] %}
     {% set summary = review_summary or {'total': question_items|length, 'auto_mapped': 0, 'needs_ai': question_items|length, 'all_mapped': false, 'explicit_by_question': {}} %}
 
@@ -181,9 +192,19 @@
                             <td>
                                 <select name="question_type" class="form-control">
                                     <option value="MCQ" {% if question_type == 'MCQ' %}selected{% endif %}>MCQ</option>
+                                    <option value="multiple_choice" {% if question_type == 'multiple_choice' %}selected{% endif %}>Multiple choice</option>
                                     <option value="T/F" {% if question_type == 'T/F' %}selected{% endif %}>T/F</option>
+                                    <option value="true_false" {% if question_type == 'true_false' %}selected{% endif %}>True/False</option>
+                                    <option value="fill_blank" {% if question_type == 'fill_blank' %}selected{% endif %}>Fill blank</option>
                                     <option value="Essay" {% if question_type == 'Essay' %}selected{% endif %}>Essay</option>
-                                    <option value="Other" {% if question_type not in ['MCQ', 'T/F', 'Essay'] %}selected{% endif %}>Other</option>
+                                    <option value="essay" {% if question_type == 'essay' %}selected{% endif %}>Essay</option>
+                                    <option value="short_answer" {% if question_type == 'short_answer' %}selected{% endif %}>Short answer</option>
+                                    <option value="matching" {% if question_type == 'matching' %}selected{% endif %}>Matching</option>
+                                    <option value="calculation" {% if question_type == 'calculation' %}selected{% endif %}>Calculation</option>
+                                    <option value="programming" {% if question_type == 'programming' %}selected{% endif %}>Programming</option>
+                                    <option value="case_study" {% if question_type == 'case_study' %}selected{% endif %}>Case study</option>
+                                    <option value="unknown" {% if question_type == 'unknown' %}selected{% endif %}>Unknown</option>
+                                    <option value="Other" {% if question_type not in ['MCQ', 'multiple_choice', 'T/F', 'true_false', 'fill_blank', 'Essay', 'essay', 'short_answer', 'matching', 'calculation', 'programming', 'case_study', 'unknown'] %}selected{% endif %}>Other</option>
                                 </select>
                             </td>
                             <td class="explicit-clo-cell">
@@ -249,8 +270,18 @@
         <td>
             <select name="question_type" class="form-control">
                 <option value="MCQ">MCQ</option>
+                <option value="multiple_choice">Multiple choice</option>
                 <option value="T/F">T/F</option>
+                <option value="true_false">True/False</option>
+                <option value="fill_blank">Fill blank</option>
                 <option value="Essay">Essay</option>
+                <option value="essay">Essay</option>
+                <option value="short_answer">Short answer</option>
+                <option value="matching">Matching</option>
+                <option value="calculation">Calculation</option>
+                <option value="programming">Programming</option>
+                <option value="case_study">Case study</option>
+                <option value="unknown">Unknown</option>
                 <option value="Other" selected>Other</option>
             </select>
         </td>
