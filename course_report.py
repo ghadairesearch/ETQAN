@@ -255,6 +255,7 @@ COURSE_REPORT_AR_LABELS = {
     'Academic advising committee': 'لجنة الإرشاد الأكاديمي',
     'College council': 'مجلس الكلية',
     'Course coordinator': 'منسق المقرر',
+    'Course team': 'فريق المقرر',
     'Technical staff': 'الكادر الفني',
     'Teaching staff': 'الكادر التعليمي',
     'Revise teaching strategies': 'مراجعة استراتيجيات التدريس',
@@ -388,6 +389,20 @@ COURSE_REPORT_AR_LABELS = {
     'Provide additional learning resources and references': 'توفير مصادر تعلم ومراجع إضافية.',
     'Encourage self-directed and collaborative learning': 'تشجيع التعلم الذاتي والتعلم التعاوني.',
     'Monitor implementation of the improvement plan in the next offering': 'متابعة تنفيذ خطة التحسين في الطرح القادم.',
+    'Improve CLO measurement mechanisms': 'تحسين آليات قياس نواتج التعلم.',
+    'Improve CLO attainment indicators and criteria': 'تحسين مؤشرات ومعايير تحقق نواتج التعلم.',
+    'Improve alignment of assessment tools with CLOs': 'تحسين مواءمة أدوات التقييم مع نواتج التعلم.',
+    'Diversify CLO measurement tools': 'تنويع أدوات قياس نواتج التعلم.',
+    'Increase evidence used to measure CLOs': 'زيادة عدد الأدلة المستخدمة لقياس نواتج التعلم.',
+    'Improve distribution of CLOs across assessment tools': 'تحسين توزيع نواتج التعلم على أدوات التقييم.',
+    'Improve CLO coverage in assessment tools': 'تحسين تغطية نواتج التعلم في أدوات التقييم.',
+    'Improve CLO attainment calculation mechanism': 'تحسين آلية احتساب نسب تحقق نواتج التعلم.',
+    'Improve quality and accuracy of measurement data': 'تحسين جودة بيانات القياس والتحقق من دقتها.',
+    'Improve question-CLO mapping': 'تحسين خريطة ربط الأسئلة بنواتج التعلم.',
+    'Redesign assessment tools for CLO alignment': 'إعادة تصميم أدوات التقييم.',
+    'Build question bank covering all CLOs': 'بناء بنك أسئلة يغطي جميع نواتج التعلم.',
+    'Develop CLO results review and analysis mechanisms': 'تطوير آليات مراجعة وتحليل نتائج نواتج التعلم.',
+    'Enhance digital technologies in CLO measurement': 'تعزيز استخدام التقنيات الرقمية في قياس نواتج التعلم.',
 }
 
 COURSE_IMPROVEMENT_RECOMMENDATION_ACTIONS = {
@@ -419,12 +434,20 @@ COURSE_IMPROVEMENT_RECOMMENDATION_ACTIONS = {
         'Other',
     ],
     'Improve alignment between CLOs and assessments': [
-        'Update exam questions',
-        'Update CLO-assessment mapping matrix',
-        'Review CLO-assessment alignment',
-        'Revise assessment methods',
-        'Coordinate with the department/course team',
-        'Monitor implementation in the next offering',
+        'Improve CLO measurement mechanisms',
+        'Improve CLO attainment indicators and criteria',
+        'Improve alignment of assessment tools with CLOs',
+        'Diversify CLO measurement tools',
+        'Increase evidence used to measure CLOs',
+        'Improve distribution of CLOs across assessment tools',
+        'Improve CLO coverage in assessment tools',
+        'Improve CLO attainment calculation mechanism',
+        'Improve quality and accuracy of measurement data',
+        'Improve question-CLO mapping',
+        'Redesign assessment tools for CLO alignment',
+        'Build question bank covering all CLOs',
+        'Develop CLO results review and analysis mechanisms',
+        'Enhance digital technologies in CLO measurement',
         'Other',
     ],
     'Enhance practical/laboratory activities': [
@@ -680,6 +703,7 @@ COURSE_IMPROVEMENT_ACTION_OPTIONS = list({
 COURSE_IMPROVEMENT_SUPPORT_OPTIONS = [
     'No additional support required',
     'Course coordinator',
+    'Course team',
     'Teaching staff',
     'Technical staff',
     'Academic advising committee',
@@ -9645,6 +9669,220 @@ def infer_spreadsheet_metrics(filepath, file_ext):
         'max_scores': {}
     }
 
+SPREADSHEET_COLUMN_SETUP_EXTENSIONS = {'.csv', '.xlsx', '.xls'}
+CSV_SHEET_KEY = '__csv__'
+
+def needs_spreadsheet_column_setup(assessment):
+    if (assessment.get('ext') or '').lower() not in SPREADSHEET_COLUMN_SETUP_EXTENSIONS:
+        return False
+    metrics = assessment.get('metrics') or {}
+    return not metrics.get('questions')
+
+def excel_column_label(index):
+    try:
+        index = int(index)
+    except (TypeError, ValueError):
+        return ''
+    label = ''
+    index += 1
+    while index:
+        index, remainder = divmod(index - 1, 26)
+        label = chr(65 + remainder) + label
+    return label
+
+def spreadsheet_column_options(df):
+    options = []
+    for index, column in enumerate(df.columns):
+        header = str(column or '').strip()
+        if not header or header.lower().startswith('unnamed:'):
+            sample = ''
+            try:
+                values = df.iloc[:, index].dropna().astype(str).str.strip()
+                values = values[values != '']
+                if not values.empty:
+                    sample = values.iloc[0]
+            except Exception:
+                sample = ''
+            header = sample or f"Column {index + 1}"
+        options.append({
+            'index': index,
+            'label': f"{excel_column_label(index)} - {header}"
+        })
+    return options
+
+def read_spreadsheet_frame(filepath, file_ext, sheet_name=None, nrows=None):
+    if file_ext == '.csv':
+        return pd.read_csv(filepath, nrows=nrows)
+    kwargs = {'sheet_name': sheet_name}
+    if nrows is not None:
+        kwargs['nrows'] = nrows
+    return pd.read_excel(filepath, **kwargs)
+
+def build_spreadsheet_column_setup_specs(assessment_files):
+    specs = []
+    for index, assessment in enumerate(assessment_files or []):
+        if not needs_spreadsheet_column_setup(assessment):
+            continue
+
+        filepath = get_upload_path(assessment.get('stored_name', ''))
+        file_ext = (assessment.get('ext') or '').lower()
+        sheet_specs = []
+        try:
+            if file_ext == '.csv':
+                df = read_spreadsheet_frame(filepath, file_ext, nrows=50)
+                sheet_specs.append({
+                    'name': CSV_SHEET_KEY,
+                    'display': 'CSV',
+                    'columns': spreadsheet_column_options(df)
+                })
+            else:
+                workbook = pd.ExcelFile(filepath)
+                for sheet_name in workbook.sheet_names:
+                    df = read_spreadsheet_frame(filepath, file_ext, sheet_name=sheet_name, nrows=50)
+                    sheet_specs.append({
+                        'name': sheet_name,
+                        'display': sheet_name,
+                        'columns': spreadsheet_column_options(df)
+                    })
+        except Exception as exc:
+            app.logger.exception("Failed to inspect spreadsheet columns: %s", exc)
+            sheet_specs = []
+
+        specs.append({
+            'index': index,
+            'label': assessment.get('label', 'Assessment'),
+            'original_name': assessment.get('original_name', ''),
+            'sheets': sheet_specs
+        })
+    return specs
+
+def selected_column_name(df, config, key):
+    raw_index = config.get(key)
+    if raw_index in (None, ''):
+        return None
+    try:
+        index = int(raw_index)
+    except (TypeError, ValueError):
+        return None
+    if index < 0 or index >= len(df.columns):
+        return None
+    return df.columns[index]
+
+def normalize_manual_metric_label(value, use_clo_label=False):
+    if use_clo_label:
+        tags = split_clo_tags(value)
+        if tags:
+            return tags[0]
+        text = '' if pd.isna(value) else str(value).strip()
+        return re.sub(r'\s+', ' ', text)
+    return normalize_grade_item_label(value)
+
+def manual_column_rows(filepath, file_ext, config):
+    sheet_name = config.get('sheet_name')
+    if file_ext == '.csv' or sheet_name == CSV_SHEET_KEY:
+        sheet_name = None
+    df = read_spreadsheet_frame(filepath, file_ext, sheet_name=sheet_name)
+
+    question_col = selected_column_name(df, config, 'question_column')
+    clo_col = selected_column_name(df, config, 'clo_column')
+    score_col = selected_column_name(df, config, 'score_column')
+    possible_col = selected_column_name(df, config, 'possible_column')
+    student_col = selected_column_name(df, config, 'student_column')
+
+    if not score_col or not (question_col or clo_col):
+        raise ValueError("Select a score column and either a question column or a CLO column.")
+
+    rows = df.copy()
+    source_col = question_col or clo_col
+    rows['_question_label'] = rows[source_col].map(lambda value: normalize_manual_metric_label(value, use_clo_label=not bool(question_col)))
+    rows['_earned_points'] = pd.to_numeric(rows[score_col], errors='coerce')
+    if possible_col:
+        rows['_possible_points'] = pd.to_numeric(rows[possible_col], errors='coerce')
+    else:
+        rows['_possible_points'] = pd.NA
+
+    if student_col:
+        rows['_student_id'] = rows[student_col].map(normalize_student_id)
+    else:
+        rows['_student_id'] = [f"__missing_student_{index + 1}" for index in range(len(rows))]
+
+    rows = rows[(rows['_question_label'] != '') & rows['_earned_points'].notna()].copy()
+    return rows, {
+        'sheet_name': sheet_name or CSV_SHEET_KEY,
+        'question_col': question_col,
+        'clo_col': clo_col,
+        'score_col': score_col,
+        'possible_col': possible_col,
+        'student_col': student_col
+    }
+
+def infer_manual_column_metrics(filepath, file_ext, config):
+    rows, selected = manual_column_rows(filepath, file_ext, config)
+    if rows.empty:
+        raise ValueError("No usable score rows were found for the selected columns.")
+
+    questions = sorted(rows['_question_label'].unique(), key=lambda question: (0, int(question[1:])) if re.match(r'^Q\d+$', str(question)) else (1, str(question)))
+    max_scores = {}
+    detected_clo_mappings = {}
+    performance = {}
+
+    for question in questions:
+        question_rows = rows[rows['_question_label'] == question]
+        possible_values = pd.to_numeric(question_rows['_possible_points'], errors='coerce').dropna()
+        earned_values = pd.to_numeric(question_rows['_earned_points'], errors='coerce').dropna()
+        max_score = float(possible_values.max()) if not possible_values.empty else (float(earned_values.max()) if not earned_values.empty else 1.0)
+        max_scores[question] = max_score or 1.0
+
+        if selected.get('clo_col'):
+            tags = []
+            for value in question_rows[selected['clo_col']].dropna().unique():
+                tags.extend(split_clo_tags(value))
+            if tags:
+                detected_clo_mappings[question] = sorted(set(tags))
+
+        deduped = question_rows.sort_values('_earned_points').drop_duplicates('_student_id', keep='last')
+        possible = pd.to_numeric(deduped['_possible_points'], errors='coerce').fillna(max_scores[question])
+        achieved = int((deduped['_earned_points'] >= possible).sum()) if len(deduped) else 0
+        performance[question] = {
+            'students_answered': len(deduped),
+            'students_correct': achieved,
+            'correct_percentage': round((achieved / len(deduped)) * 100, 2) if len(deduped) else 0
+        }
+
+    sheet_label = selected.get('sheet_name') if selected.get('sheet_name') != CSV_SHEET_KEY else 'CSV'
+    return {
+        'questions': questions,
+        'total_questions': len(questions),
+        'total_students': len({student_id for student_id in rows['_student_id'] if student_id}),
+        'confidence': 'High',
+        'text_sample': f"Detected from selected sheet/columns: {sheet_label}.",
+        'max_scores': max_scores,
+        'question_performance': performance,
+        'detected_clo_mappings': detected_clo_mappings
+    }
+
+def build_scores_from_manual_columns(filepath, file_ext, requested_questions, config):
+    rows, _ = manual_column_rows(filepath, file_ext, config)
+    if rows.empty:
+        return None
+
+    requested = set(requested_questions)
+    rows = rows[rows['_question_label'].isin(requested)].copy()
+    if rows.empty:
+        return None
+
+    score_df = rows.pivot_table(
+        index='_student_id',
+        columns='_question_label',
+        values='_earned_points',
+        aggfunc='max',
+        fill_value=0
+    )
+    available_questions = [question for question in requested_questions if question in score_df.columns]
+    if not available_questions:
+        return None
+    return score_df[available_questions].apply(pd.to_numeric, errors='coerce').fillna(0), 'numeric'
+
 PDF_GRADE_ROW_PATTERN = re.compile(
     r'(?:^|\s)(\d{1,3})\s+.*?\s+(-?\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)(?=\s+\d{1,3}\s+|$)'
 )
@@ -9947,7 +10185,7 @@ def build_scores_from_generic_long_grade_data(df, requested_questions):
         return None
     return score_df[available_questions].apply(pd.to_numeric, errors='coerce').fillna(0), 'numeric'
 
-def build_score_dataframe(filepath, file_ext, requested_questions):
+def build_score_dataframe(filepath, file_ext, requested_questions, manual_columns=None):
     requested_questions = list(requested_questions)
 
     if file_ext == '.pdf':
@@ -9958,6 +10196,11 @@ def build_score_dataframe(filepath, file_ext, requested_questions):
             if available_questions:
                 return score_df[available_questions].apply(pd.to_numeric, errors='coerce').fillna(0), 'numeric'
         return pd.DataFrame(columns=requested_questions), 'numeric'
+
+    if manual_columns and file_ext in SPREADSHEET_COLUMN_SETUP_EXTENSIONS:
+        manual_scores = build_scores_from_manual_columns(filepath, file_ext, requested_questions, manual_columns)
+        if manual_scores:
+            return manual_scores
 
     if file_ext == '.csv':
         df = pd.read_csv(filepath)
@@ -10082,7 +10325,7 @@ def build_combined_score_dataframe(assessment_files, requested_questions):
             continue
 
         filepath = get_upload_path(assessment['stored_name'])
-        score_df, score_mode = build_score_dataframe(filepath, assessment['ext'], local_questions)
+        score_df, score_mode = build_score_dataframe(filepath, assessment['ext'], local_questions, assessment.get('manual_columns'))
         if score_df.empty:
             continue
         score_df = score_df.rename(columns=rename_map)
@@ -10105,7 +10348,7 @@ def get_assessment_student_ids(assessment, requested_questions=None):
     if not questions:
         return set()
     filepath = get_upload_path(assessment['stored_name'])
-    score_df, _ = build_score_dataframe(filepath, assessment['ext'], questions)
+    score_df, _ = build_score_dataframe(filepath, assessment['ext'], questions, assessment.get('manual_columns'))
     return {
         f"{assessment.get('label', 'Assessment')}:{student_id}" if str(student_id).startswith("__missing_student_") else str(student_id)
         for student_id in score_df.index
@@ -11521,8 +11764,8 @@ def read_course_improvement_plan():
     if recommendation:
         items.append({
             'recommendation': recommendation,
-            'actions_needed': '',
-            'support': '',
+            'actions_needed': compact_text(request.form.get('course_improvement_other_actions_needed') or ''),
+            'support': compact_text(request.form.get('course_improvement_other_support') or ''),
         })
     return items
 
@@ -16830,6 +17073,9 @@ def clo_attainment():
         session.pop('mapping', None)
         session.pop('mapping_method', None)
 
+        if any(needs_spreadsheet_column_setup(assessment) for assessment in assessment_files):
+            return redirect(url_for('spreadsheet_column_setup'))
+
         return redirect(url_for('mapping_method'))
             
     selected_course_name = session.pop('selected_course_name', None) or session.get('course_name', '')
@@ -16840,6 +17086,62 @@ def clo_attainment():
         saved_target_percentages=session.get('target_percentages', {}),
         saved_custom_clos=session.get('custom_clos', [])
     )
+
+@app.route('/spreadsheet-column-setup', methods=['GET', 'POST'])
+def spreadsheet_column_setup():
+    assessment_files = session.get('assessment_files') or []
+    pending_indexes = [
+        index
+        for index, assessment in enumerate(assessment_files)
+        if needs_spreadsheet_column_setup(assessment)
+    ]
+
+    if not assessment_files:
+        return redirect(url_for('clo_attainment'))
+    if not pending_indexes:
+        return redirect(url_for('mapping_method'))
+
+    if request.method == 'POST':
+        updated_assessment_files = list(assessment_files)
+        for index in pending_indexes:
+            prefix = f'assessment_{index}_'
+            assessment = dict(updated_assessment_files[index])
+            config = {
+                'sheet_name': request.form.get(prefix + 'sheet_name') or CSV_SHEET_KEY,
+                'question_column': request.form.get(prefix + 'question_column') or '',
+                'clo_column': request.form.get(prefix + 'clo_column') or '',
+                'score_column': request.form.get(prefix + 'score_column') or '',
+                'possible_column': request.form.get(prefix + 'possible_column') or '',
+                'student_column': request.form.get(prefix + 'student_column') or '',
+            }
+
+            if not config['score_column'] or not (config['question_column'] or config['clo_column']):
+                flash("Select a sheet, score column, and question or CLO column for each file.", "error")
+                return redirect(url_for('spreadsheet_column_setup'))
+
+            filepath = get_upload_path(assessment.get('stored_name', ''))
+            try:
+                metrics = infer_manual_column_metrics(filepath, assessment.get('ext'), config)
+            except Exception as exc:
+                app.logger.exception("Failed to use selected spreadsheet columns: %s", exc)
+                flash(f"Could not read selected columns for {assessment.get('original_name') or assessment.get('label')}: {exc}", "error")
+                return redirect(url_for('spreadsheet_column_setup'))
+
+            assessment['manual_columns'] = config
+            assessment['metrics'] = metrics
+            updated_assessment_files[index] = assessment
+
+        session['assessment_files'] = updated_assessment_files
+        session['report_metrics'] = combine_assessment_metrics(updated_assessment_files)
+        session.modified = True
+        return redirect(url_for('mapping_method'))
+
+    specs = build_spreadsheet_column_setup_specs(assessment_files)
+    if not specs or any(not spec.get('sheets') for spec in specs):
+        flash("Could not inspect the uploaded spreadsheet columns. Please upload a valid CSV or Excel file.", "error")
+        return redirect(url_for('clo_attainment'))
+
+    return render_template('spreadsheet_column_setup.html', specs=specs)
 
 @app.route('/mapping-method', methods=['GET', 'POST'])
 def mapping_method():

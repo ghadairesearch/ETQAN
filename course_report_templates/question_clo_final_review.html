@@ -15,8 +15,10 @@
     }
 </style>
 
-<div class="card">
-    <h2 style="margin-top: 0;">{{ _('question_mapping.final_review') }}</h2>
+<div class="card wizard-card">
+    {% set wizard_current_step = 4 %}
+    {% set wizard_title = '&#1575;&#1604;&#1606;&#1578;&#1575;&#1574;&#1580;' if language == 'ar' else 'Results' %}
+    {% include "wizard_stepper.html" %}
     <p style="color: var(--text-muted); margin-top: -0.5rem;">
         {{ _('mapping.course') }} <strong>{{ course_name }}</strong><br>
         {{ _('detected.source') }} <strong>{{ filename }}</strong>

@@ -7,7 +7,7 @@
     <script>
         (function() {
             const sessionKey = 'clo_attainment_browser_session';
-            const resetExemptPaths = ['/', '/clo-attainment', '/question-clo-mapping', '/assessment-balance-check', '/plo-analysis', '/course-report-service', '/start-over', '/privacy-policy', '/faq', '/contact-us', '/login', '/register', '/logout', '/account', '/account/settings', '/account/report-settings', '/account/courses', '/account/organization', '/billing', '/forgot-password'];
+            const resetExemptPaths = ['/', '/clo-attainment', '/spreadsheet-column-setup', '/question-clo-mapping', '/assessment-balance-check', '/plo-analysis', '/course-report-service', '/start-over', '/privacy-policy', '/faq', '/contact-us', '/login', '/register', '/logout', '/account', '/account/settings', '/account/report-settings', '/account/courses', '/account/organization', '/billing', '/forgot-password'];
             const resetExemptPrefixes = ['/reports', '/uploads', '/reset-password'];
             const isResetExempt = resetExemptPaths.includes(window.location.pathname)
                 || resetExemptPrefixes.some(prefix => window.location.pathname.startsWith(prefix));
@@ -106,7 +106,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 2rem auto;
             padding: 0 1rem;
             flex: 1;
@@ -120,6 +120,135 @@
             border-radius: 8px;
             padding: 2rem;
             box-shadow: var(--shadow);
+        }
+
+        .wizard-card {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 2.25rem;
+        }
+
+        .wizard-progress {
+            border-bottom: 1px solid var(--border-color);
+            margin: -0.25rem 0 1.75rem;
+            padding-bottom: 1.4rem;
+        }
+
+        .wizard-progress-kicker,
+        .wizard-page-kicker {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .wizard-stepper {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.65rem;
+            list-style: none;
+            margin: 0.85rem 0 0;
+            padding: 0;
+        }
+
+        .wizard-step {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-width: 0;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .wizard-step:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 1rem;
+            inset-inline-start: calc(2rem + 0.65rem);
+            width: calc(100% - 2.75rem);
+            height: 2px;
+            background: var(--border-color);
+        }
+
+        .wizard-step-marker {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            flex: 0 0 2rem;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-weight: 800;
+        }
+
+        .wizard-step-label {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .wizard-step.is-complete,
+        .wizard-step.is-current {
+            color: var(--accent-primary);
+        }
+
+        .wizard-step.is-complete::after {
+            background: color-mix(in srgb, var(--accent-primary) 45%, var(--border-color));
+        }
+
+        .wizard-step.is-complete .wizard-step-marker,
+        .wizard-step.is-current .wizard-step-marker {
+            border-color: var(--accent-primary);
+        }
+
+        .wizard-step.is-complete .wizard-step-marker {
+            background: var(--accent-primary);
+            color: #fff;
+        }
+
+        .wizard-step.is-current .wizard-step-marker {
+            background: color-mix(in srgb, var(--accent-primary) 8%, white);
+            color: var(--accent-primary);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 12%, transparent);
+        }
+
+        .wizard-page-header {
+            margin: 0 0 1.4rem;
+        }
+
+        .wizard-page-header h2 {
+            margin: 0.25rem 0 0;
+            color: var(--text-main);
+            font-size: clamp(1.45rem, 2vw, 1.85rem);
+            line-height: 1.25;
+        }
+
+        .wizard-page-header p {
+            color: var(--text-muted);
+            margin: 0.55rem 0 0;
+        }
+
+        @media (max-width: 760px) {
+            .wizard-card {
+                padding: 1.35rem;
+            }
+
+            .wizard-stepper {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .wizard-step:not(:last-child)::after {
+                display: none;
+            }
         }
 
         .form-group {

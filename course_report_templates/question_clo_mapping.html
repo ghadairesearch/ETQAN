@@ -7,10 +7,30 @@
         direction: ltr;
         justify-content: flex-end;
     }
+
+    .exam-upload-zone {
+        border: 1px dashed color-mix(in srgb, var(--accent-primary) 35%, var(--border-color));
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--accent-primary) 3%, white);
+        padding: 1rem;
+    }
+
+    .exam-upload-zone .form-control {
+        background: var(--bg-card);
+        border-style: solid;
+    }
+
+    .exam-upload-help {
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        margin: 0.55rem 0 0;
+    }
 </style>
 
-<div class="card" style="max-width: 820px; margin: 0 auto;">
-    <h2 style="margin-top: 0;">{% if language == 'ar' %}الخطوة 1: رفع ورقة الاختبار{% else %}Step 1: Upload Exam Paper{% endif %}</h2>
+<div class="card wizard-card">
+    {% set wizard_current_step = 1 %}
+    {% set wizard_title = '&#1585;&#1601;&#1593; &#1608;&#1585;&#1602;&#1577; &#1575;&#1604;&#1575;&#1582;&#1578;&#1576;&#1575;&#1585;' if language == 'ar' else 'Upload Exam Paper' %}
+    {% include "wizard_stepper.html" %}
 
     <form method="POST" enctype="multipart/form-data">
         <div class="form-group">
@@ -30,7 +50,10 @@
 
         <div class="form-group">
             <label class="form-label">{{ _('index.exam_paper') }}</label>
-            <input type="file" name="exam_paper" class="form-control" accept=".pdf,.docx,.txt" required style="padding: 0.5rem;">
+            <div class="exam-upload-zone">
+                <input type="file" name="exam_paper" class="form-control" accept=".pdf,.docx,.txt" required style="padding: 0.65rem;">
+                <p class="exam-upload-help">PDF, DOCX, or TXT</p>
+            </div>
         </div>
 
         <div class="question-submit-row" style="justify-content: {{ 'flex-start' if language == 'ar' else 'flex-end' }};">

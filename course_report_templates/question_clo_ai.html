@@ -301,8 +301,11 @@
     }
 </style>
 
-<div class="card" style="max-width: 800px; margin: 0 auto;">
-    <h2 style="margin-top: 0;">{{ _('question_mapping.step3_title') }}</h2>
+<div class="card wizard-card">
+    {% set wizard_current_step = 3 %}
+    {% set wizard_title = '&#1585;&#1576;&#1591; &#1606;&#1608;&#1575;&#1578;&#1580; &#1575;&#1604;&#1578;&#1593;&#1604;&#1605;' if language == 'ar' else 'CLO Mapping' %}
+    {% set wizard_description = _('question_mapping.step3_description') %}
+    {% include "wizard_stepper.html" %}
 
     {% if metrics.question_clo_diagnostics %}
         <div class="ai-diagnostics">

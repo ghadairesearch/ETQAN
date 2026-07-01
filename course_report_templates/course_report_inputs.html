@@ -181,9 +181,9 @@
                 <table style="width: 100%; border-collapse: collapse; min-width: 760px;">
                     <thead>
                         <tr style="background: #f9fafb;">
-                            <th style="text-align: left; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 42%;">{{ _('results.recommendation') }}</th>
-                            <th style="text-align: left; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 29%;">{{ _('results.actions_needed') }}</th>
-                            <th style="text-align: left; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 29%;">{{ _('results.needed_support') }}</th>
+                            <th style="text-align: right; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 42%;">{{ _('results.recommendation') }}</th>
+                            <th style="text-align: right; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 29%;">{{ _('results.actions_needed') }}</th>
+                            <th style="text-align: right; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 29%;">{{ _('results.needed_support') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -238,9 +238,17 @@
                             {% endfor %}
                             {% if group.heading == 'Other' %}
                             <tr>
-                                <td colspan="3" style="padding: 0.75rem 0.65rem; border-top: 1px solid var(--border-color);">
+                                <td style="vertical-align: top; padding: 0.75rem 0.65rem; border-top: 1px solid var(--border-color);">
                                     <label class="form-label">{% if language == 'ar' %}إضافة مقترحات{% else %}Add suggestions{% endif %}</label>
                                     <textarea name="course_improvement_other_recommendation" class="form-control" rows="3" placeholder="{% if language == 'ar' %}إضافة مقترحات{% else %}Add suggestions{% endif %}">{{ saved_other_recommendation|default('') }}</textarea>
+                                </td>
+                                <td style="vertical-align: top; padding: 0.75rem 0.65rem; border-top: 1px solid var(--border-color);">
+                                    <label class="form-label">{{ _('results.actions_needed') }}</label>
+                                    <textarea name="course_improvement_other_actions_needed" class="form-control" rows="3" placeholder="{{ _('results.actions_needed') }}"></textarea>
+                                </td>
+                                <td style="vertical-align: top; padding: 0.75rem 0.65rem; border-top: 1px solid var(--border-color);">
+                                    <label class="form-label">{{ _('results.needed_support') }}</label>
+                                    <textarea name="course_improvement_other_support" class="form-control" rows="3" placeholder="{{ _('results.needed_support') }}"></textarea>
                                 </td>
                             </tr>
                             {% endif %}

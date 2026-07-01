@@ -118,11 +118,11 @@
     @media (max-width: 760px) {}
 </style>
 
-<div class="card" style="max-width: 1180px; margin: 0 auto;">
-    <h2 style="margin-top: 0;">{{ _('question_mapping.step2_title') }}</h2>
-    <p style="color: var(--text-muted); margin-top: -0.5rem;">
-        {{ _('question_mapping.step2_description') }}
-    </p>
+<div class="card wizard-card">
+    {% set wizard_current_step = 2 %}
+    {% set wizard_title = '&#1605;&#1585;&#1575;&#1580;&#1593;&#1577; &#1575;&#1604;&#1571;&#1587;&#1574;&#1604;&#1577;' if language == 'ar' else 'Review Questions' %}
+    {% set wizard_description = _('question_mapping.step2_description') %}
+    {% include "wizard_stepper.html" %}
     <p style="color: var(--text-muted);">
         {{ _('mapping.course') }} <strong>{{ course_name }}</strong><br>
         {{ _('detected.source') }} <strong>{{ filename }}</strong><br>
