@@ -5,9 +5,10 @@
     {% set wizard_steps = [
         {'number': 1, 'label': '&#1605;&#1589;&#1575;&#1583;&#1585; &#1575;&#1604;&#1576;&#1610;&#1575;&#1606;&#1575;&#1578;' if language == 'ar' else 'Data Sources'},
         {'number': 2, 'label': '&#1578;&#1601;&#1575;&#1589;&#1610;&#1604; &#1575;&#1604;&#1605;&#1602;&#1585;&#1585;' if language == 'ar' else 'Course Details'},
-        {'number': 3, 'label': '&#1575;&#1604;&#1605;&#1593;&#1575;&#1610;&#1606;&#1577;' if language == 'ar' else 'Preview'}
+        {'number': 3, 'label': '&#1582;&#1591;&#1577; &#1575;&#1604;&#1578;&#1581;&#1587;&#1610;&#1606;' if language == 'ar' else 'Improvement Plan'},
+        {'number': 4, 'label': '&#1575;&#1604;&#1605;&#1593;&#1575;&#1610;&#1606;&#1577;' if language == 'ar' else 'Preview'}
     ] %}
-    {% set wizard_current_step = 3 %}
+    {% set wizard_current_step = 4 %}
     {% set wizard_title = _('course_report.preview_title') %}
     {% set wizard_description = _('course_report.preview_description') %}
     {% include "wizard_stepper.html" %}
@@ -142,31 +143,12 @@
             <div id="course_recommendations_list" style="display: grid; gap: 0.75rem;">
                 {% for item in course_report_inputs.course_improvement_plan %}
                     <div class="course-recommendation-item" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem; background: #f9fafb;">
-                        {% if is_draft %}
-                            <input type="hidden" name="delete_rec_{{ loop.index0 }}" value="0" form="draft_save_form" class="delete-recommendation-input">
-                            <div style="display: flex; justify-content: space-between; gap: 0.75rem; align-items: center; margin-bottom: 0.35rem;">
-                                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block;">{{ _('results.recommendation') }}</label>
-                                <button type="button" class="btn remove-course-recommendation" style="background-color: var(--border-color); color: var(--text-main); padding: 0.35rem 0.7rem; font-size: 0.82rem;">{{ _('index.remove') }}</button>
-                            </div>
-                            <textarea name="rec_text_{{ loop.index0 }}" form="draft_save_form" class="form-control" rows="2" style="width: 100%; margin-bottom: 0.5rem; margin-top: 0.25rem;">{{ course_report_label(item.recommendation) }}</textarea>
-                            
-                            {% if item.actions_needed %}
-                                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block;">{{ _('results.actions_needed') }}</label>
-                                <textarea name="rec_action_{{ loop.index0 }}" form="draft_save_form" class="form-control" rows="2" style="width: 100%; margin-bottom: 0.5rem; margin-top: 0.25rem;">{{ course_report_label(item.actions_needed) }}</textarea>
-                            {% endif %}
-                            
-                            {% if item.support %}
-                                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block;">{{ _('results.needed_support') }}</label>
-                                <textarea name="rec_support_{{ loop.index0 }}" form="draft_save_form" class="form-control" rows="2" style="width: 100%; margin-top: 0.25rem;">{{ course_report_label(item.support) }}</textarea>
-                            {% endif %}
-                        {% else %}
-                            <strong style="color: var(--accent-primary);">{{ course_report_label(item.recommendation) }}</strong>
-                            {% if item.actions_needed %}
-                                <div style="color: var(--text-muted); margin-top: 0.35rem;"><strong>{{ _('results.actions_needed') }}:</strong> {{ course_report_label(item.actions_needed) }}</div>
-                            {% endif %}
-                            {% if item.support %}
-                                <div style="color: var(--text-muted); margin-top: 0.2rem;"><strong>{{ _('results.needed_support') }}:</strong> {{ course_report_label(item.support) }}</div>
-                            {% endif %}
+                        <strong style="color: var(--accent-primary);">{{ course_report_label(item.recommendation) }}</strong>
+                        {% if item.actions_needed %}
+                            <div style="color: var(--text-muted); margin-top: 0.35rem;"><strong>{{ _('results.actions_needed') }}:</strong> {{ course_report_label(item.actions_needed) }}</div>
+                        {% endif %}
+                        {% if item.support %}
+                            <div style="color: var(--text-muted); margin-top: 0.2rem;"><strong>{{ _('results.needed_support') }}:</strong> {{ course_report_label(item.support) }}</div>
                         {% endif %}
                     </div>
                 {% endfor %}
@@ -232,35 +214,4 @@
         </div>
     </div>
 </div>
-{% if is_draft %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const list = document.getElementById('course_recommendations_list');
-        const emptyState = document.getElementById('course_recommendations_empty');
-        if (!list) return;
-
-        function syncEmptyState() {
-            const visibleItems = list.querySelectorAll('.course-recommendation-item:not([hidden])');
-            if (emptyState) {
-                emptyState.style.display = visibleItems.length ? 'none' : 'block';
-            }
-        }
-
-        list.addEventListener('click', function(event) {
-            const button = event.target.closest('.remove-course-recommendation');
-            if (!button) return;
-
-            const item = button.closest('.course-recommendation-item');
-            if (!item) return;
-
-            const deleteInput = item.querySelector('.delete-recommendation-input');
-            if (deleteInput) {
-                deleteInput.value = '1';
-            }
-            item.hidden = true;
-            syncEmptyState();
-        });
-    });
-</script>
-{% endif %}
 {% endblock %}

@@ -11776,6 +11776,25 @@ def read_course_improvement_plan():
         })
     return items
 
+def read_course_report_ai_recommendations_from_form():
+    try:
+        count = int(request.form.get('ai_recommendation_count') or 0)
+    except (TypeError, ValueError):
+        count = 0
+    items = []
+    for index in range(max(count, 0)):
+        if request.form.get(f'ai_delete_rec_{index}') == '1':
+            continue
+        recommendation = compact_text(request.form.get(f'ai_rec_text_{index}') or '')
+        if not recommendation:
+            continue
+        items.append({
+            'recommendation': recommendation,
+            'actions_needed': compact_text(request.form.get(f'ai_rec_action_{index}') or ''),
+            'support': compact_text(request.form.get(f'ai_rec_support_{index}') or ''),
+        })
+    return items
+
 def read_course_report_optional_details():
     location = compact_text(request.form.get('course_location') or '')
     if location not in {'main', 'branch'}:
@@ -13238,7 +13257,7 @@ def read_course_report_export_inputs(redirect_url, stats=None, course_info=None,
         'uncovered_topic_details': read_uncovered_topic_details(),
         'grade_distribution': grade_distribution,
         'report_details': report_details,
-        'course_improvement_plan': read_course_improvement_plan(),
+        'course_improvement_plan': [],
     }
 
     language = get_export_report_language() if has_request_context() else 'en'
@@ -13249,10 +13268,6 @@ def read_course_report_export_inputs(redirect_url, stats=None, course_info=None,
     generated_recommendations = ai_insights.get('recommendations') or fallback_course_report_recommendations(stats or {}, language)
     course_report_inputs['student_results_comment'] = student_comment
     course_report_inputs['ai_recommendations'] = generated_recommendations
-    course_report_inputs['course_improvement_plan'] = merge_course_report_recommendations(
-        course_report_inputs.get('course_improvement_plan') or [],
-        generated_recommendations
-    )
     course_report_inputs['ai_source'] = ai_insights.get('source') or 'fallback'
     return course_report_inputs, None
 
@@ -13569,6 +13584,10 @@ def save_course_report_draft(payload):
     with open(course_report_draft_path(draft_id), 'w', encoding='utf-8') as f:
         json.dump(payload, f, ensure_ascii=False)
     return draft_id
+
+def write_course_report_draft(draft_id, payload):
+    with open(course_report_draft_path(draft_id), 'w', encoding='utf-8') as f:
+        json.dump(payload or {}, f, ensure_ascii=False)
 
 def load_course_report_draft(draft_id):
     path = course_report_draft_path(draft_id)
@@ -16800,7 +16819,7 @@ def export_saved_course_report_docx(report_id):
         'report_type': 'course_report'
     }
     draft_id = save_course_report_draft(payload)
-    return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
+    return redirect(url_for('course_report_improvement_draft', draft_id=draft_id))
 
 @app.route('/course-report-service/reports/export', methods=['POST'])
 def export_selected_course_report_docx():
@@ -16851,7 +16870,7 @@ def export_selected_course_report_docx():
         'report_type': 'course_report'
     }
     draft_id = save_course_report_draft(payload)
-    return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
+    return redirect(url_for('course_report_improvement_draft', draft_id=draft_id))
 
 @app.route('/course-report-service/preview/draft/<draft_id>', methods=['GET'])
 def course_report_preview_draft_get(draft_id):
@@ -16866,6 +16885,43 @@ def course_report_preview_draft_get(draft_id):
         return redirect(url_for('course_report_service'))
         
     return render_course_report_preview(draft_id, draft, is_draft=True)
+
+@app.route('/course-report-service/preview/draft/<draft_id>/improvement', methods=['GET', 'POST'])
+def course_report_improvement_draft(draft_id):
+    user = current_user()
+    if not user:
+        return redirect(url_for('login'))
+
+    try:
+        draft = load_course_report_draft(draft_id)
+    except Exception as exc:
+        flash(str(exc), "error")
+        return redirect(url_for('course_report_service'))
+
+    course_report_inputs = draft.get('course_report_inputs') or {}
+    draft['course_report_inputs'] = course_report_inputs
+
+    if request.method == 'POST':
+        selected_items = read_course_improvement_plan()
+        ai_items = read_course_report_ai_recommendations_from_form()
+        course_report_inputs['ai_recommendations'] = ai_items
+        course_report_inputs['course_improvement_plan'] = merge_course_report_recommendations(
+            selected_items,
+            ai_items
+        )
+        write_course_report_draft(draft_id, draft)
+        return redirect(url_for('course_report_preview_draft_get', draft_id=draft_id))
+
+    return render_template(
+        'course_report_improvement.html',
+        report_id=draft_id,
+        course_report_inputs=course_report_inputs,
+        ai_recommendations=course_report_inputs.get('ai_recommendations') or [],
+        course_improvement_recommendation_groups=grouped_course_improvement_recommendations(),
+        course_improvement_action_options=COURSE_IMPROVEMENT_ACTION_OPTIONS,
+        course_improvement_support_options=COURSE_IMPROVEMENT_SUPPORT_OPTIONS,
+        recommendation_action_options=COURSE_IMPROVEMENT_RECOMMENDATION_ACTIONS,
+    )
 
 @app.route('/course-report-service/preview/draft/<draft_id>/export/pdf')
 def export_course_report_draft_pdf(draft_id):

@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card wizard-card">
+    {% set wizard_steps = [
+        {'number': 1, 'label': '&#1605;&#1589;&#1575;&#1583;&#1585; &#1575;&#1604;&#1576;&#1610;&#1575;&#1606;&#1575;&#1578;' if language == 'ar' else 'Data Sources'},
+        {'number': 2, 'label': '&#1578;&#1601;&#1575;&#1589;&#1610;&#1604; &#1575;&#1604;&#1605;&#1602;&#1585;&#1585;' if language == 'ar' else 'Course Details'},
+        {'number': 3, 'label': '&#1582;&#1591;&#1577; &#1575;&#1604;&#1578;&#1581;&#1587;&#1610;&#1606;' if language == 'ar' else 'Improvement Plan'},
+        {'number': 4, 'label': '&#1575;&#1604;&#1605;&#1593;&#1575;&#1610;&#1606;&#1577;' if language == 'ar' else 'Preview'}
+    ] %}
+    {% set wizard_current_step = 3 %}
+    {% set wizard_title = _('results.course_improvement_plan') %}
+    {% set wizard_description = _('results.course_improvement_help') %}
+    {% include "wizard_stepper.html" %}
+
+    <form method="POST" action="{{ url_for('course_report_improvement_draft', draft_id=report_id) }}">
+        <section style="margin-bottom: 1.25rem;">
+            <div style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 6px; background: #fff;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 760px;">
+                    <thead>
+                        <tr style="background: #f9fafb;">
+                            <th style="text-align: right; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 42%;">{{ _('results.recommendation') }}</th>
+                            <th style="text-align: right; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 29%;">{{ _('results.actions_needed') }}</th>
+                            <th style="text-align: right; padding: 0.65rem; border-bottom: 1px solid var(--border-color); width: 29%;">{{ _('results.needed_support') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for group in course_improvement_recommendation_groups %}
+                            <tr>
+                                <td style="vertical-align: top; padding: 0.6rem 0.65rem; border-top: 1px solid var(--border-color); background: #f3f4f6; font-weight: 700; color: var(--accent);">
+                                    {{ course_report_label(group.heading) }}
+                                </td>
+                                <td style="border-top: 1px solid var(--border-color); background: #f3f4f6;"></td>
+                                <td style="border-top: 1px solid var(--border-color); background: #f3f4f6;"></td>
+                            </tr>
+                            {% for recommendation_item in group['items'] %}
+                                {% set recommendation = recommendation_item.text %}
+                                {% set recommendation_index = recommendation_item.index %}
+                                <tr data-improvement-row="{{ recommendation_index }}">
+                                    <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                                        <label style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; align-items: start; cursor: pointer; margin: 0;">
+                                            <input type="checkbox" name="course_improvement_recommendations" value="{{ recommendation }}" data-improvement-toggle="{{ recommendation_index }}" style="margin-top: 0.25rem;">
+                                            <span>{{ course_report_label(recommendation) }}</span>
+                                        </label>
+                                    </td>
+                                    <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                                        <div class="action-checkboxes-container" style="display: none; max-height: 160px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #fff;" data-improvement-action-container="{{ recommendation_index }}">
+                                            {% set action_options = recommendation_action_options[recommendation] | default(course_improvement_action_options) %}
+                                            {% for action_option in action_options %}
+                                                <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 0.35rem; cursor: pointer; line-height: 1.2;">
+                                                    <input type="checkbox" name="course_improvement_action_{{ recommendation_index }}" value="{{ action_option }}" data-improvement-action-checkbox="{{ recommendation_index }}" style="margin-top: 0.15rem;" disabled>
+                                                    <span>{{ course_report_label(action_option) }}</span>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                        <div id="course_improvement_action_other_group_{{ recommendation_index }}" style="display: none; margin-top: 0.5rem;">
+                                            <label class="form-label">{{ _('results.please_explain') }}</label>
+                                            <textarea name="course_improvement_action_other_{{ recommendation_index }}" class="form-control" rows="2" disabled></textarea>
+                                        </div>
+                                    </td>
+                                    <td style="vertical-align: top; padding: 0.65rem; border-top: 1px solid var(--border-color);">
+                                        <div class="support-checkboxes-container" style="display: none; max-height: 160px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #fff;" data-improvement-support-container="{{ recommendation_index }}">
+                                            {% for support_option in course_improvement_support_options %}
+                                                <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 0.35rem; cursor: pointer; line-height: 1.2;">
+                                                    <input type="checkbox" name="course_improvement_support_{{ recommendation_index }}" value="{{ support_option }}" data-improvement-support-checkbox="{{ recommendation_index }}" style="margin-top: 0.15rem;" disabled>
+                                                    <span>{{ course_report_label(support_option) }}</span>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                        <div id="course_improvement_support_other_group_{{ recommendation_index }}" style="display: none; margin-top: 0.5rem;">
+                                            <label class="form-label">{{ _('results.please_explain') }}</label>
+                                            <textarea name="course_improvement_support_other_{{ recommendation_index }}" class="form-control" rows="2" disabled></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% if group.heading == 'Other' %}
+                                <tr>
+                                    <td style="vertical-align: top; padding: 0.75rem 0.65rem; border-top: 1px solid var(--border-color);">
+                                        <label class="form-label">{% if language == 'ar' %}&#1573;&#1590;&#1575;&#1601;&#1577; &#1605;&#1602;&#1578;&#1585;&#1581;&#1575;&#1578;{% else %}Add suggestions{% endif %}</label>
+                                        <textarea name="course_improvement_other_recommendation" class="form-control" rows="3" placeholder="{% if language == 'ar' %}&#1573;&#1590;&#1575;&#1601;&#1577; &#1605;&#1602;&#1578;&#1585;&#1581;&#1575;&#1578;{% else %}Add suggestions{% endif %}"></textarea>
+                                    </td>
+                                    <td style="vertical-align: top; padding: 0.75rem 0.65rem; border-top: 1px solid var(--border-color);">
+                                        <label class="form-label">{{ _('results.actions_needed') }}</label>
+                                        <textarea name="course_improvement_other_actions_needed" class="form-control" rows="3" placeholder="{{ _('results.actions_needed') }}"></textarea>
+                                    </td>
+                                    <td style="vertical-align: top; padding: 0.75rem 0.65rem; border-top: 1px solid var(--border-color);">
+                                        <label class="form-label">{{ _('results.needed_support') }}</label>
+                                        <textarea name="course_improvement_other_support" class="form-control" rows="3" placeholder="{{ _('results.needed_support') }}"></textarea>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff; margin-bottom: 1.25rem;">
+            <h3 style="margin: 0 0 0.75rem;">{% if language == 'ar' %}&#1578;&#1608;&#1589;&#1610;&#1575;&#1578; &#1575;&#1604;&#1584;&#1603;&#1575;&#1569; &#1575;&#1604;&#1575;&#1589;&#1591;&#1606;&#1575;&#1593;&#1610;{% else %}AI Recommendations{% endif %}</h3>
+            <input type="hidden" name="ai_recommendation_count" value="{{ ai_recommendations|length }}">
+            {% if ai_recommendations %}
+                <div id="ai_recommendations_list" style="display: grid; gap: 0.75rem;">
+                    {% for item in ai_recommendations %}
+                        <div class="ai-recommendation-item" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 0.85rem; background: #f9fafb;">
+                            <input type="hidden" name="ai_delete_rec_{{ loop.index0 }}" value="0" class="ai-delete-recommendation-input">
+                            <div style="display: flex; justify-content: space-between; gap: 0.75rem; align-items: center; margin-bottom: 0.35rem;">
+                                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block;">{{ _('results.recommendation') }}</label>
+                                <button type="button" class="btn remove-ai-recommendation" style="background-color: var(--border-color); color: var(--text-main); padding: 0.35rem 0.7rem; font-size: 0.82rem;">{{ _('index.remove') }}</button>
+                            </div>
+                            <textarea name="ai_rec_text_{{ loop.index0 }}" class="form-control" rows="2" style="width: 100%; margin-bottom: 0.5rem; margin-top: 0.25rem;">{{ course_report_label(item.recommendation) }}</textarea>
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block;">{{ _('results.actions_needed') }}</label>
+                            <textarea name="ai_rec_action_{{ loop.index0 }}" class="form-control" rows="2" style="width: 100%; margin-bottom: 0.5rem; margin-top: 0.25rem;">{{ course_report_label(item.actions_needed) }}</textarea>
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block;">{{ _('results.needed_support') }}</label>
+                            <textarea name="ai_rec_support_{{ loop.index0 }}" class="form-control" rows="2" style="width: 100%; margin-top: 0.25rem;">{{ course_report_label(item.support) }}</textarea>
+                        </div>
+                    {% endfor %}
+                </div>
+                <p id="ai_recommendations_empty" style="display: none; color: var(--text-muted); margin: 0;">-</p>
+            {% else %}
+                <p style="color: var(--text-muted); margin: 0;">-</p>
+            {% endif %}
+        </section>
+
+        <div class="form-action-row" style="margin-top: 1.5rem;">
+            <button type="button" class="btn back-action" style="background-color: var(--border-color); color: var(--text-main);" onclick="history.back()">{{ _('mapping.back') }}</button>
+            <button type="submit" class="btn">{{ _('course_report.next') }}</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function syncImprovementActionOther(index) {
+            const group = document.getElementById('course_improvement_action_other_group_' + index);
+            const toggle = document.querySelector('[data-improvement-toggle="' + index + '"]');
+            const otherCheckbox = document.querySelector('input[data-improvement-action-checkbox="' + index + '"][value="Other"]');
+            if (!group) return;
+            const show = otherCheckbox && otherCheckbox.checked;
+            group.style.display = show ? 'block' : 'none';
+            const textarea = group.querySelector('textarea');
+            if (!textarea) return;
+            if (show && toggle && toggle.checked) {
+                textarea.removeAttribute('disabled');
+            } else {
+                textarea.setAttribute('disabled', 'true');
+            }
+        }
+
+        function syncImprovementSupportOther(index) {
+            const group = document.getElementById('course_improvement_support_other_group_' + index);
+            const toggle = document.querySelector('[data-improvement-toggle="' + index + '"]');
+            const otherCheckbox = document.querySelector('input[data-improvement-support-checkbox="' + index + '"][value="Other"]');
+            if (!group) return;
+            const show = otherCheckbox && otherCheckbox.checked;
+            group.style.display = show ? 'block' : 'none';
+            const textarea = group.querySelector('textarea');
+            if (!textarea) return;
+            if (show && toggle && toggle.checked) {
+                textarea.removeAttribute('disabled');
+            } else {
+                textarea.setAttribute('disabled', 'true');
+            }
+        }
+
+        function syncImprovementRow(toggle) {
+            const index = toggle.getAttribute('data-improvement-toggle');
+            const row = document.querySelector('[data-improvement-row="' + index + '"]');
+            if (!row) return;
+
+            const actionContainer = row.querySelector('[data-improvement-action-container="' + index + '"]');
+            if (actionContainer) actionContainer.style.display = toggle.checked ? 'block' : 'none';
+            row.querySelectorAll('[data-improvement-action-checkbox="' + index + '"]').forEach(function(cb) {
+                if (toggle.checked) cb.removeAttribute('disabled');
+                else cb.setAttribute('disabled', 'true');
+            });
+            syncImprovementActionOther(index);
+
+            const supportContainer = row.querySelector('[data-improvement-support-container="' + index + '"]');
+            if (supportContainer) supportContainer.style.display = toggle.checked ? 'block' : 'none';
+            row.querySelectorAll('[data-improvement-support-checkbox="' + index + '"]').forEach(function(cb) {
+                if (toggle.checked) cb.removeAttribute('disabled');
+                else cb.setAttribute('disabled', 'true');
+            });
+            syncImprovementSupportOther(index);
+        }
+
+        document.querySelectorAll('[data-improvement-toggle]').forEach(function(toggle) {
+            toggle.addEventListener('change', function() {
+                syncImprovementRow(toggle);
+            });
+            syncImprovementRow(toggle);
+        });
+        document.querySelectorAll('[data-improvement-action-checkbox]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                if (checkbox.value === 'Other') {
+                    syncImprovementActionOther(checkbox.getAttribute('data-improvement-action-checkbox'));
+                }
+            });
+        });
+        document.querySelectorAll('[data-improvement-support-checkbox]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                if (checkbox.value === 'Other') {
+                    syncImprovementSupportOther(checkbox.getAttribute('data-improvement-support-checkbox'));
+                }
+            });
+        });
+
+        const aiList = document.getElementById('ai_recommendations_list');
+        const aiEmptyState = document.getElementById('ai_recommendations_empty');
+        function syncAiEmptyState() {
+            if (!aiList || !aiEmptyState) return;
+            const visibleItems = aiList.querySelectorAll('.ai-recommendation-item:not([hidden])');
+            aiEmptyState.style.display = visibleItems.length ? 'none' : 'block';
+        }
+        if (aiList) {
+            aiList.addEventListener('click', function(event) {
+                const button = event.target.closest('.remove-ai-recommendation');
+                if (!button) return;
+                const item = button.closest('.ai-recommendation-item');
+                if (!item) return;
+                const deleteInput = item.querySelector('.ai-delete-recommendation-input');
+                if (deleteInput) deleteInput.value = '1';
+                item.hidden = true;
+                syncAiEmptyState();
+            });
+        }
+    });
+</script>
+{% endblock %}
